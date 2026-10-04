@@ -1,5 +1,5 @@
 {
-  "name": "mimameidr",
+  "name": "processlama",
   "private": true,
   "scripts": {
     "verify": "./scripts/verify.sh",

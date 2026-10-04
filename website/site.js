@@ -1,4 +1,4 @@
-/* Mimameidr website behaviour. Everything here is an enhancement: the pages
+/* TopLama website behaviour. Everything here is an enhancement: the pages
    read and link correctly without it. */
 (() => {
   "use strict";

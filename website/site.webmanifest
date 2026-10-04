@@ -1,6 +1,6 @@
 {
-  "name": "Mimameidr",
-  "short_name": "Mimameidr",
+  "name": "ProcessLama",
+  "short_name": "ProcessLama",
   "description": "A Flutter and Rust process explorer for Windows, Linux, and macOS.",
   "icons": [
     { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

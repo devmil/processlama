@@ -1,7 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
-  <title id="title">Mimameidr app icon</title>
-  <desc id="desc">A liquid glass app icon with a process-tree M built from connected nodes.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="300" viewBox="0 0 1180 300" role="img" aria-labelledby="title desc">
+  <title id="title">ProcessLama logo</title>
+  <desc id="desc">The ProcessLama app icon beside the wordmark.</desc>
   <defs>
+    <style>
+      .wordmark { fill: url(#wordGradient); }
+      .wordmark-rule { stroke: #127c86; opacity: 0.22; }
+      @media (prefers-color-scheme: dark) {
+        .wordmark { fill: #ecf2f7; }
+        .wordmark-rule { stroke: #44c2bc; opacity: 0.34; }
+      }
+    </style>
     <linearGradient id="plateGradient" x1="200" y1="160" x2="824" y2="880" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#3fc8c0"/>
       <stop offset="0.35" stop-color="#1f9aa0"/>
@@ -39,6 +47,11 @@
       <stop offset="0.5" stop-color="#9cebe3"/>
       <stop offset="1" stop-color="#3bb5ad"/>
     </linearGradient>
+    <linearGradient id="wordGradient" x1="346" y1="82" x2="1004" y2="216" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#17202a"/>
+      <stop offset="0.58" stop-color="#203d48"/>
+      <stop offset="1" stop-color="#127c86"/>
+    </linearGradient>
     <clipPath id="iconClip"><rect x="112" y="112" width="800" height="800" rx="184"/></clipPath>
     <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
       <feDropShadow dx="0" dy="30" stdDeviation="30" flood-color="#05121b" flood-opacity="0.35"/>
@@ -48,49 +61,41 @@
     </filter>
   </defs>
 
-  <g id="00-soft-shadow">
+  <g transform="scale(0.293)">
     <rect x="112" y="112" width="800" height="800" rx="184" fill="#07131b" opacity="0.25" filter="url(#softShadow)"/>
-  </g>
-
-  <g id="01-base-plate">
     <rect x="112" y="112" width="800" height="800" rx="184" fill="url(#plateGradient)"/>
-  </g>
-
-  <g id="02-color-field" clip-path="url(#iconClip)">
-    <rect x="112" y="112" width="800" height="800" fill="url(#warmGlow)"/>
-    <rect x="112" y="112" width="800" height="800" fill="url(#coolGlow)"/>
-    <path d="M112 118h800v240c-120 30-220 6-300-44-90-56-170-118-262-120-86-2-160 22-238 70z" fill="#ffffff" opacity="0.14"/>
-  </g>
-
-  <g id="03-glass-shell">
+    <g clip-path="url(#iconClip)">
+      <rect x="112" y="112" width="800" height="800" fill="url(#warmGlow)"/>
+      <rect x="112" y="112" width="800" height="800" fill="url(#coolGlow)"/>
+      <path d="M112 118h800v240c-120 30-220 6-300-44-90-56-170-118-262-120-86-2-160 22-238 70z" fill="#ffffff" opacity="0.14"/>
+    </g>
     <rect x="112" y="112" width="800" height="800" rx="184" fill="none" stroke="url(#glassRim)" stroke-width="30"/>
     <rect x="146" y="146" width="732" height="732" rx="155" fill="none" stroke="#ffffff" stroke-opacity="0.14" stroke-width="8"/>
-  </g>
-
-  <g id="04-process-tree-mark" filter="url(#markShadow)">
-    <path d="M262 706V330L512 660L762 330V706" fill="none" stroke="#06222e" stroke-opacity="0.55" stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M262 706V330L512 660L762 330V706" fill="none" stroke="url(#markGradient)" stroke-width="80" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M262 706V330L512 660L762 330V706" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="262" cy="330" r="62" fill="#06222e" fill-opacity="0.5"/>
-    <circle cx="512" cy="660" r="64" fill="#06222e" fill-opacity="0.5"/>
-    <circle cx="762" cy="330" r="62" fill="#06222e" fill-opacity="0.5"/>
-    <circle cx="262" cy="706" r="60" fill="#06222e" fill-opacity="0.5"/>
-    <circle cx="762" cy="706" r="60" fill="#06222e" fill-opacity="0.5"/>
-    <circle cx="262" cy="330" r="46" fill="url(#nodeAltGradient)"/>
-    <circle cx="512" cy="660" r="48" fill="url(#nodeGradient)"/>
-    <circle cx="762" cy="330" r="46" fill="url(#nodeAltGradient)"/>
-    <circle cx="262" cy="706" r="44" fill="url(#nodeAltGradient)"/>
-    <circle cx="762" cy="706" r="44" fill="url(#nodeAltGradient)"/>
-    <circle cx="250" cy="316" r="14" fill="#eafffb" opacity="0.8"/>
-    <circle cx="500" cy="646" r="15" fill="#fffbe9" opacity="0.85"/>
-    <circle cx="750" cy="316" r="14" fill="#eafffb" opacity="0.8"/>
-    <circle cx="250" cy="692" r="13" fill="#eafffb" opacity="0.8"/>
-    <circle cx="750" cy="692" r="13" fill="#eafffb" opacity="0.8"/>
-  </g>
-
-  <g id="05-specular-highlights">
+    <g filter="url(#markShadow)">
+      <path d="M262 706V330L512 660L762 330V706" fill="none" stroke="#06222e" stroke-opacity="0.55" stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M262 706V330L512 660L762 330V706" fill="none" stroke="url(#markGradient)" stroke-width="80" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M262 706V330L512 660L762 330V706" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="262" cy="330" r="62" fill="#06222e" fill-opacity="0.5"/>
+      <circle cx="512" cy="660" r="64" fill="#06222e" fill-opacity="0.5"/>
+      <circle cx="762" cy="330" r="62" fill="#06222e" fill-opacity="0.5"/>
+      <circle cx="262" cy="706" r="60" fill="#06222e" fill-opacity="0.5"/>
+      <circle cx="762" cy="706" r="60" fill="#06222e" fill-opacity="0.5"/>
+      <circle cx="262" cy="330" r="46" fill="url(#nodeAltGradient)"/>
+      <circle cx="512" cy="660" r="48" fill="url(#nodeGradient)"/>
+      <circle cx="762" cy="330" r="46" fill="url(#nodeAltGradient)"/>
+      <circle cx="262" cy="706" r="44" fill="url(#nodeAltGradient)"/>
+      <circle cx="762" cy="706" r="44" fill="url(#nodeAltGradient)"/>
+      <circle cx="250" cy="316" r="14" fill="#eafffb" opacity="0.8"/>
+      <circle cx="500" cy="646" r="15" fill="#fffbe9" opacity="0.85"/>
+      <circle cx="750" cy="316" r="14" fill="#eafffb" opacity="0.8"/>
+      <circle cx="250" cy="692" r="13" fill="#eafffb" opacity="0.8"/>
+      <circle cx="750" cy="692" r="13" fill="#eafffb" opacity="0.8"/>
+    </g>
     <path d="M210 200c-34 40-52 88-54 140" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="16" stroke-linecap="round"/>
     <ellipse cx="360" cy="232" rx="120" ry="30" transform="rotate(-20 360 232)" fill="#ffffff" opacity="0.18"/>
     <circle cx="742" cy="244" r="16" fill="#fff7d5" opacity="0.8"/>
   </g>
+
+  <text class="wordmark" x="338" y="184" font-family="SF Pro Display, Inter, Avenir Next, Segoe UI, sans-serif" font-size="114" font-weight="760" letter-spacing="0">ProcessLama</text>
+  <path class="wordmark-rule" d="M350 215h557" stroke-width="8" stroke-linecap="round"/>
 </svg>
