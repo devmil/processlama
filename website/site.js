@@ -1,4 +1,4 @@
-/* TopLama website behaviour. Everything here is an enhancement: the pages
+/* ProcessLama website behaviour. Everything here is an enhancement: the pages
    read and link correctly without it. */
 (() => {
   "use strict";
@@ -6,13 +6,16 @@
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 
-  /* Hero: a drawn process tree. Branches sway, leaves spawn and terminate,
-     and activity travels back to the root. Pointing at a node lights the
+  /* Hero: a drawn process tree on a pulse line, with the Lama standing on
+     that line. Branches sway, leaves spawn and terminate, and activity
+     travels back to the root, where it leaves as a beat along the line. A
+     beat passing under the Lama makes it hop. Pointing at a node lights the
      path to its ancestors. */
   function heroTree(canvas) {
     const hero = canvas.parentElement;
     const ctx = canvas.getContext("2d");
     const counter = document.querySelector("[data-tree-count]");
+    const lama = hero.querySelector("[data-hero-lama]");
 
     const NAMES = [
       "launchd", "WindowServer", "Finder", "Dock", "Safari", "Code", "rust-analyzer",
@@ -37,7 +40,8 @@
         branch: token("--tree-branch"),
         leaf: token("--tree-leaf"),
         node: token("--ink-muted"),
-        lit: token("--accent"),
+        lit: token("--tree-lit") || token("--accent"),
+        line: token("--prop") || token("--tree-branch"),
         spawn: token("--success"),
         exit: token("--danger"),
         raised: token("--raised"),
@@ -111,6 +115,9 @@
     let scale = 1;
     let rootX = 0;
     let rootY = 0;
+    let beatScale = 1;
+    /* The Lama's feet on the pulse line, read from its box (styles.css). */
+    let feet = { left: 0, right: 0, centre: 0 };
 
     function resize() {
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -120,9 +127,20 @@
       canvas.height = Math.round(height * ratio);
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       const narrow = width <= 820;
-      rootX = narrow ? width * 0.5 : width * 0.72;
-      rootY = height + 2;
-      scale = narrow ? Math.min(width * 1.25, 500) : Math.min(height * 1.18, width * 0.6);
+      rootY = height - (parseFloat(getComputedStyle(hero).getPropertyValue("--pulse-base")) || 0);
+      if (lama) {
+        const box = lama.getBoundingClientRect();
+        const origin = hero.getBoundingClientRect();
+        /* Legs span 23% to 87% of the 120-unit artwork. */
+        feet = {
+          left: box.left - origin.left + box.width * 0.23,
+          right: box.left - origin.left + box.width * 0.87,
+          centre: box.left - origin.left + box.width * 0.55,
+        };
+      }
+      rootX = narrow ? width * 0.34 : Math.min(width * 0.58, feet.left - 120);
+      scale = narrow ? Math.min(width * 1.05, 420) : Math.min(height * 0.96, width * 0.5);
+      beatScale = narrow ? 1.1 : 1.5;
     }
 
     function growth(node, time) {
@@ -167,7 +185,10 @@
         while (pulse.along >= 1) {
           pulse.along -= 1;
           pulse.node = pulse.node.parent;
-          if (!pulse.node) return false;
+          if (!pulse.node) {
+            rootBeat();
+            return false;
+          }
         }
         return !pulse.node.dead;
       });
@@ -191,6 +212,69 @@
         ctx.beginPath();
         ctx.arc(x, y, 1.4, 0, Math.PI * 2);
         ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    /* Beats along the pulse line: the app icon's spike, travelling right. */
+    const BEAT = [[0, 0], [6, -10], [13, 11], [19, -7], [23, 0]];
+    const BEAT_SPEED = 0.26;
+    let beats = [];
+    let beatClock = 0;
+    let lastRootBeat = -1e9;
+    let ambientAt = 1800;
+    let hopUntil = 0;
+
+    function addBeat(x) {
+      beats.push({ x, amp: 0.7 + Math.random() * 0.5 });
+    }
+
+    function rootBeat() {
+      if (beatClock - lastRootBeat < 1700) return;
+      lastRootBeat = beatClock;
+      addBeat(rootX);
+    }
+
+    function stepBeats(delta) {
+      beatClock += delta;
+      if (beatClock > ambientAt) {
+        ambientAt = beatClock + 3600 + Math.random() * 3000;
+        addBeat(-30 * beatScale);
+      }
+      const centre = BEAT[2][0] * beatScale;
+      beats = beats.filter((beat) => {
+        const before = beat.x + centre;
+        beat.x += delta * BEAT_SPEED;
+        const after = beat.x + centre;
+        if (lama && before < feet.centre && after >= feet.centre && beatClock > hopUntil) {
+          hopUntil = beatClock + 900;
+          lama.classList.remove("is-hopping");
+          void lama.offsetWidth;
+          lama.classList.add("is-hopping");
+        }
+        return beat.x < width + 40;
+      });
+    }
+
+    function drawLine() {
+      const points = [[0, rootY]];
+      const ordered = [...beats].sort((a, b) => a.x - b.x);
+      for (const beat of ordered) {
+        const edge = clamp(Math.min(beat.x + 40, width - beat.x) / 120, 0, 1);
+        for (const [dx, dy] of BEAT) {
+          const x = beat.x + dx * beatScale;
+          if (x > points[points.length - 1][0]) points.push([x, rootY + dy * beatScale * beat.amp * edge]);
+        }
+      }
+      points.push([width, rootY]);
+      ctx.strokeStyle = paint.line;
+      ctx.lineJoin = "round";
+      for (const [alpha, lineWidth] of [[0.16, 9], [1, 2.6]]) {
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = lineWidth;
+        ctx.beginPath();
+        points.forEach(([x, y], index) => (index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+        ctx.stroke();
       }
       ctx.globalAlpha = 1;
     }
@@ -230,7 +314,9 @@
       }
       if (time < introDone) return;
       if (time > autoFocusAt || (focus && focus.dead)) {
-        const candidates = nodes.filter((node) => node.depth >= 2 && !node.dead && node.grown > 0.95);
+        /* Keep the automatic label clear of the introduction on the left. */
+        const clear = width > 820 ? width * 0.5 : 0;
+        const candidates = nodes.filter((node) => node.depth >= 2 && !node.dead && node.grown > 0.95 && node.x > clear);
         setFocus(candidates.length ? candidates[Math.floor(Math.random() * candidates.length)] : null, time);
         autoFocusAt = time + 7000;
       }
@@ -273,6 +359,7 @@
     function draw(time) {
       ctx.clearRect(0, 0, width, height);
       ctx.lineCap = "round";
+      drawLine();
 
       ctx.strokeStyle = paint.branch;
       for (const node of nodes) {
@@ -376,6 +463,8 @@
     }
 
     function frameStill() {
+      /* One still beat behind the Lama, as in the app icon. */
+      beats = lama ? [{ x: feet.right + 6, amp: 1 }] : [];
       place(root, rootX, rootY, -Math.PI / 2, 1e7);
       if (pointer) pickFocus(0);
       draw(0);
@@ -395,6 +484,7 @@
       wander(delta);
       place(root, rootX, rootY, -Math.PI / 2, clock);
       stepPulses(delta);
+      stepBeats(delta);
       pickFocus(clock);
       draw(clock);
       requestAnimationFrame(frame);
@@ -432,6 +522,20 @@
     hero.addEventListener("pointerleave", () => {
       pointer = null;
     });
+
+    /* The Lama opens with the hello pose, then lifts its chin to the proud
+       mark; pointing at it says hello again. */
+    if (lama) {
+      let settle = setTimeout(() => lama.classList.remove("is-hello"), 2400);
+      lama.addEventListener("pointerenter", () => {
+        clearTimeout(settle);
+        lama.classList.add("is-hello");
+      });
+      lama.addEventListener("pointerleave", () => {
+        settle = setTimeout(() => lama.classList.remove("is-hello"), 500);
+      });
+      lama.addEventListener("animationend", () => lama.classList.remove("is-hopping"));
+    }
 
     resize();
     if (reducedMotion) frameStill();
@@ -609,7 +713,9 @@
           cells.marker.innerHTML = node.change ? svg(node.change === "spawned" ? "i-circle-plus" : "i-circle-minus") : "";
         }
         row.classList.toggle("terminated", node.change === "terminated");
-        const samples = node.past.tree.cpu.slice(-20);
+        const recent = node.past.tree.cpu.slice(-20);
+        /* A row that has just spawned has one sample; draw it flat. */
+        const samples = recent.length > 1 ? recent : [recent[0] || 0, recent[0] || 0];
         const step = 52 / (samples.length - 1);
         const y = (value) => (14 * (1 - value / cpuScale)).toFixed(2);
         cells.path.setAttribute("d", `M${samples.map((value, index) => `${(index * step).toFixed(2)} ${y(value)}`).join("L")}`);
@@ -882,6 +988,30 @@
       });
     }
 
+    /* The signature at the foot of the sidebar opens About, as in the app. */
+    const about = figure.querySelector("[data-demo-about]");
+    const aboutOpen = figure.querySelector("[data-demo-about-open]");
+    const aboutClose = figure.querySelector("[data-demo-about-close]");
+    const closeAbout = () => {
+      about.hidden = true;
+      aboutOpen.focus();
+    };
+    aboutOpen.addEventListener("click", () => {
+      about.hidden = false;
+      aboutClose.focus();
+    });
+    aboutClose.addEventListener("click", closeAbout);
+    about.addEventListener("click", (event) => {
+      if (event.target === about) closeAbout();
+    });
+    about.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeAbout();
+      if (event.key === "Tab") {
+        event.preventDefault();
+        aboutClose.focus();
+      }
+    });
+
     /* The sketch starts in the page's appearance; the switch overrides it. */
     const themeButtons = figure.querySelectorAll("[data-demo-theme]");
     const showTheme = (theme) => {
@@ -976,6 +1106,7 @@
     set("version", release.version);
     set("channel", release.channel === "beta" ? "Beta" : "Stable");
     set("detail", `${release.version} · build ${release.build} · ${release.released}`);
+    set("about", `Version ${release.version} · build ${release.build}`);
     const notes = section.querySelector('[data-release="notes"]');
     if (release.notesPath) notes.href = href(release.notesPath);
     section.querySelector('[data-release="line"]').hidden = false;

@@ -82,8 +82,8 @@
         <canvas class="hero-tree" data-hero-tree aria-hidden="true"></canvas>
         <div class="hero-inner">
           <div class="hero-copy">
-            <p class="eyebrow">Process explorer</p>
-            <h1 id="hero-title">A process tree <span class="soft">for your desktop.</span></h1>
+            <p class="eyebrow">Process explorer <span class="eyebrow-maker">by Devmil Solutions</span></p>
+            <h1 id="hero-title">See what your machine <span class="soft">is up to.</span></h1>
             <p class="lede">
               ProcessLama lists the processes on your computer as a tree and shows
               CPU, memory, network, and storage use for each one. It runs on
@@ -106,6 +106,12 @@
               <li>English + Deutsch</li>
             </ul>
           </div>
+        </div>
+        <!-- The Lama stands on the pulse line that site.js draws; it opens with
+             the hello pose, then lifts its chin to the proud mark. -->
+        <div class="hero-lama is-hello" data-hero-lama aria-hidden="true">
+          <img class="pose proud" src="assets/lama/lama-proud.svg" alt="" width="120" height="120">
+          <img class="pose hello" src="assets/lama/lama-standing-nod.svg" alt="" width="120" height="120">
         </div>
         <p class="hero-caption status live" aria-hidden="true">
           <span class="dot"></span>
@@ -148,13 +154,17 @@
               </span>
             </div>
             <div class="app-body">
-              <div class="app-nav" aria-hidden="true">
-                <div class="nav-sec">Pinned</div>
-                <div class="nav-hint">Pin rows for quick access.</div>
-                <div class="nav-sec">Snapshots</div>
-                <div class="nrow selected"><svg class="icon"><use href="#i-activity"/></svg><span class="name">Live · macos</span><small>now</small></div>
-                <div class="nav-sec">Filters</div>
-                <div class="nav-hint">No saved filters.</div>
+              <div class="app-nav">
+                <div aria-hidden="true" class="nav-sec">Pinned</div>
+                <div aria-hidden="true" class="nav-hint">Pin rows for quick access.</div>
+                <div aria-hidden="true" class="nav-sec">Snapshots</div>
+                <div class="nrow selected" aria-hidden="true"><svg class="icon"><use href="#i-activity"/></svg><span class="name">Live · macos</span><small>now</small></div>
+                <div aria-hidden="true" class="nav-sec">Filters</div>
+                <div aria-hidden="true" class="nav-hint">No saved filters.</div>
+                <button class="nav-signature" type="button" title="ProcessLama · by Devmil Solutions" data-demo-about-open>
+                  <span class="signature" aria-hidden="true"></span>
+                  <span class="sr-only">About ProcessLama</span>
+                </button>
               </div>
               <div class="island app-island focused">
                 <div class="tree-head" aria-hidden="true"><span>Name</span><span>PID</span><span class="sorted">Tree CPU<svg class="icon"><use href="#i-arrow-down"/></svg></span><span>Tree RSS</span></div>
@@ -195,6 +205,14 @@
                 </div>
               </div>
             </div>
+            <div class="sketch-scrim" data-demo-about hidden>
+              <div class="sketch-dialog" role="dialog" aria-modal="true" aria-labelledby="sketch-about-title">
+                <h3 id="sketch-about-title">About ProcessLama</h3>
+                <div class="about-ground"><img src="assets/lama/lama-proud.svg" alt="" width="96" height="96"></div>
+                <p><strong>ProcessLama</strong><span>by Devmil Solutions</span><small data-release="about">Beta build</small></p>
+                <div class="sketch-dialog-actions"><button class="button small" type="button" data-demo-about-close>Close</button></div>
+              </div>
+            </div>
             <div class="app-status">
               <span class="status live" data-demo-state><span class="dot"></span><span data-demo-status>Polling every 1000 ms</span></span>
               <span class="spacer"></span>
@@ -202,7 +220,7 @@
             </div>
           </div>
           <figcaption class="app-caption">
-            <span>A sketch, not a screenshot. The app has more columns and its other inspector tabs work.</span>
+            <span>A sketch, not a screenshot. The app has more columns and its other inspector tabs work. The small Lama at the foot of the sidebar opens About.</span>
             <span class="seg" role="group" aria-label="Sketch appearance">
               <button type="button" aria-pressed="false" data-demo-theme="light">Light</button>
               <button type="button" aria-pressed="false" data-demo-theme="dark">Dark</button>
@@ -370,7 +388,7 @@
     <footer class="site-footer">
       <span class="footer-brand"><img src="assets/brand/processlama-icon.svg" alt="" width="20" height="20">ProcessLama</span>
       <span class="footer-links"><a href="releases.html">Downloads</a><a href="download/appcast.xml">macOS appcast</a></span>
-      <span>by Devmil Solutions. Built on Meridian.</span>
+      <span class="footer-maker"><span class="signature" aria-hidden="true"></span>by Devmil Solutions. Built on Meridian.</span>
     </footer>
   </body>
 </html>
