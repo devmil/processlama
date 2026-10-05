@@ -537,6 +537,25 @@
       lama.addEventListener("animationend", () => lama.classList.remove("is-hopping"));
     }
 
+    /* Between beats the Lama gets up to things of its own (lama-antics.js,
+       from the brand repository). Tapping it plays a gag; one of them is a
+       stomp that sends a burst of beats down the pulse line. */
+    if (lama && window.LamaAntics) {
+      LamaAntics.attach(lama, {
+        base: "assets/lama/",
+        colors: ["#4C82FB", "#8AF0C6", "#FFF8EB"],
+        taps: {
+          stomp: async (antic) => {
+            await antic.move("bigHop");
+            for (let i = 0; i < 3 && antic.live(); i += 1) {
+              beats.push({ x: feet.right - BEAT[2][0] * beatScale, amp: 1.3 - i * 0.2 });
+              await antic.wait(180);
+            }
+          },
+        },
+      });
+    }
+
     resize();
     if (reducedMotion) frameStill();
     setRunning();
