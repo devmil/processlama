@@ -3,79 +3,79 @@
   "history": [],
   "beta": {
     "latest": {
-      "version": "1.0.0-beta.23",
-      "build": 30,
-      "released": "2026-10-04",
-      "notesPath": "/download/ProcessLama-1.0.0-beta.23-30.html",
+      "version": "1.0.0-beta.25",
+      "build": 32,
+      "released": "2026-10-05",
+      "notesPath": "/download/ProcessLama-1.0.0-beta.25-32.html",
       "channel": "beta",
       "productName": "ProcessLama",
       "artifacts": [
         {
-          "file": "ProcessLama-1.0.0-beta.23-30.dmg",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30.dmg",
-          "sha256": "11c2c2df18c27312416d7579967c9d7cdfcbaf790a8f794b0676b2d2bfb3eb05",
-          "sizeBytes": 28119070,
+          "file": "ProcessLama-1.0.0-beta.25-32.dmg",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.25-32/ProcessLama-1.0.0-beta.25-32.dmg",
+          "sha256": "b91a2c0b040d1781c0b202b12cf92fca58dad6d77b8b77e2c05e37545d4bc84c",
+          "sizeBytes": 27993641,
           "platform": "macos",
           "format": "dmg",
           "architectures": "Apple Silicon",
           "minimumSystem": "macOS 14.0",
-          "sparkleSignature": "VtDmmjYhec5wBgmxHuRYaio+RvcNlIrKgnv9fAEHeQPBKsnNKZIzu9f9OJq9s+TBh+9xYaEpIUyRpvh1xBpLCw=="
+          "sparkleSignature": "D3pmyZzNDy2RbkUnobsonuDpP/fVNprlwSW0jiJf0M2vWp5E4ZfLb5ilRxZWFA2wPdMkO+J3cpsPqNrs1sEoDQ=="
         },
         {
-          "file": "ProcessLama-1.0.0-beta.23-30-linux-x86_64.AppImage",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-linux-x86_64.AppImage",
-          "sha256": "cfef1bac7734f6a3527338beb8a7bcba179ae4459562aae9d9ddca415ddec6c1",
-          "sizeBytes": 18500088,
+          "file": "ProcessLama-1.0.0-beta.25-32-linux-x86_64.AppImage",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.25-32/ProcessLama-1.0.0-beta.25-32-linux-x86_64.AppImage",
+          "sha256": "acb21073564a45fe3a970ba121c14651b11e90d050946e636581754a23f72d54",
+          "sizeBytes": 18840056,
           "platform": "linux",
           "format": "appimage",
           "architectures": "x86_64",
           "minimumSystem": "Linux"
         },
         {
-          "file": "ProcessLama-1.0.0-beta.23-30-linux-x86_64.deb",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-linux-x86_64.deb",
-          "sha256": "47d328a7bb59c892c3ba479c949615ed1ff229ed675fd45817efba3bccb0bb3d",
-          "sizeBytes": 13430860,
+          "file": "ProcessLama-1.0.0-beta.25-32-linux-x86_64.deb",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.25-32/ProcessLama-1.0.0-beta.25-32-linux-x86_64.deb",
+          "sha256": "388b9a991cc7b2952cf7a708b34eea991f0a0789fa4021132daede52de1742be",
+          "sizeBytes": 13588168,
           "platform": "linux",
           "format": "deb",
           "architectures": "x86_64",
           "minimumSystem": "Linux"
         },
         {
-          "file": "ProcessLama-1.0.0-beta.23-30-linux-x86_64.rpm",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-linux-x86_64.rpm",
-          "sha256": "a548eaa6fdce361d065bddbf1de08253b3dc01b1b8c60580204962f04ea78e42",
-          "sizeBytes": 10249151,
+          "file": "ProcessLama-1.0.0-beta.25-32-linux-x86_64.rpm",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.25-32/ProcessLama-1.0.0-beta.25-32-linux-x86_64.rpm",
+          "sha256": "08e502d854343b3af8bc014dd72cd59de97fb0d07a6c19531d8b246d1f43e263",
+          "sizeBytes": 10397299,
           "platform": "linux",
           "format": "rpm",
           "architectures": "x86_64",
           "minimumSystem": "Linux"
         },
         {
-          "file": "ProcessLama-1.0.0-beta.23-30-linux-x86_64.tar.gz",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-linux-x86_64.tar.gz",
-          "sha256": "029588a6129b16c2e863585daa5ea46f708ad92d1b69b80a2e3bd29d732dc2d4",
-          "sizeBytes": 19427560,
+          "file": "ProcessLama-1.0.0-beta.25-32-linux-x86_64.tar.gz",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.25-32/ProcessLama-1.0.0-beta.25-32-linux-x86_64.tar.gz",
+          "sha256": "cdac45074a7ecaf614b4fe8fb9d3c5d130462ce7ed2e17b3ff096bdb5005bbdc",
+          "sizeBytes": 19798353,
           "platform": "linux",
           "format": "tar",
           "architectures": "x86_64",
           "minimumSystem": "Linux"
         },
         {
-          "file": "ProcessLama-1.0.0-beta.23-30-windows-x86_64.msi",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-windows-x86_64.msi",
-          "sha256": "220bfd62581206f58150245bd52b6fca92fca985af45d755fe005f6d69a661fd",
-          "sizeBytes": 11186176,
+          "file": "ProcessLama-1.0.0-beta.25-32-windows-x86_64.msi",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.25-32/ProcessLama-1.0.0-beta.25-32-windows-x86_64.msi",
+          "sha256": "9e781df5a04d318f4cf1bb853780bbf3c1a034a0a904a5319fb9da4b7ea6fd1a",
+          "sizeBytes": 11329536,
           "platform": "windows",
           "format": "msi",
           "architectures": "x86_64",
           "minimumSystem": "Windows 10 1809"
         },
         {
-          "file": "ProcessLama-1.0.0-beta.23-30-windows-x86_64.zip",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-windows-x86_64.zip",
-          "sha256": "3f1a4a2bc82a756ec0c6e8fb1c80d0adf13562d3ddd63c805c3d493713e3c4bf",
-          "sizeBytes": 14137093,
+          "file": "ProcessLama-1.0.0-beta.25-32-windows-x86_64.zip",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.25-32/ProcessLama-1.0.0-beta.25-32-windows-x86_64.zip",
+          "sha256": "142b3ce0cf60ce796fa32f382277c2f5ab0e6b61f99febb90167e80135d683f7",
+          "sizeBytes": 14473365,
           "platform": "windows",
           "format": "zip",
           "architectures": "x86_64",
@@ -85,6 +85,88 @@
       "supersededByStable": false
     },
     "history": [
+      {
+        "version": "1.0.0-beta.23",
+        "build": 30,
+        "released": "2026-10-04",
+        "notesPath": "/download/ProcessLama-1.0.0-beta.23-30.html",
+        "channel": "beta",
+        "productName": "ProcessLama",
+        "artifacts": [
+          {
+            "file": "ProcessLama-1.0.0-beta.23-30.dmg",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30.dmg",
+            "sha256": "11c2c2df18c27312416d7579967c9d7cdfcbaf790a8f794b0676b2d2bfb3eb05",
+            "sizeBytes": 28119070,
+            "platform": "macos",
+            "format": "dmg",
+            "architectures": "Apple Silicon",
+            "minimumSystem": "macOS 14.0",
+            "sparkleSignature": "VtDmmjYhec5wBgmxHuRYaio+RvcNlIrKgnv9fAEHeQPBKsnNKZIzu9f9OJq9s+TBh+9xYaEpIUyRpvh1xBpLCw=="
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.23-30-linux-x86_64.AppImage",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-linux-x86_64.AppImage",
+            "sha256": "cfef1bac7734f6a3527338beb8a7bcba179ae4459562aae9d9ddca415ddec6c1",
+            "sizeBytes": 18500088,
+            "platform": "linux",
+            "format": "appimage",
+            "architectures": "x86_64",
+            "minimumSystem": "Linux"
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.23-30-linux-x86_64.deb",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-linux-x86_64.deb",
+            "sha256": "47d328a7bb59c892c3ba479c949615ed1ff229ed675fd45817efba3bccb0bb3d",
+            "sizeBytes": 13430860,
+            "platform": "linux",
+            "format": "deb",
+            "architectures": "x86_64",
+            "minimumSystem": "Linux"
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.23-30-linux-x86_64.rpm",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-linux-x86_64.rpm",
+            "sha256": "a548eaa6fdce361d065bddbf1de08253b3dc01b1b8c60580204962f04ea78e42",
+            "sizeBytes": 10249151,
+            "platform": "linux",
+            "format": "rpm",
+            "architectures": "x86_64",
+            "minimumSystem": "Linux"
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.23-30-linux-x86_64.tar.gz",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-linux-x86_64.tar.gz",
+            "sha256": "029588a6129b16c2e863585daa5ea46f708ad92d1b69b80a2e3bd29d732dc2d4",
+            "sizeBytes": 19427560,
+            "platform": "linux",
+            "format": "tar",
+            "architectures": "x86_64",
+            "minimumSystem": "Linux"
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.23-30-windows-x86_64.msi",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-windows-x86_64.msi",
+            "sha256": "220bfd62581206f58150245bd52b6fca92fca985af45d755fe005f6d69a661fd",
+            "sizeBytes": 11186176,
+            "platform": "windows",
+            "format": "msi",
+            "architectures": "x86_64",
+            "minimumSystem": "Windows 10 1809"
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.23-30-windows-x86_64.zip",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-windows-x86_64.zip",
+            "sha256": "3f1a4a2bc82a756ec0c6e8fb1c80d0adf13562d3ddd63c805c3d493713e3c4bf",
+            "sizeBytes": 14137093,
+            "platform": "windows",
+            "format": "zip",
+            "architectures": "x86_64",
+            "minimumSystem": "Windows 10 1809"
+          }
+        ],
+        "supersededByStable": false
+      },
       {
         "version": "1.0.0-beta.22",
         "build": 29,
@@ -321,87 +403,6 @@
             "downloadPath": "https://github.com/devmil/Mimameidr/releases/download/v1.0.0-beta.20-25/Mimameidr-1.0.0-beta.20-25-windows-x86_64.zip",
             "sha256": "84b59615e935c641cef276744e96da99a67aa267a6f19ba58f1eb3db3f445072",
             "sizeBytes": 14150000,
-            "platform": "windows",
-            "format": "zip",
-            "architectures": "x86_64",
-            "minimumSystem": "Windows 10 1809"
-          }
-        ],
-        "supersededByStable": false
-      },
-      {
-        "version": "1.0.0-beta.19",
-        "build": 24,
-        "released": "2026-09-28",
-        "notesPath": "/download/Mimameidr-1.0.0-beta.19-24.html",
-        "channel": "beta",
-        "artifacts": [
-          {
-            "file": "Mimameidr-1.0.0-beta.19-24.dmg",
-            "downloadPath": "https://github.com/devmil/Mimameidr/releases/download/v1.0.0-beta.19-24/Mimameidr-1.0.0-beta.19-24.dmg",
-            "sha256": "9c39a2a2aed470ceb5da836290ea4653de00e19feaab9591d5c20febacc419c5",
-            "sizeBytes": 28482190,
-            "platform": "macos",
-            "format": "dmg",
-            "architectures": "Apple Silicon",
-            "minimumSystem": "macOS 14.0",
-            "sparkleSignature": "7mj0xA3Niw+FBWPEvsSnxBOHTIoi2cjhmQmiactp1Na7gB1uv7Y+vqcXwYk5oPe0vNjVVNGJptV+fdXFJJmHDw=="
-          },
-          {
-            "file": "Mimameidr-1.0.0-beta.19-24-linux-x86_64.AppImage",
-            "downloadPath": "https://github.com/devmil/Mimameidr/releases/download/v1.0.0-beta.19-24/Mimameidr-1.0.0-beta.19-24-linux-x86_64.AppImage",
-            "sha256": "37ef550e3e203f9da1465d104e730070ef5ccf463700be1604a715c3b157881d",
-            "sizeBytes": 18041336,
-            "platform": "linux",
-            "format": "appimage",
-            "architectures": "x86_64",
-            "minimumSystem": "Linux"
-          },
-          {
-            "file": "Mimameidr-1.0.0-beta.19-24-linux-x86_64.deb",
-            "downloadPath": "https://github.com/devmil/Mimameidr/releases/download/v1.0.0-beta.19-24/Mimameidr-1.0.0-beta.19-24-linux-x86_64.deb",
-            "sha256": "ea9462ec7c1ba9a61801bf6515edf2fbc1611de49d660d87f081cbb75b5797d3",
-            "sizeBytes": 13315108,
-            "platform": "linux",
-            "format": "deb",
-            "architectures": "x86_64",
-            "minimumSystem": "Linux"
-          },
-          {
-            "file": "Mimameidr-1.0.0-beta.19-24-linux-x86_64.rpm",
-            "downloadPath": "https://github.com/devmil/Mimameidr/releases/download/v1.0.0-beta.19-24/Mimameidr-1.0.0-beta.19-24-linux-x86_64.rpm",
-            "sha256": "1d6a44c159131134fa4a605609bd6b22cdf7d615d798affaa658c01ed4773c06",
-            "sizeBytes": 10123992,
-            "platform": "linux",
-            "format": "rpm",
-            "architectures": "x86_64",
-            "minimumSystem": "Linux"
-          },
-          {
-            "file": "Mimameidr-1.0.0-beta.19-24-linux-x86_64.tar.gz",
-            "downloadPath": "https://github.com/devmil/Mimameidr/releases/download/v1.0.0-beta.19-24/Mimameidr-1.0.0-beta.19-24-linux-x86_64.tar.gz",
-            "sha256": "9aebc13bfe8dcb13bbee6a4abab91b245d705b970b7408d7dfc32ed49754a13f",
-            "sizeBytes": 18905511,
-            "platform": "linux",
-            "format": "tar",
-            "architectures": "x86_64",
-            "minimumSystem": "Linux"
-          },
-          {
-            "file": "Mimameidr-1.0.0-beta.19-24-windows-x86_64.msi",
-            "downloadPath": "https://github.com/devmil/Mimameidr/releases/download/v1.0.0-beta.19-24/Mimameidr-1.0.0-beta.19-24-windows-x86_64.msi",
-            "sha256": "ac2b044e9c0c212150f8d4df923bdcf3525c00f3ee5033af5dca0cbd12ba5550",
-            "sizeBytes": 11177984,
-            "platform": "windows",
-            "format": "msi",
-            "architectures": "x86_64",
-            "minimumSystem": "Windows 10 1809"
-          },
-          {
-            "file": "Mimameidr-1.0.0-beta.19-24-windows-x86_64.zip",
-            "downloadPath": "https://github.com/devmil/Mimameidr/releases/download/v1.0.0-beta.19-24/Mimameidr-1.0.0-beta.19-24-windows-x86_64.zip",
-            "sha256": "3df20bc257c8050bcc7d07ad4ff83bc7e872160410a154a7be4142647bc6ad9c",
-            "sizeBytes": 14132740,
             "platform": "windows",
             "format": "zip",
             "architectures": "x86_64",
