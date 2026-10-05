@@ -75,13 +75,13 @@
   --series-7: #0784a8;
   --series-8: #5d8a12;
 
-  --accent: #2e69e6;
+  --accent: #0e7c59;
   --on-accent: #ffffff;
-  --on-accent-muted: #f2f6ff;
-  --accent-soft: #e3ecfe;
-  --accent-ink: #2a5fd0;
-  --focus: #2e69e6;
-  --brand: #16505f;
+  --on-accent-muted: #ecf9f2;
+  --accent-soft: #daf2e6;
+  --accent-ink: #026f4f;
+  --focus: #0e7c59;
+  --brand: #00402c;
 
   --shadow-pane: 0 0 0 1px rgba(15, 27, 33, 0.07), 0 1px 2px rgba(15, 27, 33, 0.05);
   --shadow-float: 0 0 0 1px rgba(15, 27, 33, 0.09), 0 16px 40px -12px rgba(15, 27, 33, 0.28);
@@ -119,13 +119,13 @@
     --series-7: #4cc9f0;
     --series-8: #a3d65c;
 
-    --accent: #4c82fb;
-    --on-accent: #050c1c;
-    --on-accent-muted: #081a40;
-    --accent-soft: #1d2a45;
-    --accent-ink: #86aeff;
-    --focus: #86aeff;
-    --brand: #1f6f78;
+    --accent: #24c27d;
+    --on-accent: #03130c;
+    --on-accent-muted: #043d2a;
+    --accent-soft: #0b3627;
+    --accent-ink: #80d6b0;
+    --focus: #80d6b0;
+    --brand: #1a533e;
 
     --shadow-pane: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.35);
     --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 16px 40px -12px rgba(0, 0, 0, 0.7);
@@ -163,13 +163,13 @@
   --series-7: #4cc9f0;
   --series-8: #a3d65c;
 
-  --accent: #4c82fb;
-  --on-accent: #050c1c;
-  --on-accent-muted: #081a40;
-  --accent-soft: #1d2a45;
-  --accent-ink: #86aeff;
-  --focus: #86aeff;
-  --brand: #1f6f78;
+  --accent: #24c27d;
+  --on-accent: #03130c;
+  --on-accent-muted: #043d2a;
+  --accent-soft: #0b3627;
+  --accent-ink: #80d6b0;
+  --focus: #80d6b0;
+  --brand: #1a533e;
 
   --shadow-pane: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.35);
   --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 16px 40px -12px rgba(0, 0, 0, 0.7);
@@ -226,11 +226,14 @@
 
   /* Lama brand colours (Devmil brand.json). Ivory and graphite stay inside
      the artwork; the hero and the Lama stages sit on the app's brand ground
-     in both appearances. --prop is the pulse line of the app icon's scene. */
+     in both appearances. --prop is the pulse line of the app icon's scene.
+     --signal is Meridian's dark accent ink, the green that reads on the
+     brand ground. */
   --ivory: #fff8eb;
   --graphite: #17171e;
-  --brand-ground: #16505f;
-  --prop: #7fd6e0;
+  --brand-ground: #00402c;
+  --prop: #fff8eb;
+  --signal: #80d6b0;
 
   --content: 1160px;
   --gutter: 24px;
@@ -547,14 +550,14 @@ button {
 /* Hero: on the brand ground, a drawn process tree (site.js) grows from a
    live pulse line, and the Lama stands on that line. The hero redefines the
    Meridian surface tokens it uses, so the tree, the labels and the status
-   dot read on teal in both appearances. */
+   dot read on green in both appearances. */
 
 .hero {
   --ink: var(--ivory);
   --ink-muted: rgba(255, 248, 235, 0.74);
-  --raised: #0f3c47;
+  --raised: #002e20;
   --line-strong: rgba(255, 248, 235, 0.2);
-  --tree-branch: var(--prop);
+  --tree-branch: var(--signal);
   --tree-leaf: #f2c14e;
   --tree-lit: var(--ivory);
   --success: #6fdc8c;
@@ -570,7 +573,7 @@ button {
   align-items: center;
   min-height: clamp(600px, 88svh, 860px);
   background:
-    radial-gradient(90% 70% at 78% 100%, rgba(127, 214, 224, 0.14), transparent 70%),
+    radial-gradient(90% 70% at 78% 100%, rgba(36, 194, 125, 0.16), transparent 70%),
     var(--brand-ground);
   color: var(--ink);
 }
@@ -620,7 +623,7 @@ button {
 }
 
 .eyebrow-maker {
-  color: var(--prop);
+  color: var(--signal);
 }
 
 .hero h1 {
@@ -631,7 +634,7 @@ button {
 }
 
 .hero .soft {
-  color: var(--prop);
+  color: var(--signal);
 }
 
 .lede {
@@ -1913,7 +1916,7 @@ button.tbtn:hover span {
 }
 
 /* Features, laid out as a tree: a trunk with one branch per feature, in the
-   same teal and amber as the hero. */
+   process tree's teal and amber. */
 
 .split {
   display: grid;

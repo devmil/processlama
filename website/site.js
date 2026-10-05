@@ -30,7 +30,7 @@
     const MAX_DEPTH = 5;
 
     /* Colours are Meridian tokens read from the page, so the drawing follows
-       light and dark: teal branches, amber leaves, the accent for the path
+       light and dark: green branches, amber leaves, the accent for the path
        being followed, success for a spawn and danger for an exit. */
     let paint = {};
     function readPaint() {
@@ -543,7 +543,7 @@
     if (lama && window.LamaAntics) {
       LamaAntics.attach(lama, {
         base: "assets/lama/",
-        colors: ["#4C82FB", "#8AF0C6", "#FFF8EB"],
+        colors: ["#24C27D", "#80D6B0", "#FFF8EB"],
         taps: {
           stomp: async (antic) => {
             await antic.move("bigHop");
