@@ -136,6 +136,7 @@
           left: box.left - origin.left + box.width * 0.23,
           right: box.left - origin.left + box.width * 0.87,
           centre: box.left - origin.left + box.width * 0.55,
+          width: box.width,
         };
       }
       rootX = narrow ? width * 0.34 : Math.min(width * 0.58, feet.left - 120);
@@ -246,7 +247,7 @@
         const before = beat.x + centre;
         beat.x += delta * BEAT_SPEED;
         const after = beat.x + centre;
-        if (lama && before < feet.centre && after >= feet.centre && beatClock > hopUntil) {
+        if (lama && !antics && before < feet.centre && after >= feet.centre && beatClock > hopUntil) {
           hopUntil = beatClock + 900;
           lama.classList.remove("is-hopping");
           void lama.offsetWidth;
@@ -254,6 +255,138 @@
         }
         return beat.x < width + 40;
       });
+      watchBeats();
+    }
+
+    /* The Lama watches the line. A beat coming at it gets jumped: a hop, a
+       tuck, a flip, a spin, or a hurdle that lifts the front legs and then
+       the back ones, timed so that no beat touches its feet. Beats close
+       together are cleared in one long leap. Now and then it misjudges
+       one, and a dozing Lama just gets bounced. */
+    let antics = null;
+    let streak = 0;
+    let fumbledAt = -1e9;
+    const STYLES = ["hop", "hurdle", "tuck", "hurdle", "spin", "kick", "hop", "twist", "flip", "hurdle"];
+    let styles = [];
+    const nextStyle = () => {
+      if (!styles.length) styles = STYLES.slice().sort(() => Math.random() - 0.5);
+      return styles.shift();
+    };
+
+    /* While a leap is in the air, [takeoff, landing] in beat-clock ms. */
+    let airborne = null;
+
+    function watchBeats() {
+      if (!antics || reducedMotion) return;
+      const state = antics.busy();
+      if (state === "tap") return;
+      /* A fumble or a doze runs its course; a leap can be extended. */
+      const chain = state === "react";
+      if (chain && !airborne) return;
+      const span = BEAT[BEAT.length - 1][0] * beatScale;
+      /* Times in ms until a beat touches the front feet and until it has
+         left the back feet. Beats on their way out are not its concern. */
+      const reach = (beat) => (feet.left - (beat.x + span)) / BEAT_SPEED;
+      const clear = (beat) => (feet.right - beat.x) / BEAT_SPEED;
+      const coming = beats.filter((beat) => !beat.seen && clear(beat) > 120).sort((a, b) => b.x - a.x);
+      if (!coming.length || reach(coming[0]) > 760) return;
+      if (chain) {
+        const first = coming[0];
+        if (beatClock + reach(first) >= airborne[0] && beatClock + clear(first) <= airborne[1]) {
+          first.seen = true;
+          return;
+        }
+        /* It would land on this one: jump again from mid-air, late enough
+           to keep the current leap's shape. */
+        if (reach(first) > 280) return;
+      }
+      const group = [coming[0]];
+      let until = clear(coming[0]);
+      for (const beat of coming.slice(1)) {
+        if (reach(beat) < until + 260 && clear(beat) < 2400) {
+          group.push(beat);
+          until = clear(beat);
+        }
+      }
+      group.forEach((beat) => { beat.seen = true; });
+      const plan = {
+        group,
+        chain,
+        touch: Math.max(0, reach(group[0])),
+        until,
+        centre: (feet.centre - (group[0].x + span / 2)) / BEAT_SPEED,
+        /* The front pair of legs reaches 24% of the Lama's width past the
+           front feet; the back pair starts 27% before the back feet. */
+        frontEnd: (feet.left + feet.width * 0.24 - group[0].x) / BEAT_SPEED,
+        backStart: (feet.right - feet.width * 0.27 - (group[0].x + span)) / BEAT_SPEED,
+        roomy: feet.width * 0.13 > span + 8,
+        dozing: antics.running() === "nap" || antics.running() === "doze",
+      };
+      antics.react((antic) => leap(antic, plan), "leap").finally(() => {
+        if (!antics.busy()) {
+          airborne = null;
+          antics.face(null);
+        }
+      });
+    }
+
+    async function leap(antic, plan) {
+      const { group, touch, until, centre } = plan;
+      antic.face("left");
+      if (plan.dozing) {
+        /* Too sleepy to jump: the beat bounces it, and it dozes on. */
+        antic.pose("resting");
+        await antic.jump({ lead: Math.max(0, centre - 150), air: 300, height: 0.06, crouch: 0 });
+        for (let i = 0; i < 3 && antic.live(); i += 1) {
+          antic.bits("bubble", 1, [0.2, 0.42], { angle: -Math.PI / 2 - 0.5, spread: 0.3, reach: 50, size: 6 + i * 2, duration: 1500, color: "#FFF8EB" });
+          await antic.wait(700);
+        }
+        antic.pose("standing");
+        await antic.move("stretch");
+        return;
+      }
+      airborne = null;
+      const fumble = !plan.chain && group.length === 1 && streak >= 2 && beatClock - fumbledAt > 15000 && Math.random() < 0.18;
+      if (fumble && Math.random() < 0.5) {
+        /* Too late: the beat trips it up. */
+        fumbledAt = beatClock;
+        streak = 0;
+        await antic.wait(Math.max(0, touch - 40));
+        antic.pose("standing");
+        antic.bits("star", 4, antic.HEAD, { angle: -Math.PI / 2, spread: 1, reach: 30, size: 7, duration: 900 });
+        await antic.move("trip");
+        return;
+      }
+      if (fumble) {
+        /* Too early: it lands on the beat, flattens it and is bounced off. */
+        fumbledAt = beatClock;
+        streak = 0;
+        const lead = Math.max(0, centre - 380);
+        await antic.jump({ lead, air: 360, height: 0.08, land: 1 });
+        group[0].amp *= 0.3;
+        antic.bits("puff", 5, antic.FEET, { angle: Math.PI / 2, spread: 1.4, reach: 22, size: 7, duration: 600, color: "#FFF8EB" });
+        antic.pose("standing");
+        await antic.jump({ air: 720, height: 0.34, style: "spin", crouch: 0 });
+        return;
+      }
+      let style = group.length > 1 || plan.chain ? "hop" : nextStyle();
+      if (style === "hurdle" && !plan.roomy) style = "tuck";
+      if (style === "hurdle") {
+        /* Never in the air, so any later beat extends it with a jump. */
+        airborne = [beatClock, beatClock];
+        await antic.hurdle({ front: [touch - 50, plan.frontEnd + 70], back: [plan.backStart - 70, until + 50] });
+      } else {
+        const lead = Math.max(0, touch - 80);
+        const air = until + 80 - lead;
+        airborne = [beatClock + lead, beatClock + lead + air];
+        await antic.jump({ lead, air, style, chain: plan.chain });
+      }
+      streak += 1;
+      if (streak % 5 === 0 && antic.live()) {
+        antic.bits("confetti", 14, antic.HEAD, { angle: -Math.PI / 2, spread: 1, reach: 60, fall: 50, turn: 400, duration: 1300 });
+        antic.pose("hello");
+        await antic.move("dip");
+      }
     }
 
     function drawLine() {
@@ -541,9 +674,35 @@
        from the brand repository). Tapping it plays a gag; one of them is a
        stomp that sends a burst of beats down the pulse line. */
     if (lama && window.LamaAntics) {
-      LamaAntics.attach(lama, {
+      antics = LamaAntics.attach(lama, {
         base: "assets/lama/",
         colors: ["#24C27D", "#80D6B0", "#FFF8EB"],
+        idle: {
+          /* It leans toward the nearest process, which lights up with its
+             label and the path to its ancestors. */
+          inspect: async (antic) => {
+            const origin = canvas.getBoundingClientRect();
+            const [hx, hy] = antic.at(antic.MUZZLE);
+            let best = null;
+            let bestDistance = Infinity;
+            for (const node of nodes) {
+              if (node.dead || node.grown < 0.95 || !node.parent) continue;
+              const distance = (node.x - (hx - origin.left)) ** 2 + (node.y - (hy - origin.top)) ** 2;
+              if (distance < bestDistance) {
+                best = node;
+                bestDistance = distance;
+              }
+            }
+            if (!best || pointer) return;
+            antic.pose("hello");
+            await antic.move("dip");
+            setFocus(best, clock);
+            autoFocusAt = clock + 5000;
+            antic.bits("spark", 3, antic.MUZZLE, { angle: Math.PI, spread: 0.6, reach: 22, size: 6, duration: 700 });
+            await antic.wait(1400);
+            await antic.move("dip");
+          },
+        },
         taps: {
           stomp: async (antic) => {
             await antic.move("bigHop");
