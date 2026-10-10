@@ -18,7 +18,7 @@
   const PHRASES_DE = {
     Lock: "Sperren",
     Unlock: "Entsperren",
-    "Polling every 1000 ms": "Abfrage alle 1000 ms",
+    "Polling every 1000 ms": "Abfrage alle 1000\u00a0ms",
     "Process tree locked": "Prozessbaum gesperrt",
     Memory: "Arbeitsspeicher",
     Network: "Netzwerk",
@@ -38,6 +38,12 @@
   const languageListeners = [];
   const tr = (text) => (language === "de" && PHRASES_DE[text]) || text;
   const onLanguage = (listener) => languageListeners.push(listener);
+  /* A figure with its unit. German writes a decimal comma and keeps the unit
+     with the number behind a non-breaking space, percent included. */
+  const withUnit = (number, unit) => {
+    if (language === "de") return `${number.replace(".", ",")}\u00a0${unit}`;
+    return unit === "%" ? `${number}%` : `${number} ${unit}`;
+  };
 
   function storedLanguage() {
     try {
@@ -562,7 +568,7 @@
     function drawLabel(node) {
       /* A Meridian tooltip: raised surface, float edge, name then figures. */
       const name = node.name;
-      const figures = `${node.pid} · ${(node.cpu * 38).toFixed(1)}%`;
+      const figures = `${node.pid} · ${withUnit((node.cpu * 38).toFixed(1), "%")}`;
       ctx.font = '600 12px "Geist", sans-serif';
       const nameWidth = ctx.measureText(name).width;
       ctx.font = '400 11px "Geist Mono", ui-monospace, monospace';
@@ -843,16 +849,16 @@
     const svg = (id) => `<svg class="icon" aria-hidden="true"><use href="#${id}"/></svg>`;
 
     /* The app's formatters (process_explorer_screen.dart). */
-    const percent = (value) => (value <= 0 ? "0.0%" : `${value.toFixed(value >= 10 ? 0 : 1)}%`);
+    const percent = (value) => withUnit(value <= 0 ? "0.0" : value.toFixed(value >= 10 ? 0 : 1), "%");
     const bytes = (value) => {
-      if (value <= 0) return "0 B";
+      if (value <= 0) return withUnit("0", "B");
       const units = ["B", "KB", "MB", "GB", "TB"];
       let unit = 0;
       while (value >= 1024 && unit < units.length - 1) {
         value /= 1024;
         unit += 1;
       }
-      return `${value.toFixed(unit ? 1 : 0)} ${units[unit]}`;
+      return withUnit(value.toFixed(unit ? 1 : 0), units[unit]);
     };
     const rate = (value) => `${bytes(Math.round(value))}/s`;
 
@@ -1268,6 +1274,7 @@
     });
     onLanguage(() => {
       paintLock();
+      paintRows();
       paintInspector();
     });
     for (const button of figure.querySelectorAll("[data-demo-scope]")) {
@@ -1355,7 +1362,7 @@
       size /= 1024;
       unit += 1;
     }
-    return unit ? `${size.toFixed(1)} ${units[unit]}` : `${size} B`;
+    return withUnit(unit ? size.toFixed(1) : String(size), units[unit]);
   }
 
   /* Point the landing page's download cards at the newest published build.
@@ -1380,7 +1387,10 @@
         const artifact = files.find((entry) => entry.format === link.dataset.format);
         if (!artifact || !artifact.downloadPath) continue;
         link.href = href(artifact.downloadPath);
-        link.querySelector("[data-size]").textContent = sizeLabel(artifact.sizeBytes);
+        const size = link.querySelector("[data-size]");
+        const paintSize = () => (size.textContent = sizeLabel(artifact.sizeBytes));
+        paintSize();
+        onLanguage(paintSize);
       }
       const first = files[0];
       const requires = card.querySelector('[data-release="requires"]');
