@@ -6,6 +6,110 @@
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 
+  /* Language. English is the source text in the HTML; German sits beside it
+     in `data-de` (text) and `data-de-<attribute>` attributes. The choice is
+     shared by every Devmil site on this origin under one storage key. Legal
+     pages are separate files per language, so their switch is a pair of
+     links that only records the choice. */
+  const LANGUAGE_KEY = "preferred-language";
+  const LANGUAGES = ["en", "de"];
+  const TRANSLATED_ATTRIBUTES = ["content", "aria-label", "alt", "placeholder", "title", "href"];
+  /* Copy that this script writes itself, in German. */
+  const PHRASES_DE = {
+    Lock: "Sperren",
+    Unlock: "Entsperren",
+    "Polling every 1000 ms": "Abfrage alle 1000 ms",
+    "Process tree locked": "Prozessbaum gesperrt",
+    Memory: "Arbeitsspeicher",
+    Network: "Netzwerk",
+    Storage: "Speicher",
+    Descendants: "Nachkommen",
+    "Network history": "Netzwerkverlauf",
+    "Storage history": "Speicherverlauf",
+    "Out / In": "Ausgang / Eingang",
+    "Read / Write": "Lesen / Schreiben",
+    Beta: "Beta",
+    Stable: "Stabil",
+    build: "Build",
+    Version: "Version",
+    Copied: "Kopiert",
+  };
+  let language = "en";
+  const languageListeners = [];
+  const tr = (text) => (language === "de" && PHRASES_DE[text]) || text;
+  const onLanguage = (listener) => languageListeners.push(listener);
+
+  function storedLanguage() {
+    try {
+      const value = localStorage.getItem(LANGUAGE_KEY);
+      return LANGUAGES.includes(value) ? value : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function storeLanguage(value) {
+    try {
+      localStorage.setItem(LANGUAGE_KEY, value);
+    } catch {
+      /* Private modes may refuse storage; the page still switches. */
+    }
+  }
+
+  function applyLanguage(value) {
+    language = value;
+    document.documentElement.lang = value;
+    for (const node of document.querySelectorAll("[data-de]")) {
+      if (!("en" in node.dataset)) node.dataset.en = node.textContent;
+      node.textContent = value === "de" ? node.dataset.de : node.dataset.en;
+    }
+    const selector = TRANSLATED_ATTRIBUTES.map((name) => `[data-de-${name}]`).join(",");
+    for (const node of document.querySelectorAll(selector)) {
+      for (const name of TRANSLATED_ATTRIBUTES) {
+        const german = node.getAttribute(`data-de-${name}`);
+        if (german === null) continue;
+        if (!node.hasAttribute(`data-en-${name}`)) node.setAttribute(`data-en-${name}`, node.getAttribute(name) || "");
+        node.setAttribute(name, value === "de" ? german : node.getAttribute(`data-en-${name}`));
+      }
+    }
+    for (const button of document.querySelectorAll(".lang-switch button[data-lang]")) {
+      button.setAttribute("aria-pressed", String(button.dataset.lang === value));
+    }
+    for (const listener of languageListeners) listener(value);
+  }
+
+  function languageSwitch() {
+    const buttons = document.querySelectorAll(".lang-switch button[data-lang]");
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        storeLanguage(button.dataset.lang);
+        applyLanguage(button.dataset.lang);
+      });
+    }
+    /* Legal pages: the links navigate to the counterpart file. */
+    for (const link of document.querySelectorAll(".lang-switch a[data-lang]")) {
+      link.addEventListener("click", () => storeLanguage(link.dataset.lang));
+    }
+    if (!buttons.length) return;
+    const browser = String(navigator.language || "").toLowerCase().startsWith("de") ? "de" : "en";
+    applyLanguage(storedLanguage() || browser);
+  }
+
+  /* The address is assembled only when someone clicks it. */
+  function contactEmails() {
+    for (const node of document.querySelectorAll(".contact-email")) {
+      const link = document.createElement("a");
+      link.href = "#";
+      link.textContent = node.textContent;
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        const parts = node.dataset;
+        window.location.href = "mail" + "to:" + parts.user + "@" + parts.domain + "." + parts.tld;
+      });
+      node.replaceChildren(link);
+    }
+  }
+
   /* Hero: a drawn process tree on a pulse line, with the Lama standing on
      that line. Branches sway, leaves spawn and terminate, and activity
      travels back to the root, where it leaves as a beat along the line. A
@@ -938,7 +1042,8 @@
       const card = document.createElement("div");
       card.className = `chart-card${diverging ? " diverging" : ""}`;
       card.dataset.chart = key;
-      card.innerHTML = `<div class="chart-top"><div><strong>${title}</strong>${detail ? `<small>${detail}</small>` : ""}</div><b></b></div><div class="chart-plot"><div class="chart-scale"><span></span><span></span><span></span></div><div class="chart-bars" style="height: ${diverging ? 56 : 44}px"><svg preserveAspectRatio="none" aria-hidden="true"></svg></div></div>`;
+      const german = (text) => (PHRASES_DE[text] ? ` data-de="${PHRASES_DE[text]}"` : "");
+      card.innerHTML = `<div class="chart-top"><div><strong${german(title)}>${title}</strong>${detail ? `<small${german(detail)}>${detail}</small>` : ""}</div><b></b></div><div class="chart-plot"><div class="chart-scale"><span></span><span></span><span></span></div><div class="chart-bars" style="height: ${diverging ? 56 : 44}px"><svg preserveAspectRatio="none" aria-hidden="true"></svg></div></div>`;
       const bars = card.querySelector(".chart-bars");
       bars.addEventListener("pointermove", (event) => {
         const box = bars.getBoundingClientRect();
@@ -983,7 +1088,7 @@
       ];
       if (useTree) tiles.push(["Descendants", String(node.descendants)]);
       field("tiles").innerHTML = tiles
-        .map(([label, value, warn]) => `<div class="tile"><small>${label}</small><b${warn ? ' class="warn"' : ""}>${value}</b></div>`)
+        .map(([label, value, warn]) => `<div class="tile"><small>${tr(label)}</small><b${warn ? ' class="warn"' : ""}>${value}</b></div>`)
         .join("");
 
       const peak = (values, current) => Math.max(0.1, current, ...values);
@@ -1150,13 +1255,20 @@
       select(node);
     });
     search.addEventListener("input", highlight);
-    lock.addEventListener("click", () => {
-      const locked = lock.getAttribute("aria-pressed") !== "true";
-      lock.setAttribute("aria-pressed", String(locked));
-      lock.querySelector("span").textContent = locked ? "Unlock" : "Lock";
-      status.textContent = locked ? "Process tree locked" : liveStatus;
+    const paintLock = () => {
+      const locked = lock.getAttribute("aria-pressed") === "true";
+      lock.querySelector("span").textContent = tr(locked ? "Unlock" : "Lock");
+      status.textContent = tr(locked ? "Process tree locked" : liveStatus);
       state.classList.toggle("live", !locked);
       state.classList.toggle("neutral", locked);
+    };
+    lock.addEventListener("click", () => {
+      lock.setAttribute("aria-pressed", String(lock.getAttribute("aria-pressed") !== "true"));
+      paintLock();
+    });
+    onLanguage(() => {
+      paintLock();
+      paintInspector();
     });
     for (const button of figure.querySelectorAll("[data-demo-scope]")) {
       button.addEventListener("click", () => {
@@ -1281,10 +1393,14 @@
     const set = (name, text) => {
       for (const node of document.querySelectorAll(`[data-release="${name}"]`)) node.textContent = text;
     };
-    set("version", release.version);
-    set("channel", release.channel === "beta" ? "Beta" : "Stable");
-    set("detail", `${release.version} · build ${release.build} · ${release.released}`);
-    set("about", `Version ${release.version} · build ${release.build}`);
+    const paintRelease = () => {
+      set("version", release.version);
+      set("channel", tr(release.channel === "beta" ? "Beta" : "Stable"));
+      set("detail", `${release.version} · ${tr("build")} ${release.build} · ${release.released}`);
+      set("about", `${tr("Version")} ${release.version} · ${tr("build")} ${release.build}`);
+    };
+    paintRelease();
+    onLanguage(paintRelease);
     const notes = section.querySelector('[data-release="notes"]');
     if (release.notesPath) notes.href = href(release.notesPath);
     section.querySelector('[data-release="line"]').hidden = false;
@@ -1300,7 +1416,7 @@
         return;
       }
       const label = button.textContent;
-      button.textContent = "Copied";
+      button.textContent = tr("Copied");
       button.classList.add("is-done");
       setTimeout(() => {
         button.textContent = label;
@@ -1359,4 +1475,6 @@
   markPlatform();
   copyButtons();
   reveals();
+  contactEmails();
+  languageSwitch();
 })();

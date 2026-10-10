@@ -1349,6 +1349,15 @@ button.tbtn:hover span {
   box-shadow: none;
 }
 
+/* A translated label inside a heading cell is plain text. */
+.tree-head span > span {
+  display: inline;
+  height: auto;
+  padding: 0;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
 .tree-head .sorted {
   color: var(--ink);
   font-weight: 600;
@@ -2278,6 +2287,101 @@ button.tbtn:hover span {
 .dl-more a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Language switch: EN / DE on the Meridian segmented control. Main pages
+   swap their copy with site.js, so their buttons need it; the links on the
+   legal pages work without it. */
+
+.site-header nav > .nav-links {
+  margin-left: auto;
+}
+
+.site-header nav > .lang-switch {
+  flex: none;
+}
+
+.lang-switch a,
+.lang-switch button {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-4);
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.lang-switch a:hover,
+.lang-switch button:hover {
+  color: var(--ink);
+}
+
+.lang-switch a[aria-current="true"],
+.lang-switch button[aria-pressed="true"] {
+  background: var(--pane);
+  box-shadow: 0 0 0 1px var(--line-strong), var(--shadow-control);
+  color: var(--ink);
+}
+
+html:not(.js) [data-needs-js] {
+  display: none;
+}
+
+/* On phones the section links give way to Download and the switch. */
+@media (max-width: 480px) {
+  .nav-links .nav-section {
+    display: none;
+  }
+}
+
+/* Imprint and privacy policy: one readable column in the page layout. */
+
+.page.legal {
+  padding-top: var(--space-10);
+  overflow-wrap: break-word;
+}
+
+.page.legal > * {
+  max-width: 70ch;
+}
+
+.legal h2 {
+  margin: var(--space-10) 0 var(--space-4);
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.legal h3 {
+  margin: var(--space-8) 0 var(--space-3);
+  font-size: 16px;
+}
+
+.legal p,
+.legal li,
+.legal address {
+  color: var(--ink-muted);
+  font-size: 15px;
+  font-style: normal;
+  line-height: 1.65;
+}
+
+.legal ul {
+  padding-left: 1.2em;
+}
+
+.legal a {
+  color: var(--accent-ink, var(--accent));
+  text-underline-offset: 3px;
+}
+
+.legal code {
+  font-size: 0.92em;
 }
 
 /* Footer */

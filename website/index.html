@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ProcessLama — Process Explorer for macOS, Linux, and Windows</title>
+    <title data-de="ProcessLama — Prozess-Explorer für macOS, Linux und Windows">ProcessLama — Process Explorer for macOS, Linux, and Windows</title>
     <meta
       name="description"
       content="ProcessLama is a desktop process explorer for macOS, Linux, and Windows. It shows processes as a tree with CPU, memory, network, and storage figures and an inspector for details."
+      data-de-content="ProcessLama ist ein Prozess-Explorer für macOS, Linux und Windows. Er zeigt Prozesse als Baum mit Werten für CPU, Arbeitsspeicher, Netzwerk und Speicher und einen Inspektor für Details."
     >
     <link rel="canonical" href="https://devmil.de/processlama/">
     <meta name="author" content="Devmil Solutions">
@@ -30,11 +31,11 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://devmil.de/processlama/assets/brand/processlama-feature-graphic.png?v=0f01a3331868">
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ProcessLama", "url": "https://devmil.de/processlama/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "macOS, Linux, Windows", "author": {"@type": "Organization", "name": "Devmil Solutions", "url": "https://devmil.de/"}}</script>
-    <link rel="stylesheet" href="styles.css?v=907f46e92d0b">
+    <link rel="stylesheet" href="styles.css?v=a73240d9e23c">
     <link rel="stylesheet" href="assets/lama/lama-antics.css?v=926d01e9bae2">
     <script>document.documentElement.classList.add("js");</script>
     <script src="assets/lama/lama-antics.js?v=fd9d7d8235fa" defer></script>
-    <script src="site.js?v=0e7518af687a" defer></script>
+    <script src="site.js?v=21d7787136e5" defer></script>
   </head>
   <body>
     <!-- Icons: Lucide (lucide-static 1.37.0, ISC), the set Meridian ships in the app. -->
@@ -63,18 +64,22 @@
       <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
     </svg>
 
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main" data-de="Zum Inhalt springen">Skip to content</a>
 
     <header class="site-header">
-      <nav aria-label="Main">
+      <nav aria-label="Main" data-de-aria-label="Hauptnavigation">
         <a class="brand" href="./">
           <img class="brand-mark" src="assets/brand/processlama-icon.svg?v=3c6a3d3545c0" alt="" width="26" height="26">
           <span class="brand-name">ProcessLama</span>
         </a>
         <div class="nav-links">
-          <a href="#window">Window</a>
-          <a href="#features">Features</a>
+          <a class="nav-section" href="#window" data-de="Fenster">Window</a>
+          <a class="nav-section" href="#features" data-de="Funktionen">Features</a>
           <a class="nav-cta" href="#download">Download</a>
+        </div>
+        <div class="lang-switch seg" role="group" aria-label="Language" data-de-aria-label="Sprache" data-needs-js>
+          <button type="button" lang="en" data-lang="en" aria-pressed="true">EN</button>
+          <button type="button" lang="de" data-lang="de" aria-pressed="false">DE</button>
         </div>
       </nav>
     </header>
@@ -84,9 +89,9 @@
         <canvas class="hero-tree" data-hero-tree aria-hidden="true"></canvas>
         <div class="hero-inner">
           <div class="hero-copy">
-            <p class="eyebrow">Process explorer <span class="eyebrow-maker">by Devmil Solutions</span></p>
-            <h1 id="hero-title">See what your machine <span class="soft">is up to.</span></h1>
-            <p class="lede">
+            <p class="eyebrow"><span data-de="Prozess-Explorer">Process explorer</span> <span class="eyebrow-maker">by Devmil Solutions</span></p>
+            <h1 id="hero-title"><span data-de="Sehen Sie, was Ihr Rechner">See what your machine</span> <span class="soft" data-de="gerade tut.">is up to.</span></h1>
+            <p class="lede" data-de="ProcessLama zeigt die Prozesse auf Ihrem Computer als Baum und für jeden Prozess die Nutzung von CPU, Arbeitsspeicher, Netzwerk und Speicher. Es läuft unter macOS, Linux und Windows und ist in der Beta-Phase.">
               ProcessLama lists the processes on your computer as a tree and shows
               CPU, memory, network, and storage use for each one. It runs on
               macOS, Linux, and Windows, and it is in beta.
@@ -94,18 +99,18 @@
             <div class="actions">
               <a class="button primary" href="#download">
                 <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
-                Download ProcessLama
+                <span data-de="ProcessLama herunterladen">Download ProcessLama</span>
               </a>
               <a class="button" href="#window">
-                See the window
+                <span data-de="Zum Fenster">See the window</span>
                 <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg>
               </a>
             </div>
             <ul class="hero-facts">
               <li><b data-release="version">Beta</b></li>
-              <li><b>3</b> platforms</li>
-              <li>Light + dark</li>
-              <li>English + Deutsch</li>
+              <li><b>3</b> <span data-de="Plattformen">platforms</span></li>
+              <li data-de="Hell + dunkel">Light + dark</li>
+              <li data-de="Englisch + Deutsch">English + Deutsch</li>
             </ul>
           </div>
         </div>
@@ -117,15 +122,15 @@
         </div>
         <p class="hero-caption status live" aria-hidden="true">
           <span class="dot"></span>
-          <span>Drawing, not your machine · <span data-tree-count>0</span> processes</span>
+          <span><span data-de="Zeichnung, nicht Ihr Rechner">Drawing, not your machine</span> · <span data-tree-count>0</span> <span data-de="Prozesse">processes</span></span>
         </p>
       </section>
 
       <section id="window" class="section" aria-labelledby="window-title">
         <div class="section-head reveal">
-          <p class="eyebrow"><b>01</b> / The window</p>
-          <h2 id="window-title">Tree in the middle. <span class="soft">Details on the right.</span></h2>
-          <p class="section-lede">
+          <p class="eyebrow"><b>01</b> / <span data-de="Das Fenster">The window</span></p>
+          <h2 id="window-title"><span data-de="Der Baum in der Mitte.">Tree in the middle.</span> <span class="soft" data-de="Details rechts.">Details on the right.</span></h2>
+          <p class="section-lede" data-de="Eine Skizze des Hauptfensters, in HTML gebaut, mit erfundenen Zahlen. Sie können eine Zeile auswählen, einen Zweig einklappen, suchen, zwischen Baum- und Prozesswerten wechseln oder den Baum sperren.">
             A sketch of the main window, built in HTML with made-up numbers. You
             can select a row, fold a branch, search, switch between tree and
             process figures, or lock the tree.
@@ -138,8 +143,8 @@
               <span class="app-title"><strong>ProcessLama</strong><small>Live · macos</small></span>
               <label class="app-search">
                 <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
-                <span class="sr-only">Search the sketch</span>
-                <input type="search" placeholder="Search name, PID, or path" autocomplete="off" spellcheck="false" data-demo-search>
+                <span class="sr-only" data-de="Skizze durchsuchen">Search the sketch</span>
+                <input type="search" placeholder="Search name, PID, or path" data-de-placeholder="Name, PID oder Pfad suchen" autocomplete="off" spellcheck="false" data-demo-search>
                 <output data-demo-matches></output>
                 <span class="field-tools" aria-hidden="true"><svg class="icon"><use href="#i-case"/></svg><svg class="icon"><use href="#i-word"/></svg></span>
               </label>
@@ -149,27 +154,27 @@
                 <button class="tbtn" type="button" aria-pressed="false" data-demo-lock>
                   <svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg><span>Lock</span>
                 </button>
-                <span class="tbtn" aria-hidden="true"><svg class="icon"><use href="#i-camera"/></svg><span>Snapshot</span></span>
+                <span class="tbtn" aria-hidden="true"><svg class="icon"><use href="#i-camera"/></svg><span data-de="Schnappschuss">Snapshot</span></span>
                 <span class="tbtn" aria-hidden="true"><svg class="icon"><use href="#i-download"/></svg><span>Updates</span></span>
-                <span class="tbtn on" aria-hidden="true"><svg class="icon"><use href="#i-panel-right"/></svg><span>Inspector</span></span>
-                <span class="tbtn" aria-hidden="true"><svg class="icon"><use href="#i-settings"/></svg><span>Preferences</span></span>
+                <span class="tbtn on" aria-hidden="true"><svg class="icon"><use href="#i-panel-right"/></svg><span data-de="Inspektor">Inspector</span></span>
+                <span class="tbtn" aria-hidden="true"><svg class="icon"><use href="#i-settings"/></svg><span data-de="Einstellungen">Preferences</span></span>
               </span>
             </div>
             <div class="app-body">
               <div class="app-nav">
-                <div aria-hidden="true" class="nav-sec">Pinned</div>
-                <div aria-hidden="true" class="nav-hint">Pin rows for quick access.</div>
-                <div aria-hidden="true" class="nav-sec">Snapshots</div>
-                <div class="nrow selected" aria-hidden="true"><svg class="icon"><use href="#i-activity"/></svg><span class="name">Live · macos</span><small>now</small></div>
-                <div aria-hidden="true" class="nav-sec">Filters</div>
-                <div aria-hidden="true" class="nav-hint">No saved filters.</div>
+                <div aria-hidden="true" class="nav-sec" data-de="Angeheftet">Pinned</div>
+                <div aria-hidden="true" class="nav-hint" data-de="Zeilen für schnellen Zugriff anheften.">Pin rows for quick access.</div>
+                <div aria-hidden="true" class="nav-sec" data-de="Schnappschüsse">Snapshots</div>
+                <div class="nrow selected" aria-hidden="true"><svg class="icon"><use href="#i-activity"/></svg><span class="name">Live · macos</span><small data-de="jetzt">now</small></div>
+                <div aria-hidden="true" class="nav-sec" data-de="Filter">Filters</div>
+                <div aria-hidden="true" class="nav-hint" data-de="Keine gespeicherten Filter.">No saved filters.</div>
                 <button class="nav-signature" type="button" title="ProcessLama · by Devmil Solutions" data-demo-about-open>
                   <span class="signature" aria-hidden="true"></span>
-                  <span class="sr-only">About ProcessLama</span>
+                  <span class="sr-only" data-de="Über ProcessLama">About ProcessLama</span>
                 </button>
               </div>
               <div class="island app-island focused">
-                <div class="tree-head" aria-hidden="true"><span>Name</span><span>PID</span><span class="sorted">Tree CPU<svg class="icon"><use href="#i-arrow-down"/></svg></span><span>Tree RSS</span></div>
+                <div class="tree-head" aria-hidden="true"><span>Name</span><span>PID</span><span class="sorted"><span data-de="Baum-CPU">Tree CPU</span><svg class="icon"><use href="#i-arrow-down"/></svg></span><span data-de="Baum-RSS">Tree RSS</span></div>
                 <div class="tree-rows" data-demo-rows>
                   <button class="tree-row selected" type="button" data-depth="0" data-name="launchd" data-pid="1" data-cpu="0.2" data-mem="42" data-gpu="0" data-net="0" data-io="0" data-threads="4" data-hidden="392" data-hidden-cpu="14" data-hidden-mem="9200" data-hidden-gpu="2" data-hidden-net="18" data-hidden-io="900"><span class="name"><span class="label">launchd</span></span><span class="num pid">1</span><span class="num">0.2%</span><span class="num">42.0 MB</span></button>
                   <button class="tree-row" type="button" data-depth="1" data-name="Code" data-pid="902" data-cpu="2.1" data-mem="520" data-gpu="0.4" data-net="6" data-io="20" data-threads="41"><span class="name"><span class="label">Code</span></span><span class="num pid">902</span><span class="num">2.1%</span><span class="num">520.0 MB</span></button>
@@ -196,11 +201,11 @@
                   <span class="avatar large" data-i="avatar">L</span>
                   <div><strong data-i="name">launchd</strong><span>pid <span data-i="pid">1</span> · macos</span></div>
                 </div>
-                <div class="tabs" aria-hidden="true"><span class="on">Overview</span><span>Details</span><span>Network</span><span>Threads</span><span>Files &amp; Sockets</span></div>
+                <div class="tabs" aria-hidden="true"><span class="on" data-de="Übersicht">Overview</span><span>Details</span><span data-de="Netzwerk">Network</span><span>Threads</span><span data-de="Dateien &amp; Sockets">Files &amp; Sockets</span></div>
                 <div class="inspector-body" data-i="body">
-                  <span class="seg sm" role="group" aria-label="Figures for">
-                    <button type="button" aria-pressed="true" data-demo-scope="tree">Tree</button>
-                    <button type="button" aria-pressed="false" data-demo-scope="process">Process</button>
+                  <span class="seg sm" role="group" aria-label="Figures for" data-de-aria-label="Werte für">
+                    <button type="button" aria-pressed="true" data-demo-scope="tree" data-de="Baum">Tree</button>
+                    <button type="button" aria-pressed="false" data-demo-scope="process" data-de="Prozess">Process</button>
                   </span>
                   <div class="tiles" data-i="tiles"></div>
                   <div data-i="charts"></div>
@@ -209,23 +214,23 @@
             </div>
             <div class="sketch-scrim" data-demo-about hidden>
               <div class="sketch-dialog" role="dialog" aria-modal="true" aria-labelledby="sketch-about-title">
-                <h3 id="sketch-about-title">About ProcessLama</h3>
+                <h3 id="sketch-about-title" data-de="Über ProcessLama">About ProcessLama</h3>
                 <div class="about-ground"><img src="assets/lama/lama-proud.svg?v=a8d927b48be1" alt="" width="96" height="96"></div>
-                <p><strong>ProcessLama</strong><span>by Devmil Solutions</span><small data-release="about">Beta build</small></p>
-                <div class="sketch-dialog-actions"><button class="button small" type="button" data-demo-about-close>Close</button></div>
+                <p><strong>ProcessLama</strong><span>by Devmil Solutions</span><small data-release="about" data-de="Beta-Build">Beta build</small></p>
+                <div class="sketch-dialog-actions"><button class="button small" type="button" data-demo-about-close data-de="Schließen">Close</button></div>
               </div>
             </div>
             <div class="app-status">
               <span class="status live" data-demo-state><span class="dot"></span><span data-demo-status>Polling every 1000 ms</span></span>
               <span class="spacer"></span>
-              <span><span data-demo-count>425</span> processes</span>
+              <span><span data-demo-count>425</span> <span data-de="Prozesse">processes</span></span>
             </div>
           </div>
           <figcaption class="app-caption">
-            <span>A sketch, not a screenshot. The app has more columns and its other inspector tabs work. The small Lama at the foot of the sidebar opens About.</span>
-            <span class="seg" role="group" aria-label="Sketch appearance">
-              <button type="button" aria-pressed="false" data-demo-theme="light">Light</button>
-              <button type="button" aria-pressed="false" data-demo-theme="dark">Dark</button>
+            <span data-de="Eine Skizze, kein Screenshot. Die App hat mehr Spalten, und ihre anderen Inspektor-Tabs funktionieren. Das kleine Lama am Fuß der Seitenleiste öffnet „Über“.">A sketch, not a screenshot. The app has more columns and its other inspector tabs work. The small Lama at the foot of the sidebar opens About.</span>
+            <span class="seg" role="group" aria-label="Sketch appearance" data-de-aria-label="Darstellung der Skizze">
+              <button type="button" aria-pressed="false" data-demo-theme="light" data-de="Hell">Light</button>
+              <button type="button" aria-pressed="false" data-demo-theme="dark" data-de="Dunkel">Dark</button>
             </span>
           </figcaption>
         </figure>
@@ -234,61 +239,61 @@
       <section id="features" class="section" aria-labelledby="features-title">
         <div class="split">
           <div class="section-head reveal">
-            <p class="eyebrow"><b>02</b> / Features</p>
-            <h2 id="features-title">What it does. <span class="soft">In eight parts.</span></h2>
-            <p class="section-lede">
+            <p class="eyebrow"><b>02</b> / <span data-de="Funktionen">Features</span></p>
+            <h2 id="features-title"><span data-de="Was es kann.">What it does.</span> <span class="soft" data-de="In acht Teilen.">In eight parts.</span></h2>
+            <p class="section-lede" data-de="Manche Details unterscheiden sich zwischen macOS, Linux und Windows, und der Inspektor kann nur zeigen, was das System erlaubt.">
               Some details differ between macOS, Linux, and Windows, and the
               inspector can only show what the system allows.
             </p>
           </div>
           <ol class="ftree" data-ftree>
             <li class="fnode reveal">
-              <h3>Process tree <span class="ftag">tree</span></h3>
-              <p>Processes are shown with their parents and children. Rows keep their place while the values update.</p>
+              <h3><span data-de="Prozessbaum">Process tree</span> <span class="ftag">tree</span></h3>
+              <p data-de="Prozesse werden mit ihren Eltern und Kindern angezeigt. Die Zeilen behalten ihren Platz, während sich die Werte aktualisieren.">Processes are shown with their parents and children. Rows keep their place while the values update.</p>
             </li>
             <li class="fnode reveal">
-              <h3>Tree lock <span class="ftag">lock</span></h3>
-              <p>Lock the tree to freeze the order while you look at something. The values keep refreshing.</p>
+              <h3><span data-de="Baumsperre">Tree lock</span> <span class="ftag">lock</span></h3>
+              <p data-de="Sperren Sie den Baum, um die Reihenfolge einzufrieren, während Sie sich etwas ansehen. Die Werte werden weiter aktualisiert.">Lock the tree to freeze the order while you look at something. The values keep refreshing.</p>
             </li>
             <li class="fnode reveal">
-              <h3>Search and filters <span class="ftag">search</span></h3>
-              <p>Search by name, PID, or path. Matches are highlighted and the rest of the tree stays visible. A search can be saved as a filter.</p>
+              <h3><span data-de="Suche und Filter">Search and filters</span> <span class="ftag">search</span></h3>
+              <p data-de="Suchen Sie nach Name, PID oder Pfad. Treffer werden hervorgehoben, der Rest des Baums bleibt sichtbar. Eine Suche lässt sich als Filter speichern.">Search by name, PID, or path. Matches are highlighted and the rest of the tree stays visible. A search can be saved as a filter.</p>
             </li>
             <li class="fnode reveal">
-              <h3>Metrics and history <span class="ftag">metrics</span></h3>
-              <p>CPU, memory, network, and storage per process and per subtree, with history charts. Hover a chart to read a sample.</p>
+              <h3><span data-de="Werte und Verlauf">Metrics and history</span> <span class="ftag">metrics</span></h3>
+              <p data-de="CPU, Arbeitsspeicher, Netzwerk und Speicher pro Prozess und pro Teilbaum, mit Verlaufsdiagrammen. Zeigen Sie auf ein Diagramm, um einen Messwert abzulesen.">CPU, memory, network, and storage per process and per subtree, with history charts. Hover a chart to read a sample.</p>
             </li>
             <li class="fnode reveal">
-              <h3>Inspector <span class="ftag">inspect</span></h3>
-              <p>Open files, sockets, threads, and security details for the selected process. When the system denies access, the inspector says so.</p>
+              <h3><span data-de="Inspektor">Inspector</span> <span class="ftag">inspect</span></h3>
+              <p data-de="Offene Dateien, Sockets, Threads und Sicherheitsdetails des ausgewählten Prozesses. Verweigert das System den Zugriff, zeigt der Inspektor das an.">Open files, sockets, threads, and security details for the selected process. When the system denies access, the inspector says so.</p>
             </li>
             <li class="fnode reveal">
-              <h3>Process actions <span class="ftag">signal</span></h3>
-              <p>Terminate, force kill, suspend, or resume a process. ProcessLama asks before it sends a destructive signal.</p>
+              <h3><span data-de="Prozessaktionen">Process actions</span> <span class="ftag">signal</span></h3>
+              <p data-de="Einen Prozess beenden, sofort beenden, anhalten oder fortsetzen. ProcessLama fragt nach, bevor es ein destruktives Signal sendet.">Terminate, force kill, suspend, or resume a process. ProcessLama asks before it sends a destructive signal.</p>
             </li>
             <li class="fnode reveal">
-              <h3>Pins and subtree focus <span class="ftag">focus</span></h3>
-              <p>Pin the processes you check often, or narrow the view to one subtree.</p>
+              <h3><span data-de="Anheften und Teilbaum-Fokus">Pins and subtree focus</span> <span class="ftag">focus</span></h3>
+              <p data-de="Heften Sie die Prozesse an, die Sie oft prüfen, oder beschränken Sie die Ansicht auf einen Teilbaum.">Pin the processes you check often, or narrow the view to one subtree.</p>
             </li>
             <li class="fnode reveal">
-              <h3>Snapshots <span class="ftag">snapshot</span></h3>
-              <p>Save the current tree, give it a name, export it, and open it again later.</p>
+              <h3><span data-de="Schnappschüsse">Snapshots</span> <span class="ftag">snapshot</span></h3>
+              <p data-de="Speichern Sie den aktuellen Baum, geben Sie ihm einen Namen, exportieren Sie ihn und öffnen Sie ihn später wieder.">Save the current tree, give it a name, export it, and open it again later.</p>
             </li>
           </ol>
         </div>
 
         <dl class="facts">
           <div class="island reveal">
-            <dt><svg class="icon" aria-hidden="true"><use href="#i-cpu"/></svg>Rust core</dt>
-            <dd>Process data is collected in Rust. The interface is built with Flutter on Meridian.</dd>
+            <dt><svg class="icon" aria-hidden="true"><use href="#i-cpu"/></svg><span data-de="Rust-Kern">Rust core</span></dt>
+            <dd data-de="Die Prozessdaten werden in Rust erfasst. Die Oberfläche ist mit Flutter auf Meridian gebaut.">Process data is collected in Rust. The interface is built with Flutter on Meridian.</dd>
           </div>
           <div class="island reveal">
-            <dt><svg class="icon" aria-hidden="true"><use href="#i-shield-check"/></svg>Local only</dt>
-            <dd>Everything stays on your machine. No accounts and no analytics.</dd>
+            <dt><svg class="icon" aria-hidden="true"><use href="#i-shield-check"/></svg><span data-de="Nur lokal">Local only</span></dt>
+            <dd data-de="Alles bleibt auf Ihrem Rechner. Keine Konten und keine Analyse.">Everything stays on your machine. No accounts and no analytics.</dd>
           </div>
           <div class="island reveal">
-            <dt><svg class="icon" aria-hidden="true"><use href="#i-languages"/></svg>Two languages</dt>
-            <dd>English and German, with light and dark appearance.</dd>
+            <dt><svg class="icon" aria-hidden="true"><use href="#i-languages"/></svg><span data-de="Zwei Sprachen">Two languages</span></dt>
+            <dd data-de="Englisch und Deutsch, mit heller und dunkler Darstellung.">English and German, with light and dark appearance.</dd>
           </div>
         </dl>
       </section>
@@ -296,37 +301,37 @@
       <section id="download" class="section" aria-labelledby="download-title" data-downloads>
         <div class="section-head reveal">
           <p class="eyebrow"><b>03</b> / Download</p>
-          <h2 id="download-title">Get ProcessLama. <span class="soft">macOS, Linux, Windows.</span></h2>
-          <p class="section-lede">Pick the file for your system. The downloads page lists a SHA&#8209;256 checksum for every file.</p>
+          <h2 id="download-title"><span data-de="Holen Sie sich ProcessLama.">Get ProcessLama.</span> <span class="soft">macOS, Linux, Windows.</span></h2>
+          <p class="section-lede" data-de="Wählen Sie die Datei für Ihr System. Die Downloadseite nennt für jede Datei eine SHA&#8209;256-Prüfsumme.">Pick the file for your system. The downloads page lists a SHA&#8209;256 checksum for every file.</p>
         </div>
         <p class="release-line reveal" data-release="line" hidden>
           <span class="chip" data-release="channel"></span>
           <span class="mono" data-release="detail"></span>
-          <a data-release="notes" href="releases.html">Release notes</a>
+          <a data-release="notes" href="releases.html" data-de="Versionshinweise">Release notes</a>
         </p>
         <div class="os-grid">
           <article class="os-card island reveal" data-platform="macos">
             <div class="os-head">
               <span class="os-mark"><span class="os-icon os-apple" aria-hidden="true"></span></span>
               <div><h3>macOS</h3><p data-release="requires">Apple Silicon · macOS 14.0</p></div>
-              <span class="chip accent" data-yours hidden>Your system</span>
+              <span class="chip accent" data-yours hidden data-de="Ihr System">Your system</span>
             </div>
             <ul class="file-list">
               <li class="file"><a class="file-link" href="releases.html" data-format="dmg">
                 <span class="file-icons" aria-hidden="true"><span class="os-icon os-apple"></span></span>
-                <span class="file-main"><strong>DMG</strong><span>Disk image</span></span>
+                <span class="file-main"><strong>DMG</strong><span data-de="Disk-Image">Disk image</span></span>
                 <span class="file-size" data-size></span>
                 <span class="file-get" aria-hidden="true"><svg class="icon"><use href="#i-download"/></svg></span>
               </a></li>
             </ul>
-            <p class="os-note">Signed and notarized. Updates are installed from inside the app.</p>
+            <p class="os-note" data-de="Signiert und notarisiert. Updates werden in der App installiert.">Signed and notarized. Updates are installed from inside the app.</p>
           </article>
 
           <article class="os-card island reveal" data-platform="linux">
             <div class="os-head">
               <span class="os-mark"><span class="os-icon os-linux" aria-hidden="true"></span></span>
               <div><h3>Linux</h3><p data-release="requires">x86_64</p></div>
-              <span class="chip accent" data-yours hidden>Your system</span>
+              <span class="chip accent" data-yours hidden data-de="Ihr System">Your system</span>
             </div>
             <ul class="file-list">
               <li class="file"><a class="file-link" href="releases.html" data-format="rpm">
@@ -343,54 +348,54 @@
               </a></li>
               <li class="file"><a class="file-link" href="releases.html" data-format="appimage">
                 <span class="file-icons" aria-hidden="true"><span class="os-icon os-package"></span></span>
-                <span class="file-main"><strong>AppImage</strong><span>Single file, no install</span></span>
+                <span class="file-main"><strong>AppImage</strong><span data-de="Einzelne Datei, keine Installation">Single file, no install</span></span>
                 <span class="file-size" data-size></span>
                 <span class="file-get" aria-hidden="true"><svg class="icon"><use href="#i-download"/></svg></span>
               </a></li>
               <li class="file"><a class="file-link" href="releases.html" data-format="tar">
                 <span class="file-icons" aria-hidden="true"><span class="os-icon os-archive"></span></span>
-                <span class="file-main"><strong>Portable tarball</strong><span>Unpack and run</span></span>
+                <span class="file-main"><strong data-de="Portables Tarball-Archiv">Portable tarball</strong><span data-de="Entpacken und starten">Unpack and run</span></span>
                 <span class="file-size" data-size></span>
                 <span class="file-get" aria-hidden="true"><svg class="icon"><use href="#i-download"/></svg></span>
               </a></li>
             </ul>
-            <p class="os-note">RPM and DEB include the service for per-process network figures. The portable builds can install it from the app.</p>
+            <p class="os-note" data-de="RPM und DEB enthalten den Dienst für Netzwerkwerte pro Prozess. Die portablen Builds können ihn aus der App installieren.">RPM and DEB include the service for per-process network figures. The portable builds can install it from the app.</p>
           </article>
 
           <article class="os-card island reveal" data-platform="windows">
             <div class="os-head">
               <span class="os-mark"><span class="os-icon os-windows" aria-hidden="true"></span></span>
               <div><h3>Windows</h3><p data-release="requires">x86_64 · Windows 10 1809</p></div>
-              <span class="chip accent" data-yours hidden>Your system</span>
+              <span class="chip accent" data-yours hidden data-de="Ihr System">Your system</span>
             </div>
             <ul class="file-list">
               <li class="file"><a class="file-link" href="releases.html" data-format="msi">
                 <span class="file-icons" aria-hidden="true"><span class="os-icon os-windows"></span></span>
-                <span class="file-main"><strong>Installer</strong><span>MSI</span></span>
+                <span class="file-main"><strong data-de="Installationsprogramm">Installer</strong><span>MSI</span></span>
                 <span class="file-size" data-size></span>
                 <span class="file-get" aria-hidden="true"><svg class="icon"><use href="#i-download"/></svg></span>
               </a></li>
               <li class="file"><a class="file-link" href="releases.html" data-format="zip">
                 <span class="file-icons" aria-hidden="true"><span class="os-icon os-archive"></span></span>
-                <span class="file-main"><strong>Portable ZIP</strong><span>Unpack and run</span></span>
+                <span class="file-main"><strong data-de="Portables ZIP">Portable ZIP</strong><span data-de="Entpacken und starten">Unpack and run</span></span>
                 <span class="file-size" data-size></span>
                 <span class="file-get" aria-hidden="true"><svg class="icon"><use href="#i-download"/></svg></span>
               </a></li>
             </ul>
-            <p class="os-note">The app checks for new builds and links back to the downloads page.</p>
+            <p class="os-note" data-de="Die App sucht nach neuen Builds und verlinkt auf die Downloadseite.">The app checks for new builds and links back to the downloads page.</p>
           </article>
         </div>
         <p class="dl-more reveal">
-          <span>Checksums, install commands, and earlier builds are on the downloads page.</span>
-          <a href="releases.html">Open the downloads page <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          <span data-de="Prüfsummen, Installationsbefehle und frühere Builds finden Sie auf der Downloadseite.">Checksums, install commands, and earlier builds are on the downloads page.</span>
+          <a href="releases.html"><span data-de="Zur Downloadseite">Open the downloads page</span> <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
         </p>
       </section>
     </main>
 
     <footer class="site-footer">
       <span class="footer-brand"><img src="assets/brand/processlama-icon.svg?v=3c6a3d3545c0" alt="" width="20" height="20">ProcessLama</span>
-      <span class="footer-links"><a href="releases.html">Downloads</a><a href="download/appcast.xml">macOS appcast</a></span>
-      <span class="footer-maker"><span class="signature" aria-hidden="true"></span>by Devmil Solutions. Built on Meridian.</span>
+      <span class="footer-links"><a href="releases.html">Downloads</a><a href="download/appcast.xml" data-de="macOS-Appcast">macOS appcast</a><a href="imprint.html" data-de="Impressum" data-de-href="de/imprint.html">Imprint</a><a href="privacy.html" data-de="Datenschutz" data-de-href="de/privacy.html">Privacy</a></span>
+      <span class="footer-maker"><span class="signature" aria-hidden="true"></span><span data-de="by Devmil Solutions. Gebaut mit Meridian.">by Devmil Solutions. Built on Meridian.</span></span>
     </footer>
   </body>
 </html>
