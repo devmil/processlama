@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Remote hosts · ProcessLama</title>
+    <meta name="description" content="Set up remote hosts in ProcessLama: SSH configuration, supported systems, the helper, the network service and uninstalling.">
+    <meta name="author" content="Devmil Solutions">
+    <link rel="canonical" href="https://devmil.de/processlama/remote-hosts.html">
+    <link rel="alternate" hreflang="en" href="https://devmil.de/processlama/remote-hosts.html">
+    <link rel="alternate" hreflang="de" href="https://devmil.de/processlama/de/remote-hosts.html">
+    <link rel="icon" href="favicon.ico?v=40686994f202" sizes="any">
+    <link rel="icon" href="assets/brand/processlama-icon.svg?v=3c6a3d3545c0" type="image/svg+xml">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png?v=20a163e9b2f7">
+    <link rel="manifest" href="site.webmanifest?v=4a1da52cc7f8">
+    <meta name="theme-color" content="#e8ecee" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b151a" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="styles.css?v=c253751c6fd2">
+    <script>document.documentElement.classList.add("js");</script>
+    <script src="site.js?v=a55f555e30dc" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <nav aria-label="Main">
+        <a class="brand" href="index.html">
+          <img class="brand-mark" src="assets/brand/processlama-icon.svg?v=3c6a3d3545c0" alt="" width="26" height="26">
+          <span class="brand-name">ProcessLama</span>
+        </a>
+        <div class="nav-links">
+          <a class="nav-section" href="index.html#window">Window</a>
+          <a class="nav-section" href="index.html#features">Features</a>
+          <a class="nav-cta" href="releases.html">Download</a>
+        </div>
+        <div class="lang-switch seg" role="group" aria-label="Language">
+          <a href="remote-hosts.html" lang="en" hreflang="en" data-lang="en" aria-current="true">EN</a>
+          <a href="de/remote-hosts.html" lang="de" hreflang="de" data-lang="de">DE</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="page-hero">
+        <div class="page">
+          <p class="eyebrow">Guide</p>
+          <h1>Remote hosts</h1>
+          
+        </div>
+      </section>
+      <article class="page legal">
+        <p>ProcessLama shows the processes of other machines in their own tabs. It connects with your OpenSSH client, copies a small helper program to the host and streams the process tree back. The helper runs as your SSH user and never uses <code>sudo</code>.</p>
+
+        <h2>Requirements</h2>
+        <ul>
+          <li>On this computer: OpenSSH 8.9 or newer, and a key-based login that works without a prompt (a key in your agent, or one without passphrase). ProcessLama runs ssh with <code>BatchMode=yes</code> and <code>StrictHostKeyChecking=yes</code>: connect once with <code>ssh &lt;alias&gt;</code> in a terminal to trust the host key.</li>
+          <li>Linux hosts: x86_64 or arm64 with glibc 2.34 or newer (for example Ubuntu 22.04, Debian 12, RHEL 9).</li>
+          <li>macOS hosts: Apple silicon or Intel, macOS 13 or newer.</li>
+        </ul>
+
+        <h2>Your ~/.ssh/config</h2>
+        <p>ProcessLama stores only a host alias. User names, ports, keys and jump hosts belong in <code>~/.ssh/config</code>:</p>
+<pre><code>Host build-box
+    HostName build-box.example.net
+    User deploy
+    IdentityFile ~/.ssh/id_ed25519
+
+Host db-internal
+    HostName 10.0.4.12
+    User ops
+    ProxyJump bastion</code></pre>
+        <p>Check that <code>ssh &lt;alias&gt; true</code> returns without asking anything, then use the alias in ProcessLama.</p>
+
+        <h2>Adding a host</h2>
+        <p>Click <strong>+</strong> at the end of the tab strip (Ctrl+T, ⌘T on macOS) and choose <strong>Add remote host…</strong>. Enter the alias and click <strong>Test connection</strong>. Save, and the host opens in a tab. When the helper is missing, ProcessLama shows its path, version, size and checksum and asks before installing it, unless you turned on <strong>Install helper automatically</strong>.</p>
+        <p>The helper goes to <code>~/.local/lib/processlama/</code> on the host, its icon cache to <code>~/.cache/processlama/</code>.</p>
+
+        <h2>Common problems</h2>
+        <ul>
+          <li><strong>noexec home directory:</strong> the helper cannot run from a home directory mounted <code>noexec</code>. ProcessLama does not install anywhere else.</li>
+          <li><strong>Login scripts:</strong> text printed by <code>~/.bashrc</code> is skipped, but a script that reads input stops the helper from starting. Guard interactive parts with <code>case $- in *i*) ;; *) return ;; esac</code>.</li>
+          <li><strong>Only your processes:</strong> hosts mounted with <code>hidepid=2</code> hide other users' processes; the tab says so.</li>
+        </ul>
+
+        <h2>Network rates on Linux hosts</h2>
+        <p>Per-process network rates need the ProcessLama network service on the host. Machines with the ProcessLama RPM or DEB already have it. For other hosts, the <a href="releases.html">downloads page</a> lists it under “Network service for remote Linux hosts”. In a remote tab, the network banner's <strong>Copy install command</strong> copies a command you run on the host; ProcessLama never runs <code>sudo</code> itself.</p>
+
+        <h2>macOS hosts</h2>
+        <p>An SSH session on macOS has no privacy permissions. For processes of other users, including root, the inspector shows files, sockets and threads as restricted; security details stay available. Your own processes show everything.</p>
+
+        <h2>When the connection drops</h2>
+        <p>The tab keeps its last sample and marks it stale with the time and the reason, and ProcessLama reconnects after 2, 5, 15 and 30 seconds, then every minute for up to ten minutes. Processes are never shown as ended only because the connection dropped.</p>
+
+        <h2>Removing the helper</h2>
+        <p>In <strong>Preferences → Remote hosts</strong>, open the host's menu and choose <strong>Remove helper from host…</strong>. Or run <code>ssh &lt;alias&gt; 'rm -rf ~/.local/lib/processlama ~/.cache/processlama'</code>.</p>
+
+        <h2>Privacy</h2>
+        <p>ProcessLama stores only the alias and what the helper last reported (system, architecture, helper version). It stores no user names, ports, keys or passwords, and its logs contain no host names or aliases.</p>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <span class="footer-brand"><img src="assets/brand/processlama-icon.svg?v=3c6a3d3545c0" alt="" width="20" height="20">ProcessLama</span>
+      <span class="footer-links"><a href="index.html">Home</a><a href="releases.html">Downloads</a><a href="imprint.html">Imprint</a><a href="privacy.html">Privacy</a></span>
+      <span class="footer-maker"><span class="signature" aria-hidden="true"></span>by Devmil Solutions. Built on Meridian.</span>
+    </footer>
+  </body>
+</html>

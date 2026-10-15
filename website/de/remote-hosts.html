@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entfernte Hosts · ProcessLama</title>
+    <meta name="description" content="Entfernte Hosts in ProcessLama einrichten: SSH-Konfiguration, unterstützte Systeme, der Helfer, der Netzwerkdienst und die Deinstallation.">
+    <meta name="author" content="Devmil Solutions">
+    <link rel="canonical" href="https://devmil.de/processlama/de/remote-hosts.html">
+    <link rel="alternate" hreflang="en" href="https://devmil.de/processlama/remote-hosts.html">
+    <link rel="alternate" hreflang="de" href="https://devmil.de/processlama/de/remote-hosts.html">
+    <link rel="icon" href="../favicon.ico?v=40686994f202" sizes="any">
+    <link rel="icon" href="../assets/brand/processlama-icon.svg?v=3c6a3d3545c0" type="image/svg+xml">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png?v=20a163e9b2f7">
+    <link rel="manifest" href="../site.webmanifest?v=4a1da52cc7f8">
+    <meta name="theme-color" content="#e8ecee" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b151a" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="../styles.css?v=c253751c6fd2">
+    <script>document.documentElement.classList.add("js");</script>
+    <script src="../site.js?v=a55f555e30dc" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Zum Inhalt springen</a>
+    <header class="site-header">
+      <nav aria-label="Hauptnavigation">
+        <a class="brand" href="../index.html">
+          <img class="brand-mark" src="../assets/brand/processlama-icon.svg?v=3c6a3d3545c0" alt="" width="26" height="26">
+          <span class="brand-name">ProcessLama</span>
+        </a>
+        <div class="nav-links">
+          <a class="nav-section" href="../index.html#window">Fenster</a>
+          <a class="nav-section" href="../index.html#features">Funktionen</a>
+          <a class="nav-cta" href="../releases.html">Download</a>
+        </div>
+        <div class="lang-switch seg" role="group" aria-label="Sprache">
+          <a href="../remote-hosts.html" lang="en" hreflang="en" data-lang="en">EN</a>
+          <a href="remote-hosts.html" lang="de" hreflang="de" data-lang="de" aria-current="true">DE</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="page-hero">
+        <div class="page">
+          <p class="eyebrow">Anleitung</p>
+          <h1>Entfernte Hosts</h1>
+          
+        </div>
+      </section>
+      <article class="page legal">
+        <p>ProcessLama zeigt die Prozesse anderer Rechner in eigenen Tabs. Es verbindet sich mit deinem OpenSSH-Client, kopiert ein kleines Hilfsprogramm auf den Host und überträgt den Prozessbaum zurück. Der Helfer läuft als dein SSH-Benutzer und verwendet nie <code>sudo</code>.</p>
+
+        <h2>Voraussetzungen</h2>
+        <ul>
+          <li>Auf diesem Rechner: OpenSSH 8.9 oder neuer und eine Anmeldung per Schlüssel, die ohne Rückfrage funktioniert (ein Schlüssel im Agent oder einer ohne Passphrase). ProcessLama startet ssh mit <code>BatchMode=yes</code> und <code>StrictHostKeyChecking=yes</code>: Verbinde dich einmal mit <code>ssh &lt;alias&gt;</code> in einem Terminal, um dem Host-Schlüssel zu vertrauen.</li>
+          <li>Linux-Hosts: x86_64 oder arm64 mit glibc 2.34 oder neuer (zum Beispiel Ubuntu 22.04, Debian 12, RHEL 9).</li>
+          <li>macOS-Hosts: Apple Silicon oder Intel, macOS 13 oder neuer.</li>
+        </ul>
+
+        <h2>Deine ~/.ssh/config</h2>
+        <p>ProcessLama speichert nur einen Host-Alias. Benutzernamen, Ports, Schlüssel und Jump-Hosts gehören in die <code>~/.ssh/config</code>:</p>
+<pre><code>Host build-box
+    HostName build-box.example.net
+    User deploy
+    IdentityFile ~/.ssh/id_ed25519
+
+Host db-internal
+    HostName 10.0.4.12
+    User ops
+    ProxyJump bastion</code></pre>
+        <p>Prüfe, dass <code>ssh &lt;alias&gt; true</code> ohne Rückfrage zurückkehrt, und verwende dann den Alias in ProcessLama.</p>
+
+        <h2>Einen Host hinzufügen</h2>
+        <p>Klick auf <strong>+</strong> am Ende der Tab-Leiste (Strg+T, unter macOS ⌘T) und wähle <strong>Entfernten Host hinzufügen …</strong>. Gib den Alias ein und klick auf <strong>Verbindung testen</strong>. Nach dem Speichern öffnet sich der Host in einem Tab. Fehlt der Helfer, zeigt ProcessLama Pfad, Version, Größe und Prüfsumme und fragt vor der Installation, sofern du <strong>Helfer automatisch installieren</strong> nicht eingeschaltet hast.</p>
+        <p>Der Helfer liegt auf dem Host unter <code>~/.local/lib/processlama/</code>, sein Icon-Cache unter <code>~/.cache/processlama/</code>.</p>
+
+        <h2>Häufige Probleme</h2>
+        <ul>
+          <li><strong>Home-Verzeichnis mit noexec:</strong> Aus einem mit <code>noexec</code> eingebundenen Home-Verzeichnis kann der Helfer nicht starten. ProcessLama installiert nirgendwo anders.</li>
+          <li><strong>Login-Skripte:</strong> Text, den die <code>~/.bashrc</code> ausgibt, wird übersprungen; ein Skript, das Eingaben liest, verhindert aber den Start des Helfers. Schütze interaktive Teile mit <code>case $- in *i*) ;; *) return ;; esac</code>.</li>
+          <li><strong>Nur deine Prozesse:</strong> Hosts mit <code>hidepid=2</code> verbergen die Prozesse anderer Benutzer; der Tab weist darauf hin.</li>
+        </ul>
+
+        <h2>Netzwerkwerte auf Linux-Hosts</h2>
+        <p>Netzwerkwerte pro Prozess brauchen den ProcessLama-Netzwerkdienst auf dem Host. Rechner mit dem RPM oder DEB von ProcessLama haben ihn bereits. Für andere Hosts führt ihn die <a href="../releases.html">Download-Seite</a> unter „Netzwerkdienst für entfernte Linux-Hosts“. In einem entfernten Tab kopiert <strong>Installationsbefehl kopieren</strong> im Netzwerk-Hinweis einen Befehl, den du auf dem Host ausführst; ProcessLama selbst führt nie <code>sudo</code> aus.</p>
+
+        <h2>macOS-Hosts</h2>
+        <p>Eine SSH-Sitzung auf macOS hat keine Datenschutzfreigaben. Für Prozesse anderer Benutzer, auch für root, zeigt der Inspektor Dateien, Sockets und Threads als eingeschränkt; die Sicherheitsdetails bleiben verfügbar. Deine eigenen Prozesse zeigen alles.</p>
+
+        <h2>Wenn die Verbindung abbricht</h2>
+        <p>Der Tab behält seinen letzten Messwert und markiert ihn mit Uhrzeit und Grund als veraltet. ProcessLama verbindet sich nach 2, 5, 15 und 30 Sekunden neu, danach jede Minute für bis zu zehn Minuten. Ein Verbindungsabbruch lässt keinen Prozess als beendet erscheinen.</p>
+
+        <h2>Den Helfer entfernen</h2>
+        <p>Öffne unter <strong>Einstellungen → Entfernte Hosts</strong> das Menü des Hosts und wähle <strong>Helfer vom Host entfernen …</strong>. Oder führe <code>ssh &lt;alias&gt; 'rm -rf ~/.local/lib/processlama ~/.cache/processlama'</code> aus.</p>
+
+        <h2>Datenschutz</h2>
+        <p>ProcessLama speichert nur den Alias und was der Helfer zuletzt gemeldet hat (System, Architektur, Helferversion). Es speichert keine Benutzernamen, Ports, Schlüssel oder Passwörter, und seine Protokolle enthalten keine Host-Namen oder Aliasse.</p>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <span class="footer-brand"><img src="../assets/brand/processlama-icon.svg?v=3c6a3d3545c0" alt="" width="20" height="20">ProcessLama</span>
+      <span class="footer-links"><a href="../index.html">Startseite</a><a href="../releases.html">Downloads</a><a href="imprint.html">Impressum</a><a href="privacy.html">Datenschutz</a></span>
+      <span class="footer-maker"><span class="signature" aria-hidden="true"></span>by Devmil Solutions. Basiert auf Meridian.</span>
+    </footer>
+  </body>
+</html>
