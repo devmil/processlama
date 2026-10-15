@@ -3,98 +3,108 @@
   "history": [],
   "beta": {
     "latest": {
-      "version": "1.0.0-beta.27",
-      "build": 34,
+      "version": "1.0.0-beta.28",
+      "build": 35,
       "released": "2026-10-15",
-      "notesPath": "/download/ProcessLama-1.0.0-beta.27-34.html",
+      "notesPath": "/download/ProcessLama-1.0.0-beta.28-35.html",
       "channel": "beta",
       "productName": "ProcessLama",
       "artifacts": [
         {
-          "file": "ProcessLama-1.0.0-beta.27-34.dmg",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34.dmg",
-          "sha256": "ae88855909fc6c69ac066abb3526ae40274061b5ba74f20a9032e38172511640",
-          "sizeBytes": 32989170,
+          "file": "ProcessLama-1.0.0-beta.28-35.dmg",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/ProcessLama-1.0.0-beta.28-35.dmg",
+          "sha256": "da51c7841de363447102556a9f01ed6b195476f98373b0455ca1b828789358f9",
+          "sizeBytes": 33178894,
           "platform": "macos",
           "format": "dmg",
           "architectures": "Apple Silicon",
           "minimumSystem": "macOS 14.0",
-          "sparkleSignature": "TbR2li9ZDIEWRxPvVP+/DRE/lG1LR4/xNdoEMZP9Wb1rXx+rTnWy48Ywzk9Qgvpc9IjquD2pi15ApZSqz6MBBw=="
+          "sparkleSignature": "g+gonRyqV5iRITeO36KlIRB1VxcUOMbFII3rjOwI41DINh+Y0myyYXRnf27DVsFOpjwcsa4iw3UC+fITwlW9Dw=="
         },
         {
-          "file": "ProcessLama-1.0.0-beta.27-34-linux-x86_64.AppImage",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-linux-x86_64.AppImage",
-          "sha256": "4633df3076843a3eb03ac07f8c96a7b5a76d04b7c753830d7f8a918f6efae7b7",
-          "sizeBytes": 16435704,
+          "file": "ProcessLama-1.0.0-beta.28-35-linux-x86_64.AppImage",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/ProcessLama-1.0.0-beta.28-35-linux-x86_64.AppImage",
+          "sha256": "93dbf998fe9b15a34bb49c45a8290cf40b7c6e1ad0e15ea1390ed45988dabdf3",
+          "sizeBytes": 16443896,
           "platform": "linux",
           "format": "appimage",
           "architectures": "x86_64",
           "minimumSystem": "Linux"
         },
         {
-          "file": "ProcessLama-1.0.0-beta.27-34-linux-x86_64.deb",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-linux-x86_64.deb",
-          "sha256": "97cba81cc6964c56cede50d03450e5afccab585b0dec0e1f1047c833bb5287d4",
-          "sizeBytes": 11930576,
+          "file": "ProcessLama-1.0.0-beta.28-35-linux-x86_64.deb",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/ProcessLama-1.0.0-beta.28-35-linux-x86_64.deb",
+          "sha256": "c81295dbbd60399144926674735b1d07c0c12881a3860a8c09953b07daa192a8",
+          "sizeBytes": 11938408,
           "platform": "linux",
           "format": "deb",
           "architectures": "x86_64",
           "minimumSystem": "Linux"
         },
         {
-          "file": "ProcessLama-1.0.0-beta.27-34-linux-x86_64.rpm",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-linux-x86_64.rpm",
-          "sha256": "27492e6f7082bd3893a9d80854db2aba2bc331d40559e83952bc877746a4a77b",
-          "sizeBytes": 13095459,
+          "file": "ProcessLama-1.0.0-beta.28-35-linux-x86_64.rpm",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/ProcessLama-1.0.0-beta.28-35-linux-x86_64.rpm",
+          "sha256": "e5bfe25cf810bcb3d7cb017f56456f267246525a3c41308620cf2249c632fb56",
+          "sizeBytes": 13102980,
           "platform": "linux",
           "format": "rpm",
           "architectures": "x86_64",
           "minimumSystem": "Linux"
         },
         {
-          "file": "ProcessLama-1.0.0-beta.27-34-linux-x86_64.tar.gz",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-linux-x86_64.tar.gz",
-          "sha256": "61b22b0b5b8205b4d3942ded66bfe3055c73345dd50662ca5c3c9af3d41485c3",
-          "sizeBytes": 16939911,
+          "file": "ProcessLama-1.0.0-beta.28-35-linux-x86_64.tar.gz",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/ProcessLama-1.0.0-beta.28-35-linux-x86_64.tar.gz",
+          "sha256": "a8d7a5f30ebdce72aa21f1ead3873c42e388bb9f3c65d2798cada99e47d1eb97",
+          "sizeBytes": 16946148,
           "platform": "linux",
           "format": "tar",
           "architectures": "x86_64",
           "minimumSystem": "Linux"
         },
         {
-          "file": "ProcessLama-1.0.0-beta.27-34-windows-x86_64.msi",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-windows-x86_64.msi",
-          "sha256": "3e1fbebeecfc176d050d9453346c2f73b94b16317f4f91da09cc197d7b470889",
-          "sizeBytes": 14729216,
+          "file": "ProcessLama-1.0.0-beta.28-35-windows-x86_64.msi",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/ProcessLama-1.0.0-beta.28-35-windows-x86_64.msi",
+          "sha256": "786f83e2f19fb6b6bd205252c54669e9d7aa494002b4a8264b5eb5ef371ab8e2",
+          "sizeBytes": 14737408,
           "platform": "windows",
           "format": "msi",
           "architectures": "x86_64",
           "minimumSystem": "Windows 10 1809"
         },
         {
-          "file": "processlama-network-service-1.0.0-beta.27-34-linux-aarch64.deb",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-aarch64.deb",
-          "sha256": "04946fda20da8b02992bd5dbdba4c2c41d787a2cb2cb28b194093eb72aadb19d",
-          "sizeBytes": 286902,
+          "file": "ProcessLama-1.0.0-beta.28-35-windows-x86_64.zip",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/ProcessLama-1.0.0-beta.28-35-windows-x86_64.zip",
+          "sha256": "467df9afaf8277b9eed5d319889c7c605d9e9812b76282d4184e96bd1826dcd2",
+          "sizeBytes": 18591668,
+          "platform": "windows",
+          "format": "zip",
+          "architectures": "x86_64",
+          "minimumSystem": "Windows 10 1809"
+        },
+        {
+          "file": "processlama-network-service-1.0.0-beta.28-35-linux-aarch64.deb",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/processlama-network-service-1.0.0-beta.28-35-linux-aarch64.deb",
+          "sha256": "2e5adf7452f98ee44728058ae1fe7ea92daa4f2d52cb39300ca556b9f1a77e96",
+          "sizeBytes": 286904,
           "platform": "linux-network",
           "format": "deb",
           "architectures": "aarch64",
           "minimumSystem": "glibc 2.34, systemd"
         },
         {
-          "file": "processlama-network-service-1.0.0-beta.27-34-linux-aarch64.rpm",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-aarch64.rpm",
-          "sha256": "c5de35da67f7f78751f1099e742202d5e73744e8e2d3aed165a7a94a295c42bf",
-          "sizeBytes": 323552,
+          "file": "processlama-network-service-1.0.0-beta.28-35-linux-aarch64.rpm",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/processlama-network-service-1.0.0-beta.28-35-linux-aarch64.rpm",
+          "sha256": "597faac21641365a69d526ac769beb732987723e5428f8c8d11e66014c13028d",
+          "sizeBytes": 323555,
           "platform": "linux-network",
           "format": "rpm",
           "architectures": "aarch64",
           "minimumSystem": "glibc 2.34, systemd"
         },
         {
-          "file": "processlama-network-service-1.0.0-beta.27-34-linux-aarch64.tar.gz",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-aarch64.tar.gz",
-          "sha256": "7f38e07a0a5f84538d52932ae9642860886b64ae3ada097fb1c43cb09b4bc500",
+          "file": "processlama-network-service-1.0.0-beta.28-35-linux-aarch64.tar.gz",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/processlama-network-service-1.0.0-beta.28-35-linux-aarch64.tar.gz",
+          "sha256": "f0204a858b5c7932f360e2d947dc2feea3a9b1dfa22400ba30feffaf4443c99b",
           "sizeBytes": 315719,
           "platform": "linux-network",
           "format": "tar",
@@ -102,9 +112,9 @@
           "minimumSystem": "glibc 2.34, systemd"
         },
         {
-          "file": "processlama-network-service-1.0.0-beta.27-34-linux-x86_64.deb",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-x86_64.deb",
-          "sha256": "ac62f8564c309975f75e6936d0800063fe9b3fbb9e17639b9224ec22c1605f27",
+          "file": "processlama-network-service-1.0.0-beta.28-35-linux-x86_64.deb",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/processlama-network-service-1.0.0-beta.28-35-linux-x86_64.deb",
+          "sha256": "743cba43cb73c22667636e53baec02da7bbd759e0c2a7eb663f9a77724ef742a",
           "sizeBytes": 298822,
           "platform": "linux-network",
           "format": "deb",
@@ -112,20 +122,20 @@
           "minimumSystem": "glibc 2.34, systemd"
         },
         {
-          "file": "processlama-network-service-1.0.0-beta.27-34-linux-x86_64.rpm",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-x86_64.rpm",
-          "sha256": "2028571134e9912094002429f120f455ef0f5f3f39e57e84bfc0fbb19dff1784",
-          "sizeBytes": 335553,
+          "file": "processlama-network-service-1.0.0-beta.28-35-linux-x86_64.rpm",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/processlama-network-service-1.0.0-beta.28-35-linux-x86_64.rpm",
+          "sha256": "4f918430c0fec193579f831f52fb728b26c0cfe096eb40e8910dca8fe032899f",
+          "sizeBytes": 335552,
           "platform": "linux-network",
           "format": "rpm",
           "architectures": "x86_64",
           "minimumSystem": "glibc 2.34, systemd"
         },
         {
-          "file": "processlama-network-service-1.0.0-beta.27-34-linux-x86_64.tar.gz",
-          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-x86_64.tar.gz",
-          "sha256": "5f2a57a783d77ded3526d125a523d5a379ed27fdbc13191104f296e34374583c",
-          "sizeBytes": 327952,
+          "file": "processlama-network-service-1.0.0-beta.28-35-linux-x86_64.tar.gz",
+          "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.28-35/processlama-network-service-1.0.0-beta.28-35-linux-x86_64.tar.gz",
+          "sha256": "01cf4c06a83e0faa52c39fa8e20e6d8f447828b5cbdd230743a74a7ecbe4f040",
+          "sizeBytes": 327951,
           "platform": "linux-network",
           "format": "tar",
           "architectures": "x86_64",
@@ -135,6 +145,138 @@
       "supersededByStable": false
     },
     "history": [
+      {
+        "version": "1.0.0-beta.27",
+        "build": 34,
+        "released": "2026-10-15",
+        "notesPath": "/download/ProcessLama-1.0.0-beta.27-34.html",
+        "channel": "beta",
+        "productName": "ProcessLama",
+        "artifacts": [
+          {
+            "file": "ProcessLama-1.0.0-beta.27-34.dmg",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34.dmg",
+            "sha256": "ae88855909fc6c69ac066abb3526ae40274061b5ba74f20a9032e38172511640",
+            "sizeBytes": 32989170,
+            "platform": "macos",
+            "format": "dmg",
+            "architectures": "Apple Silicon",
+            "minimumSystem": "macOS 14.0",
+            "sparkleSignature": "TbR2li9ZDIEWRxPvVP+/DRE/lG1LR4/xNdoEMZP9Wb1rXx+rTnWy48Ywzk9Qgvpc9IjquD2pi15ApZSqz6MBBw=="
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.27-34-linux-x86_64.AppImage",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-linux-x86_64.AppImage",
+            "sha256": "4633df3076843a3eb03ac07f8c96a7b5a76d04b7c753830d7f8a918f6efae7b7",
+            "sizeBytes": 16435704,
+            "platform": "linux",
+            "format": "appimage",
+            "architectures": "x86_64",
+            "minimumSystem": "Linux"
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.27-34-linux-x86_64.deb",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-linux-x86_64.deb",
+            "sha256": "97cba81cc6964c56cede50d03450e5afccab585b0dec0e1f1047c833bb5287d4",
+            "sizeBytes": 11930576,
+            "platform": "linux",
+            "format": "deb",
+            "architectures": "x86_64",
+            "minimumSystem": "Linux"
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.27-34-linux-x86_64.rpm",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-linux-x86_64.rpm",
+            "sha256": "27492e6f7082bd3893a9d80854db2aba2bc331d40559e83952bc877746a4a77b",
+            "sizeBytes": 13095459,
+            "platform": "linux",
+            "format": "rpm",
+            "architectures": "x86_64",
+            "minimumSystem": "Linux"
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.27-34-linux-x86_64.tar.gz",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-linux-x86_64.tar.gz",
+            "sha256": "61b22b0b5b8205b4d3942ded66bfe3055c73345dd50662ca5c3c9af3d41485c3",
+            "sizeBytes": 16939911,
+            "platform": "linux",
+            "format": "tar",
+            "architectures": "x86_64",
+            "minimumSystem": "Linux"
+          },
+          {
+            "file": "ProcessLama-1.0.0-beta.27-34-windows-x86_64.msi",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/ProcessLama-1.0.0-beta.27-34-windows-x86_64.msi",
+            "sha256": "3e1fbebeecfc176d050d9453346c2f73b94b16317f4f91da09cc197d7b470889",
+            "sizeBytes": 14729216,
+            "platform": "windows",
+            "format": "msi",
+            "architectures": "x86_64",
+            "minimumSystem": "Windows 10 1809"
+          },
+          {
+            "file": "processlama-network-service-1.0.0-beta.27-34-linux-aarch64.deb",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-aarch64.deb",
+            "sha256": "04946fda20da8b02992bd5dbdba4c2c41d787a2cb2cb28b194093eb72aadb19d",
+            "sizeBytes": 286902,
+            "platform": "linux-network",
+            "format": "deb",
+            "architectures": "aarch64",
+            "minimumSystem": "glibc 2.34, systemd"
+          },
+          {
+            "file": "processlama-network-service-1.0.0-beta.27-34-linux-aarch64.rpm",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-aarch64.rpm",
+            "sha256": "c5de35da67f7f78751f1099e742202d5e73744e8e2d3aed165a7a94a295c42bf",
+            "sizeBytes": 323552,
+            "platform": "linux-network",
+            "format": "rpm",
+            "architectures": "aarch64",
+            "minimumSystem": "glibc 2.34, systemd"
+          },
+          {
+            "file": "processlama-network-service-1.0.0-beta.27-34-linux-aarch64.tar.gz",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-aarch64.tar.gz",
+            "sha256": "7f38e07a0a5f84538d52932ae9642860886b64ae3ada097fb1c43cb09b4bc500",
+            "sizeBytes": 315719,
+            "platform": "linux-network",
+            "format": "tar",
+            "architectures": "aarch64",
+            "minimumSystem": "glibc 2.34, systemd"
+          },
+          {
+            "file": "processlama-network-service-1.0.0-beta.27-34-linux-x86_64.deb",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-x86_64.deb",
+            "sha256": "ac62f8564c309975f75e6936d0800063fe9b3fbb9e17639b9224ec22c1605f27",
+            "sizeBytes": 298822,
+            "platform": "linux-network",
+            "format": "deb",
+            "architectures": "x86_64",
+            "minimumSystem": "glibc 2.34, systemd"
+          },
+          {
+            "file": "processlama-network-service-1.0.0-beta.27-34-linux-x86_64.rpm",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-x86_64.rpm",
+            "sha256": "2028571134e9912094002429f120f455ef0f5f3f39e57e84bfc0fbb19dff1784",
+            "sizeBytes": 335553,
+            "platform": "linux-network",
+            "format": "rpm",
+            "architectures": "x86_64",
+            "minimumSystem": "glibc 2.34, systemd"
+          },
+          {
+            "file": "processlama-network-service-1.0.0-beta.27-34-linux-x86_64.tar.gz",
+            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.27-34/processlama-network-service-1.0.0-beta.27-34-linux-x86_64.tar.gz",
+            "sha256": "5f2a57a783d77ded3526d125a523d5a379ed27fdbc13191104f296e34374583c",
+            "sizeBytes": 327952,
+            "platform": "linux-network",
+            "format": "tar",
+            "architectures": "x86_64",
+            "minimumSystem": "glibc 2.34, systemd"
+          }
+        ],
+        "supersededByStable": false
+      },
       {
         "version": "1.0.0-beta.26",
         "build": 33,
@@ -373,88 +515,6 @@
             "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.23-30/ProcessLama-1.0.0-beta.23-30-windows-x86_64.zip",
             "sha256": "3f1a4a2bc82a756ec0c6e8fb1c80d0adf13562d3ddd63c805c3d493713e3c4bf",
             "sizeBytes": 14137093,
-            "platform": "windows",
-            "format": "zip",
-            "architectures": "x86_64",
-            "minimumSystem": "Windows 10 1809"
-          }
-        ],
-        "supersededByStable": false
-      },
-      {
-        "version": "1.0.0-beta.22",
-        "build": 29,
-        "released": "2026-10-04",
-        "notesPath": "/download/ProcessLama-1.0.0-beta.22-29.html",
-        "channel": "beta",
-        "productName": "ProcessLama",
-        "artifacts": [
-          {
-            "file": "ProcessLama-1.0.0-beta.22-29.dmg",
-            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.22-29/ProcessLama-1.0.0-beta.22-29.dmg",
-            "sha256": "ffe0d1c1d9e79ae270b7dfe96070e1e981ffdd62feba5d3b4faf1d4ef6cbd0df",
-            "sizeBytes": 28119066,
-            "platform": "macos",
-            "format": "dmg",
-            "architectures": "Apple Silicon",
-            "minimumSystem": "macOS 14.0",
-            "sparkleSignature": "ufpk/rO40ULM4iuuVVq0jNjqW3psB05Z6vgH81/ViyQIAHlzvm883vbjZU598VJsA+ZkpkX7fVzyBTmh9rT0BA=="
-          },
-          {
-            "file": "ProcessLama-1.0.0-beta.22-29-linux-x86_64.AppImage",
-            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.22-29/ProcessLama-1.0.0-beta.22-29-linux-x86_64.AppImage",
-            "sha256": "0db19b9f026c775270ef3e475570c5c5b97a80d734bc5705ed63f8e425ef89ea",
-            "sizeBytes": 18500088,
-            "platform": "linux",
-            "format": "appimage",
-            "architectures": "x86_64",
-            "minimumSystem": "Linux"
-          },
-          {
-            "file": "ProcessLama-1.0.0-beta.22-29-linux-x86_64.deb",
-            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.22-29/ProcessLama-1.0.0-beta.22-29-linux-x86_64.deb",
-            "sha256": "1ef377e4a3a82190710e3d0cc20f268dbabdd12209d700d5803f083a34f64204",
-            "sizeBytes": 13431060,
-            "platform": "linux",
-            "format": "deb",
-            "architectures": "x86_64",
-            "minimumSystem": "Linux"
-          },
-          {
-            "file": "ProcessLama-1.0.0-beta.22-29-linux-x86_64.rpm",
-            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.22-29/ProcessLama-1.0.0-beta.22-29-linux-x86_64.rpm",
-            "sha256": "da2879c1b5dbc986059bd2918eef3b64d86917743d7d1a3ffa95a6415ede8c49",
-            "sizeBytes": 10247813,
-            "platform": "linux",
-            "format": "rpm",
-            "architectures": "x86_64",
-            "minimumSystem": "Linux"
-          },
-          {
-            "file": "ProcessLama-1.0.0-beta.22-29-linux-x86_64.tar.gz",
-            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.22-29/ProcessLama-1.0.0-beta.22-29-linux-x86_64.tar.gz",
-            "sha256": "2b1b396c5e8cfd83f37d0200bc99e77e44bceeb2f7173b15e203d1618ecb2e33",
-            "sizeBytes": 19425497,
-            "platform": "linux",
-            "format": "tar",
-            "architectures": "x86_64",
-            "minimumSystem": "Linux"
-          },
-          {
-            "file": "ProcessLama-1.0.0-beta.22-29-windows-x86_64.msi",
-            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.22-29/ProcessLama-1.0.0-beta.22-29-windows-x86_64.msi",
-            "sha256": "7f53b482848118d879bead64bebdcb748a4e31303f2be10a5d58ef8b3ce108b7",
-            "sizeBytes": 11182080,
-            "platform": "windows",
-            "format": "msi",
-            "architectures": "x86_64",
-            "minimumSystem": "Windows 10 1809"
-          },
-          {
-            "file": "ProcessLama-1.0.0-beta.22-29-windows-x86_64.zip",
-            "downloadPath": "https://github.com/devmil/processlama/releases/download/v1.0.0-beta.22-29/ProcessLama-1.0.0-beta.22-29-windows-x86_64.zip",
-            "sha256": "e01610174acd75ecb919665dfa57aa15e903a767498f1711b662bd722cbf18d2",
-            "sizeBytes": 14135266,
             "platform": "windows",
             "format": "zip",
             "architectures": "x86_64",
