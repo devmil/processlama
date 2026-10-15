@@ -2070,6 +2070,269 @@ button.tbtn:hover span {
   line-height: 22px;
 }
 
+/* Remote hosts: a brand-ground stage like the hero. The copy reads on
+   green; the sketch keeps the page's own appearance and shows the app's tab
+   strip (Local, then one tab per host with its connection dot) over the
+   tree of a remote host, where the helper runs under the SSH session. The
+   Lama rests on the window. */
+
+.remote-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: var(--space-10);
+  align-items: center;
+  border-radius: var(--radius-xl);
+  padding: 44px 48px;
+  background:
+    radial-gradient(80% 90% at 85% 100%, rgba(36, 194, 125, 0.16), transparent 70%),
+    var(--brand-ground);
+  box-shadow: var(--shadow-pane);
+}
+
+.remote-copy {
+  --ink: var(--ivory);
+  --ink-muted: rgba(255, 248, 235, 0.74);
+  --focus: var(--ivory);
+  --tree-leaf: #f2c14e;
+
+  min-width: 0;
+  color: var(--ink);
+}
+
+.remote-copy .eyebrow::before {
+  background: rgba(255, 248, 235, 0.4);
+}
+
+.remote-copy .eyebrow b {
+  color: var(--signal);
+}
+
+.remote-copy h2 {
+  margin-bottom: var(--space-6);
+  font-size: clamp(28px, 3.2vw, 38px);
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.remote-copy .soft {
+  color: var(--signal);
+}
+
+.remote-points {
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.remote-points li {
+  position: relative;
+  padding-left: var(--space-8);
+  overflow-wrap: break-word;
+}
+
+.remote-points li + li {
+  margin-top: var(--space-4);
+}
+
+/* A leaf of the process tree as the bullet. */
+.remote-points li::before {
+  position: absolute;
+  top: 7px;
+  left: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--tree-leaf);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tree-leaf) 22%, transparent);
+  content: "";
+}
+
+.remote-more {
+  margin: var(--space-8) 0 0;
+}
+
+.remote-more a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--signal);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.remote-more a:hover span {
+  text-decoration: underline;
+}
+
+.remote-scene {
+  --lama-size: 104px;
+
+  position: relative;
+  min-width: 0;
+  padding-top: 80px;
+}
+
+/* The resting pose's body sits about 8% above the artwork's bottom edge. */
+.remote-lama {
+  position: absolute;
+  top: calc(80px + var(--lama-size) * 0.08 - var(--lama-size));
+  right: var(--space-9);
+  width: var(--lama-size);
+  height: var(--lama-size);
+}
+
+.remote-window {
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--ground);
+  box-shadow: var(--shadow-float);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.remote-titlebar {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 var(--space-6);
+}
+
+/* WorkspaceTabStrip: the fixed Local pill, the host tabs, then `+`. */
+.remote-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+}
+
+.remote-tab {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+  height: 26px;
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-5);
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.remote-tab.on {
+  background: var(--pane);
+  box-shadow: var(--shadow-pane);
+  color: var(--ink);
+}
+
+.remote-tab-name {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remote-tab .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.remote-tab .close {
+  width: 12px;
+  height: 12px;
+  color: var(--ink-faint);
+}
+
+.remote-tab-add {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-left: auto;
+  color: var(--ink-muted);
+}
+
+.status.warning .dot {
+  background: var(--warning);
+}
+
+.remote-pane {
+  margin: 0 var(--space-3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2) 0 var(--space-4);
+  background: var(--pane);
+  box-shadow: var(--shadow-pane);
+}
+
+.remote-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px 52px;
+  gap: var(--space-5);
+  align-items: center;
+  height: 26px;
+  padding: 0 var(--space-6);
+}
+
+.remote-head {
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.remote-head span + span {
+  text-align: right;
+}
+
+.remote-row .name {
+  overflow: hidden;
+  padding-left: calc(var(--depth, 0) * 14px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remote-row .num {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.remote-row.helper {
+  background: var(--accent-soft);
+}
+
+.remote-row.helper .name {
+  color: var(--accent-ink);
+  font-weight: 500;
+}
+
+.remote-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-width: 0;
+  height: 28px;
+  padding: 0 var(--space-6);
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.remote-status .spacer {
+  flex: 1;
+}
+
 /* Downloads */
 
 .release-line {
@@ -2333,8 +2596,9 @@ html:not(.js) [data-needs-js] {
   display: none;
 }
 
-/* On phones the section links give way to Download and the switch. */
-@media (max-width: 480px) {
+/* On phones the section links give way to Download and the switch; four
+   links and the German labels need up to 560px. */
+@media (max-width: 560px) {
   .nav-links .nav-section {
     display: none;
   }
@@ -2729,6 +2993,12 @@ html:not(.js) .copy {
     grid-template-columns: 1fr;
   }
 
+  .remote-stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-9);
+    padding: 40px 36px;
+  }
+
   .split {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -2833,6 +3103,44 @@ html:not(.js) .copy {
 
   .facts {
     grid-template-columns: 1fr;
+  }
+
+  .remote-stage {
+    padding: 28px 20px 20px;
+  }
+
+  .remote-row {
+    grid-template-columns: minmax(0, 1fr) 52px;
+  }
+
+  .remote-row .pid {
+    display: none;
+  }
+
+  .remote-row .name {
+    padding-left: calc(var(--depth, 0) * 10px);
+  }
+
+  .remote-scene {
+    --lama-size: 88px;
+  }
+
+  .remote-lama {
+    right: var(--space-6);
+  }
+
+  /* As in the app's narrow strip, background tabs drop their close button. */
+  .remote-tabs {
+    padding: 0 var(--space-3);
+  }
+
+  .remote-tab {
+    gap: var(--space-3);
+    padding: 0 var(--space-4);
+  }
+
+  .remote-tab:not(.on) .close {
+    display: none;
   }
 
   .fnode {

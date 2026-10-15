@@ -31,7 +31,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://devmil.de/processlama/assets/brand/processlama-feature-graphic.png?v=0f01a3331868">
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ProcessLama", "url": "https://devmil.de/processlama/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "macOS, Linux, Windows", "author": {"@type": "Organization", "name": "Devmil Solutions", "url": "https://devmil.de/"}}</script>
-    <link rel="stylesheet" href="styles.css?v=c253751c6fd2">
+    <link rel="stylesheet" href="styles.css?v=75e899b1241a">
     <link rel="stylesheet" href="assets/lama/lama-antics.css?v=926d01e9bae2">
     <script>document.documentElement.classList.add("js");</script>
     <script src="assets/lama/lama-antics.js?v=fd9d7d8235fa" defer></script>
@@ -62,6 +62,9 @@
       <symbol id="i-circle-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></symbol>
       <symbol id="i-circle-minus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></symbol>
       <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+      <symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
     </svg>
 
     <a class="skip-link" href="#main" data-de="Zum Inhalt springen">Skip to content</a>
@@ -75,6 +78,7 @@
         <div class="nav-links">
           <a class="nav-section" href="#window" data-de="Fenster">Window</a>
           <a class="nav-section" href="#features" data-de="Funktionen">Features</a>
+          <a class="nav-section" href="#remote" data-de="Entfernte Hosts">Remote hosts</a>
           <a class="nav-cta" href="#download">Download</a>
         </div>
         <div class="lang-switch seg" role="group" aria-label="Language" data-de-aria-label="Sprache" data-needs-js>
@@ -240,7 +244,7 @@
         <div class="split">
           <div class="section-head reveal">
             <p class="eyebrow"><b>02</b> / <span data-de="Funktionen">Features</span></p>
-            <h2 id="features-title"><span data-de="Was die App kann.">What it does.</span> <span class="soft" data-de="In neun Punkten.">In nine parts.</span></h2>
+            <h2 id="features-title"><span data-de="Was die App kann.">What it does.</span> <span class="soft" data-de="In acht Punkten.">In eight parts.</span></h2>
             <p class="section-lede" data-de="Manche Details unterscheiden sich unter macOS, Linux und Windows, und der Inspektor kann nur anzeigen, was das System zulässt.">
               Some details differ between macOS, Linux, and Windows, and the
               inspector can only show what the system allows.
@@ -279,11 +283,6 @@
               <h3><span data-de="Schnappschüsse">Snapshots</span> <span class="ftag">snapshot</span></h3>
               <p data-de="Speichere den aktuellen Baum, gib ihm einen Namen, exportiere ihn und öffne ihn später wieder.">Save the current tree, give it a name, export it, and open it again later.</p>
             </li>
-            <li class="fnode reveal">
-              <h3><span data-de="Entfernte Hosts">Remote hosts</span> <span class="ftag">ssh</span></h3>
-              <p data-de="Öffne Linux- und macOS-Rechner in eigenen Tabs, über deine SSH-Konfiguration. Ein kleiner Helfer liefert Baum, Messwerte, Icons und Details, ganz ohne sudo.">Open Linux and macOS machines in their own tabs, through your SSH configuration. A small helper streams the tree, metrics, icons, and details, without sudo.</p>
-              <p><a href="remote-hosts.html" data-de="Zur Einrichtung" data-de-href="de/remote-hosts.html">Setup guide</a></p>
-            </li>
           </ol>
         </div>
 
@@ -303,9 +302,63 @@
         </dl>
       </section>
 
+      <section id="remote" class="section" aria-labelledby="remote-title">
+        <div class="remote-stage reveal">
+          <div class="remote-copy">
+            <p class="eyebrow"><b>03</b> / <span data-de="Entfernte Hosts">Remote hosts</span></p>
+            <h2 id="remote-title"><span data-de="Auch andere Rechner.">Other machines, too.</span> <span class="soft" data-de="Jeder in seinem eigenen Tab.">Each in its own tab.</span></h2>
+            <p class="section-lede" data-de="Öffne einen Linux-Rechner oder einen Mac über das SSH, das du ohnehin nutzt. ProcessLama kopiert einen kleinen Helfer auf den Host und holt von dort den Prozessbaum mit Messwerten, Icons, Inspektor-Details und Prozessaktionen – im selben Fenster wie für deinen eigenen Rechner.">
+              Open a Linux machine or a Mac over the SSH you already use.
+              ProcessLama copies a small helper to the host and streams its
+              process tree back, with metrics, icons, inspector details, and
+              process actions, in the same window as your own computer.
+            </p>
+            <ul class="remote-points">
+              <li data-de="Du gibst nur den Host-Alias aus deiner ~/.ssh/config an. Benutzer, Schlüssel und Jump-Hosts bleiben dort; ProcessLama speichert keine Passwörter und fragt nie nach einem.">You enter only a host alias from your ~/.ssh/config. Users, keys, and jump hosts stay there; ProcessLama stores no passwords and never asks for one.</li>
+              <li data-de="Der Helfer läuft als dein SSH-Benutzer und nie mit sudo. Bevor ProcessLama ihn installiert oder nach einem App-Update aktualisiert, fragt es nach – außer du erlaubst das für einen Host automatisch.">The helper runs as your SSH user and never with sudo. ProcessLama asks before it installs it, or updates it after an app update, unless you allow that automatically for a host.</li>
+              <li data-de="Linux-Hosts mit x86_64 oder arm64 und Macs mit Apple Silicon oder Intel. Geöffnete Tabs kommen nach einem Neustart zurück; Tabs im Hintergrund aktualisieren sich alle 5&#160;Sekunden, auf Wunsch live oder gar nicht.">Linux hosts on x86_64 or arm64, and Macs with Apple silicon or Intel. Open tabs come back after a restart; background tabs refresh every 5&#160;seconds, or live, or not at all if you prefer.</li>
+              <li data-de="Bricht die Verbindung ab, bleibt der letzte Stand als veraltet markiert stehen, und ProcessLama verbindet sich von selbst neu. Kein Prozess gilt als beendet, nur weil die Leitung still war.">When the connection drops, the last sample stays, marked stale, and ProcessLama reconnects on its own. No process is shown as ended just because the line went quiet.</li>
+            </ul>
+            <p class="remote-more">
+              <a href="remote-hosts.html" data-de-href="de/remote-hosts.html"><span data-de="Zur Einrichtung">Read the setup guide</span> <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+            </p>
+          </div>
+          <!-- A sketch of the tab strip (Local, then remote tabs with their
+               connection dot) over a remote host's tree; the Lama rests on
+               the window, the helper is in the tree. -->
+          <div class="remote-scene" aria-hidden="true">
+            <img class="remote-lama" src="assets/lama/lama-resting.svg?v=a92936df666c" alt="" width="88" height="88">
+            <div class="remote-window">
+              <div class="remote-titlebar"><span class="lights"><i></i><i></i><i></i></span></div>
+              <div class="remote-tabs">
+                <span class="remote-tab"><svg class="icon"><use href="#i-monitor"/></svg><span class="remote-tab-name" data-de="Lokal">Local</span></span>
+                <span class="remote-tab on"><span class="status live"><span class="dot"></span></span><span class="remote-tab-name">Fedora</span><svg class="icon close"><use href="#i-x"/></svg></span>
+                <span class="remote-tab"><span class="status warning"><span class="dot"></span></span><span class="remote-tab-name">Pi</span><svg class="icon close"><use href="#i-x"/></svg></span>
+                <span class="remote-tab-add"><svg class="icon"><use href="#i-plus"/></svg></span>
+              </div>
+              <div class="remote-pane">
+                <div class="remote-row remote-head"><span>Name</span><span class="pid">PID</span><span>CPU</span></div>
+                <div class="remote-row" style="--depth: 0"><span class="name">systemd</span><span class="num pid">1</span><span class="num">0.2%</span></div>
+                <div class="remote-row" style="--depth: 1"><span class="name">sshd</span><span class="num pid">1021</span><span class="num">0.0%</span></div>
+                <div class="remote-row" style="--depth: 2"><span class="name">sshd-session</span><span class="num pid">48210</span><span class="num">0.1%</span></div>
+                <div class="remote-row helper" style="--depth: 3"><span class="name">processlama-remote-helper</span><span class="num pid">48233</span><span class="num">0.9%</span></div>
+                <div class="remote-row" style="--depth: 1"><span class="name">postgres</span><span class="num pid">1310</span><span class="num">3.8%</span></div>
+                <div class="remote-row" style="--depth: 1"><span class="name">nginx</span><span class="num pid">1288</span><span class="num">0.4%</span></div>
+                <div class="remote-row" style="--depth: 1"><span class="name">NetworkManager</span><span class="num pid">902</span><span class="num">0.1%</span></div>
+              </div>
+              <div class="remote-status">
+                <span class="status live"><span class="dot"></span><span data-de="Verbunden · Linux/x86_64">Connected · Linux/x86_64</span></span>
+                <span class="spacer"></span>
+                <span>214 <span data-de="Prozesse">processes</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="download" class="section" aria-labelledby="download-title" data-downloads>
         <div class="section-head reveal">
-          <p class="eyebrow"><b>03</b> / Download</p>
+          <p class="eyebrow"><b>04</b> / Download</p>
           <h2 id="download-title"><span data-de="ProcessLama herunterladen.">Get ProcessLama.</span> <span class="soft">macOS, Linux, Windows.</span></h2>
           <p class="section-lede" data-de="Wähle die Datei für dein System. Die Downloadseite nennt für jede Datei eine SHA&#8209;256-Prüfsumme.">Pick the file for your system. The downloads page lists a SHA&#8209;256 checksum for every file.</p>
         </div>
