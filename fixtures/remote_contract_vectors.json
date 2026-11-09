@@ -1,0 +1,573 @@
+{
+  "comment": "Accept/reject vectors for the product payloads of the remote helper protocol. rust-core/wire and test/remote/contract_vectors_test.dart both read this file.",
+  "vectors": [
+    {
+      "name": "linux hello",
+      "type": "helloBody",
+      "valid": true,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "macos hello",
+      "type": "helloBody",
+      "valid": true,
+      "value": {
+        "os": "macos",
+        "arch": "arm64",
+        "target": "macos-arm64",
+        "kernel": "24.6.0",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "nettop",
+            "reason": null
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": true
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "extra key",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        },
+        "hostname": "build-box"
+      }
+    },
+    {
+      "name": "missing bounds",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        }
+      }
+    },
+    {
+      "name": "os does not match target",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "macos",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "unknown target",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-riscv64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "uppercase instance id",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789ABCDEF0123456789ABCDEF",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "short hostname hash",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "abc",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "unknown network source",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "pcap",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "missing network reason",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "zero icon bound",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 0,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "kernel too long",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "control character in kernel",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8\n",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": 1000
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    },
+    {
+      "name": "uid is a string",
+      "type": "helloBody",
+      "valid": false,
+      "value": {
+        "os": "linux",
+        "arch": "x86_64",
+        "target": "linux-x86_64",
+        "kernel": "6.8.0-45-generic",
+        "hostInstanceId": "0123456789abcdef0123456789abcdef",
+        "hostnameHash": "0123456789abcdef",
+        "processtreeRevision": "a9aed83765bc4afd3526a3ae209899719faa0c07",
+        "compatibility": 1,
+        "account": {
+          "uid": "1000"
+        },
+        "capabilities": {
+          "gpu": false,
+          "storageIo": true,
+          "network": {
+            "source": "none",
+            "reason": "serviceNotInstalled"
+          },
+          "signals": true,
+          "inspector": {
+            "files": true,
+            "sockets": true,
+            "threads": true,
+            "security": false
+          },
+          "icons": true,
+          "hidepid": false
+        },
+        "bounds": {
+          "iconBytes": 262144,
+          "iconsPerFetch": 64,
+          "iconFetchBytes": 4194304,
+          "processesPerSample": 65536
+        }
+      }
+    }
+  ]
+}

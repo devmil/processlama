@@ -1,0 +1,26 @@
+[Unit]
+Description=ProcessLama process network accounting
+Documentation=https://devmil.de/processlama/
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/processlama/processlama-network-helper
+Restart=on-failure
+RestartSec=2s
+RuntimeDirectory=processlama
+RuntimeDirectoryMode=0755
+UMask=0022
+NoNewPrivileges=no
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+RestrictRealtime=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=multi-user.target

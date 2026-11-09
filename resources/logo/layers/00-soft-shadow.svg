@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="30" stdDeviation="30" flood-color="#05121b" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <g id="00-soft-shadow">
+    <rect x="112" y="112" width="800" height="800" rx="184" fill="#07131b" opacity="0.25" filter="url(#softShadow)"/>
+  </g>
+</svg>

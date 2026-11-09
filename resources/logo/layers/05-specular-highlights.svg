@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <g id="05-specular-highlights">
+    <path d="M210 200c-34 40-52 88-54 140" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="16" stroke-linecap="round"/>
+    <ellipse cx="360" cy="232" rx="120" ry="30" transform="rotate(-20 360 232)" fill="#ffffff" opacity="0.18"/>
+    <circle cx="742" cy="244" r="16" fill="#fff7d5" opacity="0.8"/>
+  </g>
+</svg>

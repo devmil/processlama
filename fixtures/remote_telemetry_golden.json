@@ -1,0 +1,240 @@
+{
+  "samples": [
+    {
+      "capturedAtMs": 1700000000000,
+      "listeningPorts": [
+        null,
+        [
+          8080
+        ]
+      ],
+      "localPorts": [
+        null,
+        [
+          8080,
+          51000
+        ]
+      ],
+      "metrics": {
+        "cpu": [
+          0,
+          123
+        ],
+        "cpuTimeMs": [
+          4200,
+          0
+        ],
+        "files": [
+          0,
+          23
+        ],
+        "gpu": [
+          0,
+          0
+        ],
+        "ioAvail": [
+          0,
+          1
+        ],
+        "ioRead": [
+          0,
+          0
+        ],
+        "ioReadTotal": [
+          0,
+          0
+        ],
+        "ioWrite": [
+          0,
+          0
+        ],
+        "ioWriteTotal": [
+          0,
+          0
+        ],
+        "netIn": [
+          0,
+          2048
+        ],
+        "netInTotal": [
+          0,
+          9000000
+        ],
+        "netOut": [
+          0,
+          0
+        ],
+        "netOutTotal": [
+          0,
+          0
+        ],
+        "nice": [
+          0,
+          0
+        ],
+        "prio": [
+          0,
+          0
+        ],
+        "rss": [
+          12582912,
+          104857600
+        ],
+        "status": [
+          1,
+          0
+        ],
+        "threads": [
+          1,
+          8
+        ],
+        "vmem": [
+          171048960,
+          2147483648
+        ]
+      },
+      "platform": "linux",
+      "topology": {
+        "bundle": [
+          "",
+          ""
+        ],
+        "cmd": [
+          "",
+          "/usr/bin/worker --serve"
+        ],
+        "exe": [
+          "",
+          "/usr/bin/worker"
+        ],
+        "icon": [
+          null,
+          null
+        ],
+        "name": [
+          "init",
+          "worker"
+        ],
+        "parent": [
+          -1,
+          0
+        ],
+        "pid": [
+          1,
+          42
+        ],
+        "ppid": [
+          0,
+          1
+        ],
+        "start": [
+          1699000000000,
+          1699000001000
+        ],
+        "uid": [
+          0,
+          1000
+        ],
+        "user": [
+          "root",
+          "tester"
+        ]
+      },
+      "topologyVersion": 1
+    },
+    {
+      "capturedAtMs": 1700000001000,
+      "listeningPorts": [
+        null,
+        []
+      ],
+      "localPorts": [
+        null,
+        [
+          9090
+        ]
+      ],
+      "metrics": {
+        "cpu": [
+          0,
+          500
+        ],
+        "cpuTimeMs": [
+          null,
+          0
+        ],
+        "files": [
+          0,
+          23
+        ],
+        "gpu": [
+          0,
+          0
+        ],
+        "ioAvail": [
+          0,
+          1
+        ],
+        "ioRead": [
+          0,
+          0
+        ],
+        "ioReadTotal": [
+          0,
+          0
+        ],
+        "ioWrite": [
+          0,
+          0
+        ],
+        "ioWriteTotal": [
+          0,
+          0
+        ],
+        "netIn": [
+          0,
+          0
+        ],
+        "netInTotal": [
+          0,
+          null
+        ],
+        "netOut": [
+          0,
+          0
+        ],
+        "netOutTotal": [
+          0,
+          0
+        ],
+        "nice": [
+          0,
+          0
+        ],
+        "prio": [
+          0,
+          0
+        ],
+        "rss": [
+          null,
+          null
+        ],
+        "status": [
+          1,
+          0
+        ],
+        "threads": [
+          1,
+          8
+        ],
+        "vmem": [
+          null,
+          null
+        ]
+      },
+      "platform": "linux",
+      "topology": null,
+      "topologyVersion": 1
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+rust_root: rust-core/core
+rust_input: crate::api
+dart_output: lib/rust
+rust_output: rust-core/core/src/frb_generated.rs

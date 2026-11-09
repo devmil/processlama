@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
+  <title id="title">ProcessLama icon background + color field (full rect, no mask)</title>
+  <defs>
+    <linearGradient id="plateGradient" x1="200" y1="160" x2="824" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3fc8c0"/>
+      <stop offset="0.35" stop-color="#1f9aa0"/>
+      <stop offset="0.7" stop-color="#16505f"/>
+      <stop offset="1" stop-color="#0a2230"/>
+    </linearGradient>
+    <radialGradient id="warmGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(770 250) rotate(125) scale(520 400)">
+      <stop offset="0" stop-color="#ffd36a" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#e9a73c" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#e9a73c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="coolGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(250 770) rotate(-35) scale(560 430)">
+      <stop offset="0" stop-color="#56e7df" stop-opacity="0.7"/>
+      <stop offset="0.6" stop-color="#1aa0a8" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#1aa0a8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- base plate: full bleed, no rounding -->
+  <rect width="1024" height="1024" fill="url(#plateGradient)"/>
+
+  <!-- color field: full bleed, no clip -->
+  <rect width="1024" height="1024" fill="url(#warmGlow)"/>
+  <rect width="1024" height="1024" fill="url(#coolGlow)"/>
+  <path d="M0 6h1024v252c-126 32-231 6-315-46-94-59-179-124-276-126-90-2-168 23-251 74z" fill="#ffffff" opacity="0.14"/>
+</svg>

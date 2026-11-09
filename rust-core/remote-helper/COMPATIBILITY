@@ -1,0 +1,8 @@
+# The remote helper compatibility version and the fingerprint of the sources it is built from.
+# Raise the version for any change to what the helper accepts, returns or does; read
+# "Remote helper compatibility" in AGENTS.md. Record with
+# scripts/check_helper_compatibility.py --record.
+version 3
+contract 7803d7a176673eacf6297247977a722a90e84172523192b7f63d2bfd30f9842e
+recorded-for 3
+processtree fa710ffa9e2344d8bf27c97f7ffa5cfd57355f00

@@ -1,0 +1,24 @@
+[package]
+name = "processlama-remote-helper"
+# The helper is identified by its compatibility version (COMPATIBILITY), not by this version.
+version = "0.0.0"
+edition.workspace = true
+publish.workspace = true
+description = "ProcessLama's headless process telemetry helper, started over SSH"
+
+[[bin]]
+name = "processlama-remote-helper"
+path = "src/main.rs"
+
+[dependencies]
+devmil_remote = { workspace = true }
+processlama_telemetry = { workspace = true }
+processlama_wire = { workspace = true }
+serde_json = "1"
+sha2 = "0.10"
+
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1", features = ["system", "process"] }
+
+[lints.rust]
+unsafe_code = "deny"

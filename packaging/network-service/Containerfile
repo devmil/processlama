@@ -1,0 +1,21 @@
+# Builds and packages processlama-network-helper natively for one architecture on the
+# glibc 2.35 baseline (Ubuntu 22.04). scripts/package-network-helper.sh runs it per
+# architecture; arm64 runs under qemu-user so libbpf and the BPF program are never
+# cross-compiled.
+FROM docker.io/library/ubuntu:22.04
+
+ARG RUST_VERSION=1.99.0
+ENV DEBIAN_FRONTEND=noninteractive \
+    RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
+
+RUN apt-get update -qq \
+ && apt-get install -y --no-install-recommends \
+      ca-certificates curl build-essential pkg-config clang llvm libelf-dev zlib1g-dev \
+      linux-libc-dev rpm dpkg-dev tar gzip python3 \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+      | sh -s -- -y --no-modify-path --profile minimal --default-toolchain "${RUST_VERSION}" \
+ && rustup component add rustfmt

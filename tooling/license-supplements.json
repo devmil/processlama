@@ -1,0 +1,28 @@
+{
+  "dart-sys@4.1.5": [
+    {
+      "file": "upstream-dart-sys-LICENSE-MIT.md.txt",
+      "sha256": "a6b742d988bc83c6182193ca4e5abf2dbb67e929817fc94f5ed6e9f49b803f29",
+      "source": "https://github.com/dart-sys/dart-sys/blob/c9329430a5a8e3828cf59600babe7896326c7c44/LICENSE-MIT.md"
+    },
+    {
+      "file": "upstream-dart-sys-LICENSE-APACHE-2.0.md.txt",
+      "sha256": "9c7a58ef39c896d7cc48e18c0a38eb570fc7cecb15a656101d399e367da800a2",
+      "source": "https://github.com/dart-sys/dart-sys/blob/c9329430a5a8e3828cf59600babe7896326c7c44/LICENSE-APACHE-2.0.md"
+    }
+  ],
+  "flutter_rust_bridge@2.12.0": [
+    {
+      "file": "upstream-flutter_rust_bridge-LICENSE.txt",
+      "sha256": "d56622df159a9967bd6a16c726823a2cbe8546c1f18437617283c9da27000390",
+      "source": "https://github.com/fzyzcjy/flutter_rust_bridge/blob/62b9330ed2f900535e34d8443ff82dc54070579a/LICENSE"
+    }
+  ],
+  "flutter_rust_bridge_macros@2.12.0": [
+    {
+      "file": "upstream-flutter_rust_bridge-LICENSE.txt",
+      "sha256": "d56622df159a9967bd6a16c726823a2cbe8546c1f18437617283c9da27000390",
+      "source": "https://github.com/fzyzcjy/flutter_rust_bridge/blob/62b9330ed2f900535e34d8443ff82dc54070579a/LICENSE"
+    }
+  ]
+}

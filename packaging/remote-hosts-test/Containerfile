@@ -1,0 +1,32 @@
+# A disposable SSH host for the remote hosts lanes (scripts/verify_remote_hosts.py
+# --containers): Ubuntu 22.04 (the helper's glibc floor) with OpenSSH and an unprivileged
+# account. The lane mounts the client key and selects a variant at run time.
+FROM docker.io/library/ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq \
+ && apt-get install -y --no-install-recommends openssh-server procps coreutils util-linux iproute2 zsh \
+ && rm -rf /var/lib/apt/lists/* \
+ && useradd --create-home --shell /bin/bash tester \
+ && usermod -p '*' tester \
+ && mkdir -p /run/sshd /etc/ssh/keys \
+ && rm -f /etc/ssh/ssh_host_* \
+ && ssh-keygen -q -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key \
+ && printf '%s\n' \
+      'Port 22' \
+      'HostKey /etc/ssh/ssh_host_ed25519_key' \
+      'AuthorizedKeysFile /etc/ssh/keys/authorized_keys' \
+      'PasswordAuthentication no' \
+      'KbdInteractiveAuthentication no' \
+      'PubkeyAuthentication yes' \
+      'PermitRootLogin no' \
+      'UsePAM no' \
+      'StrictModes no' \
+      'AllowTcpForwarding no' \
+      'X11Forwarding no' \
+      'LogLevel ERROR' \
+      > /etc/ssh/sshd_config
+
+COPY entrypoint.sh /usr/local/bin/remote-hosts-test-entrypoint
+RUN chmod 755 /usr/local/bin/remote-hosts-test-entrypoint
+ENTRYPOINT ["/usr/local/bin/remote-hosts-test-entrypoint"]

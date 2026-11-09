@@ -1,0 +1,15 @@
+[package]
+name = "processlama_telemetry"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+description = "ProcessLama telemetry use cases over processtree"
+
+[dependencies]
+processtree = { workspace = true }
+image = { version = "=0.25.10", default-features = false, features = ["png"] }
+resvg = { version = "=0.48.1", default-features = false }
+sha2 = "0.10"
+
+[target.'cfg(unix)'.dev-dependencies]
+rustix = { version = "1", features = ["process"] }

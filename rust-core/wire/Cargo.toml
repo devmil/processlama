@@ -1,0 +1,10 @@
+[package]
+name = "processlama_wire"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+description = "ProcessLama remote helper wire contract: generated names and limits, message codecs and the helper build ID"
+build = "build.rs"
+
+[dependencies]
+serde_json = "1"

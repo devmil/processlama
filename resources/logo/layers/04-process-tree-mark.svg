@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="markGradient" x1="280" y1="320" x2="744" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#eafdff"/>
+      <stop offset="1" stop-color="#c7f6f0"/>
+    </linearGradient>
+    <linearGradient id="nodeGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe9ac"/>
+      <stop offset="0.5" stop-color="#f5c451"/>
+      <stop offset="1" stop-color="#d4882a"/>
+    </linearGradient>
+    <linearGradient id="nodeAltGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2fffd"/>
+      <stop offset="0.5" stop-color="#9cebe3"/>
+      <stop offset="1" stop-color="#3bb5ad"/>
+    </linearGradient>
+    <filter id="markShadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#02101a" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <g id="04-process-tree-mark" filter="url(#markShadow)">
+    <path d="M262 706V330L512 660L762 330V706" fill="none" stroke="#06222e" stroke-opacity="0.55" stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M262 706V330L512 660L762 330V706" fill="none" stroke="url(#markGradient)" stroke-width="80" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M262 706V330L512 660L762 330V706" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="262" cy="330" r="62" fill="#06222e" fill-opacity="0.5"/>
+    <circle cx="512" cy="660" r="64" fill="#06222e" fill-opacity="0.5"/>
+    <circle cx="762" cy="330" r="62" fill="#06222e" fill-opacity="0.5"/>
+    <circle cx="262" cy="706" r="60" fill="#06222e" fill-opacity="0.5"/>
+    <circle cx="762" cy="706" r="60" fill="#06222e" fill-opacity="0.5"/>
+    <circle cx="262" cy="330" r="46" fill="url(#nodeAltGradient)"/>
+    <circle cx="512" cy="660" r="48" fill="url(#nodeGradient)"/>
+    <circle cx="762" cy="330" r="46" fill="url(#nodeAltGradient)"/>
+    <circle cx="262" cy="706" r="44" fill="url(#nodeAltGradient)"/>
+    <circle cx="762" cy="706" r="44" fill="url(#nodeAltGradient)"/>
+    <circle cx="250" cy="316" r="14" fill="#eafffb" opacity="0.8"/>
+    <circle cx="500" cy="646" r="15" fill="#fffbe9" opacity="0.85"/>
+    <circle cx="750" cy="316" r="14" fill="#eafffb" opacity="0.8"/>
+    <circle cx="250" cy="692" r="13" fill="#eafffb" opacity="0.8"/>
+    <circle cx="750" cy="692" r="13" fill="#eafffb" opacity="0.8"/>
+  </g>
+</svg>

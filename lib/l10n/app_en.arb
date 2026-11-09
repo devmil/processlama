@@ -1,0 +1,1620 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "ProcessLama",
+  "@appTitle": {
+    "description": "The application title shown in the title bar and taskbar."
+  },
+
+  "processExplorer": "Process Explorer",
+  "@processExplorer": {
+    "description": "Subtitle shown next to the app title in the window header."
+  },
+
+  "hideInspector": "Hide inspector",
+  "@hideInspector": {
+    "description": "Tooltip for the button that hides the inspector panel."
+  },
+
+  "showInspector": "Show inspector",
+  "@showInspector": {
+    "description": "Tooltip for the button that shows the inspector panel."
+  },
+
+  "checkForUpdates": "Check for updates",
+  "@checkForUpdates": {
+    "description": "Tooltip for the button that opens the native update checker."
+  },
+
+  "updateCheckFailed": "Update check failed: {error}",
+  "@updateCheckFailed": {
+    "description": "SnackBar message when checking for updates fails.",
+    "placeholders": {
+      "error": { "type": "String", "example": "Network unavailable" }
+    }
+  },
+
+  "updateUpToDate": "ProcessLama {version} (build {build}) is up to date.",
+  "@updateUpToDate": {
+    "description": "Message shown when no newer release is available.",
+    "placeholders": {
+      "version": { "type": "String", "example": "1.0.0" },
+      "build": { "type": "String", "example": "15" }
+    }
+  },
+
+  "updateNoPublishedRelease": "No release is published for this channel yet.",
+  "@updateNoPublishedRelease": {
+    "description": "Message shown when the selected release channel is empty."
+  },
+
+  "updateAvailableTitle": "ProcessLama {version} is available",
+  "@updateAvailableTitle": {
+    "description": "Title for the new release dialog.",
+    "placeholders": {
+      "version": { "type": "String", "example": "1.1.0" }
+    }
+  },
+
+  "updateAvailableBody": "You have {installedVersion} (build {installedBuild}). Build {availableBuild} is ready on the downloads page.",
+  "@updateAvailableBody": {
+    "description": "Body for the new release dialog.",
+    "placeholders": {
+      "installedVersion": { "type": "String", "example": "1.0.0" },
+      "installedBuild": { "type": "String", "example": "15" },
+      "availableBuild": { "type": "String", "example": "16" }
+    }
+  },
+
+  "later": "Later",
+  "@later": {
+    "description": "Button that closes the new release dialog."
+  },
+
+  "openDownloads": "Open downloads",
+  "@openDownloads": {
+    "description": "Button that opens the ProcessLama downloads page."
+  },
+
+  "updateDownloadOpenFailed": "The downloads page could not be opened.",
+  "@updateDownloadOpenFailed": {
+    "description": "Message shown when opening the downloads page fails."
+  },
+
+  "focusedOnSubtree": "Focused on {name}",
+  "@focusedOnSubtree": {
+    "description": "Label shown when the tree is focused on a subtree.",
+    "placeholders": {
+      "name": { "type": "String", "example": "subtree" }
+    }
+  },
+
+  "subtree": "subtree",
+  "@subtree": {
+    "description": "Fallback name when the focused subtree process name is unknown."
+  },
+
+  "leaveSubtreeFocus": "Leave subtree focus",
+  "@leaveSubtreeFocus": {
+    "description": "Tooltip for the button to leave subtree focus when no focus stack."
+  },
+
+  "backOneSubtree": "Back one subtree",
+  "@backOneSubtree": {
+    "description": "Tooltip for the button to go back one level in the subtree focus stack."
+  },
+
+  "showFullTree": "Show full tree",
+  "@showFullTree": {
+    "description": "Tooltip for the button to clear subtree focus and show the full tree."
+  },
+
+  "pollingInterval": "Polling interval",
+  "@pollingInterval": {
+    "description": "Tooltip for the polling interval popup button."
+  },
+
+  "searchHint": "Search name, PID, path, or :port",
+  "@searchHint": {
+    "description": "Hint text for the process search field."
+  },
+
+  "clearSearch": "Clear search",
+  "@clearSearch": {
+    "description": "Tooltip for clearing the process search field."
+  },
+
+  "previousSearchMatch": "Previous match",
+  "@previousSearchMatch": {
+    "description": "Tooltip for navigating to the previous process tree search match."
+  },
+
+  "nextSearchMatch": "Next match",
+  "@nextSearchMatch": {
+    "description": "Tooltip for navigating to the next process tree search match."
+  },
+
+  "matchCase": "Match case",
+  "@matchCase": {
+    "description": "Tooltip for toggling case-sensitive process search."
+  },
+
+  "wholeWord": "Whole word",
+  "@wholeWord": {
+    "description": "Tooltip for toggling whole-word process search."
+  },
+
+  "saveCurrentFilter": "Save current filter",
+  "@saveCurrentFilter": {
+    "description": "Tooltip for the bookmark/save filter button."
+  },
+
+  "savedFilters": "Saved filters",
+  "@savedFilters": {
+    "description": "Tooltip for the saved filters popup button."
+  },
+
+  "unlockProcessTree": "Unlock process tree",
+  "@unlockProcessTree": {
+    "description": "Tooltip when the process tree is frozen/locked."
+  },
+
+  "lockProcessTree": "Lock process tree",
+  "@lockProcessTree": {
+    "description": "Tooltip when the process tree is unfrozen/unlocked."
+  },
+
+  "refreshProcessSnapshot": "Refresh process snapshot",
+  "@refreshProcessSnapshot": {
+    "description": "Tooltip for the refresh button."
+  },
+
+  "takeSnapshot": "Take snapshot",
+  "@takeSnapshot": {
+    "description": "Tooltip for the take snapshot button."
+  },
+
+  "openSnapshot": "Open snapshot…",
+  "@openSnapshot": {
+    "description": "Tooltip and dialog title for opening an exported snapshot document."
+  },
+
+  "preferences": "Preferences",
+  "@preferences": {
+    "description": "Tooltip for the settings/gear button and dialog title."
+  },
+
+  "processCount": "{count} processes",
+  "@processCount": {
+    "description": "Status bar showing the number of processes.",
+    "placeholders": {
+      "count": { "type": "String", "example": "42" }
+    }
+  },
+
+  "queuedCount": " - queued {count}",
+  "@queuedCount": {
+    "description": "Suffix showing the number of queued process mutations.",
+    "placeholders": {
+      "count": { "type": "String", "example": "3" }
+    }
+  },
+
+  "columnPid": "PID",
+  "@columnPid": {
+    "description": "Column header for process ID."
+  },
+
+  "columnName": "Name",
+  "@columnName": {
+    "description": "Column header for process name."
+  },
+
+  "columnCpu": "CPU",
+  "@columnCpu": {
+    "description": "Column header for CPU usage."
+  },
+
+  "columnTreeCpu": "Tree CPU",
+  "@columnTreeCpu": {
+    "description": "Column header for tree CPU usage."
+  },
+
+  "columnGpu": "GPU",
+  "@columnGpu": {
+    "description": "Column header for GPU usage."
+  },
+
+  "columnTreeGpu": "Tree GPU",
+  "@columnTreeGpu": {
+    "description": "Column header for tree GPU usage."
+  },
+
+  "columnRss": "RSS",
+  "@columnRss": {
+    "description": "Column header for resident set size (memory)."
+  },
+
+  "columnTreeRss": "Tree RSS",
+  "@columnTreeRss": {
+    "description": "Column header for tree resident set size."
+  },
+
+  "columnNetIn": "Net In",
+  "@columnNetIn": {
+    "description": "Column header for network input."
+  },
+
+  "columnNetOut": "Net Out",
+  "@columnNetOut": {
+    "description": "Column header for network output."
+  },
+
+  "columnTreeNetIn": "Tree Net In",
+  "@columnTreeNetIn": {
+    "description": "Column header for tree network input."
+  },
+
+  "columnTreeNetOut": "Tree Net Out",
+  "@columnTreeNetOut": {
+    "description": "Column header for tree network output."
+  },
+
+  "columnStorageRead": "Storage Read",
+  "@columnStorageRead": {
+    "description": "Column header for process storage read throughput."
+  },
+
+  "columnStorageWrite": "Storage Write",
+  "@columnStorageWrite": {
+    "description": "Column header for process storage write throughput."
+  },
+
+  "columnTreeStorageRead": "Tree Storage Read",
+  "@columnTreeStorageRead": {
+    "description": "Column header for subtree storage read throughput."
+  },
+
+  "columnTreeStorageWrite": "Tree Storage Write",
+  "@columnTreeStorageWrite": {
+    "description": "Column header for subtree storage write throughput."
+  },
+
+  "columnStarted": "Started",
+  "@columnStarted": {
+    "description": "Column header for process start time."
+  },
+
+  "columnState": "State",
+  "@columnState": {
+    "description": "Column header for process state."
+  },
+
+  "columnUid": "UID",
+  "@columnUid": {
+    "description": "Column header for user ID."
+  },
+
+  "showAllColumns": "Show all columns",
+  "@showAllColumns": {
+    "description": "Context menu item to show all columns."
+  },
+
+  "resetColumnOrder": "Reset column order",
+  "@resetColumnOrder": {
+    "description": "Context menu item to reset column order."
+  },
+
+  "noProcessesMatchFilter": "Nothing matches that filter.",
+  "@noProcessesMatchFilter": {
+    "description": "Empty-state message when no processes match the filter."
+  },
+
+  "liveOrderingPausedTooltip": "Live ordering is paused while the pointer is over the tree",
+  "@liveOrderingPausedTooltip": {
+    "description": "Tooltip for the order-locked hint."
+  },
+
+  "liveOrderingPaused": "Live ordering paused",
+  "@liveOrderingPaused": {
+    "description": "Badge text shown when live ordering is paused."
+  },
+
+  "collapse": "Collapse",
+  "@collapse": {
+    "description": "Tooltip for the collapse tree node button."
+  },
+
+  "expand": "Expand",
+  "@expand": {
+    "description": "Tooltip for the expand tree node button."
+  },
+
+  "unpinProcess": "Unpin process",
+  "@unpinProcess": {
+    "description": "Tooltip for the unpin process button."
+  },
+
+  "pinProcess": "Pin process",
+  "@pinProcess": {
+    "description": "Tooltip for the pin process button."
+  },
+
+  "spawned": "Spawned",
+  "@spawned": {
+    "description": "Tooltip for the spawned change marker icon."
+  },
+
+  "terminated": "Terminated",
+  "@terminated": {
+    "description": "Tooltip for the terminated change marker icon."
+  },
+
+  "unpinProcessMenu": "Unpin process",
+  "@unpinProcessMenu": {
+    "description": "Context menu item to unpin a process."
+  },
+
+  "pinProcessMenu": "Pin process",
+  "@pinProcessMenu": {
+    "description": "Context menu item to pin a process."
+  },
+
+  "focusSubtree": "Focus subtree",
+  "@focusSubtree": {
+    "description": "Context menu item to focus on a subtree."
+  },
+
+  "expandSubtree": "Expand subtree",
+  "@expandSubtree": {
+    "description": "Context menu item to expand a subtree."
+  },
+
+  "collapseSubtree": "Collapse subtree",
+  "@collapseSubtree": {
+    "description": "Context menu item to collapse a subtree."
+  },
+
+  "terminateProcessMenu": "Terminate process",
+  "@terminateProcessMenu": {
+    "description": "Context menu item to send SIGTERM to a process."
+  },
+
+  "killProcessMenu": "Force kill process",
+  "@killProcessMenu": {
+    "description": "Context menu item to send SIGKILL to a process."
+  },
+
+  "suspendProcessMenu": "Suspend process",
+  "@suspendProcessMenu": {
+    "description": "Context menu item to send SIGSTOP to a process."
+  },
+
+  "resumeProcessMenu": "Resume process",
+  "@resumeProcessMenu": {
+    "description": "Context menu item to send SIGCONT to a process."
+  },
+
+  "processTerminated": "Terminate signal sent.",
+  "@processTerminated": {
+    "description": "SnackBar message after sending a terminate signal."
+  },
+
+  "processKilled": "Kill signal sent.",
+  "@processKilled": {
+    "description": "SnackBar message after sending a kill signal."
+  },
+
+  "processSuspended": "Suspend signal sent.",
+  "@processSuspended": {
+    "description": "SnackBar message after sending a suspend signal."
+  },
+
+  "processResumed": "Resume signal sent.",
+  "@processResumed": {
+    "description": "SnackBar message after sending a resume signal."
+  },
+
+  "processActionFailed": "Process action failed: {error}",
+  "@processActionFailed": {
+    "description": "SnackBar message when a process action fails.",
+    "placeholders": {
+      "error": { "type": "String", "example": "Operation not permitted" }
+    }
+  },
+
+  "processActionConfirmCancel": "Cancel",
+  "@processActionConfirmCancel": {
+    "description": "Cancel button on the process action confirmation dialog."
+  },
+
+  "terminateConfirmTitle": "Terminate process?",
+  "@terminateConfirmTitle": {
+    "description": "Title of the confirmation dialog for terminating a process."
+  },
+
+  "terminateConfirmBody": "Send SIGTERM to \"{name}\" (pid {pid}). The process can clean up before exiting.",
+  "@terminateConfirmBody": {
+    "description": "Body of the confirmation dialog for terminating a process.",
+    "placeholders": {
+      "name": { "type": "String", "example": "Finder" },
+      "pid": { "type": "String", "example": "1234" }
+    }
+  },
+
+  "killConfirmTitle": "Force kill process?",
+  "@killConfirmTitle": {
+    "description": "Title of the confirmation dialog for force killing a process."
+  },
+
+  "killConfirmBody": "Send SIGKILL to \"{name}\" (pid {pid}). The process is killed immediately and may leave data in an inconsistent state.",
+  "@killConfirmBody": {
+    "description": "Body of the confirmation dialog for force killing a process.",
+    "placeholders": {
+      "name": { "type": "String", "example": "Finder" },
+      "pid": { "type": "String", "example": "1234" }
+    }
+  },
+
+  "suspendConfirmTitle": "Suspend process?",
+  "@suspendConfirmTitle": {
+    "description": "Title of the confirmation dialog for suspending a process."
+  },
+
+  "suspendConfirmBody": "Send SIGSTOP to \"{name}\" (pid {pid}). The process pauses until it is resumed.",
+  "@suspendConfirmBody": {
+    "description": "Body of the confirmation dialog for suspending a process.",
+    "placeholders": {
+      "name": { "type": "String", "example": "Finder" },
+      "pid": { "type": "String", "example": "1234" }
+    }
+  },
+
+  "copyPid": "Copy PID {pid}",
+  "@copyPid": {
+    "description": "Context menu item to copy a process PID.",
+    "placeholders": {
+      "pid": { "type": "String", "example": "1234" }
+    }
+  },
+
+  "copyName": "Copy {name}",
+  "@copyName": {
+    "description": "Context menu item to copy a process name.",
+    "placeholders": {
+      "name": { "type": "String", "example": "Finder" }
+    }
+  },
+
+  "copyExecutablePath": "Copy executable path",
+  "@copyExecutablePath": {
+    "description": "Context menu item to copy the executable path."
+  },
+
+  "rememberTreeExpansion": "Remember tree expansion",
+  "@rememberTreeExpansion": {
+    "description": "Setting label for remembering tree expansion state."
+  },
+
+  "rowHeatmap": "CPU row heatmap",
+  "@rowHeatmap": {
+    "description": "Setting label for subtle CPU-tinted process rows."
+  },
+
+  "rowDensity": "Row density",
+  "@rowDensity": {
+    "description": "Setting label for how tall process tree and list rows are."
+  },
+
+  "rowDensityCompact": "Compact",
+  "@rowDensityCompact": {
+    "description": "Row density option: shortest rows, most processes on screen."
+  },
+
+  "rowDensityRegular": "Regular",
+  "@rowDensityRegular": {
+    "description": "Row density option: medium row height."
+  },
+
+  "rowDensityComfortable": "Comfortable",
+  "@rowDensityComfortable": {
+    "description": "Row density option: tallest rows."
+  },
+
+  "releaseChannel": "Release channel",
+  "@releaseChannel": {
+    "description": "Setting label for choosing the app update release channel."
+  },
+
+  "releaseChannelStable": "Stable",
+  "@releaseChannelStable": {
+    "description": "Release channel option for stable updates only."
+  },
+
+  "releaseChannelBeta": "Beta",
+  "@releaseChannelBeta": {
+    "description": "Release channel option for beta updates plus stable updates."
+  },
+
+  "system": "System",
+  "@system": {
+    "description": "Appearance mode option: system theme."
+  },
+
+  "light": "Light",
+  "@light": {
+    "description": "Appearance mode option: light theme."
+  },
+
+  "dark": "Dark",
+  "@dark": {
+    "description": "Appearance mode option: dark theme."
+  },
+
+  "close": "Close",
+  "@close": {
+    "description": "Button text to close a dialog."
+  },
+
+  "columns": "Columns",
+  "@columns": {
+    "description": "Section header for column preferences."
+  },
+
+  "moveColumnEarlier": "Move column earlier",
+  "@moveColumnEarlier": {
+    "description": "Tooltip for the move column up arrow."
+  },
+
+  "moveColumnLater": "Move column later",
+  "@moveColumnLater": {
+    "description": "Tooltip for the move column down arrow."
+  },
+
+  "pollingIntervalLabel": "Polling interval: {value}ms",
+  "@pollingIntervalLabel": {
+    "description": "Label for the polling interval slider.",
+    "placeholders": {
+      "value": { "type": "String", "example": "1000" }
+    }
+  },
+
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Fallback text for empty or unknown values."
+  },
+
+  "inspector": "Inspector",
+  "@inspector": {
+    "description": "Inspector panel title when no process is selected."
+  },
+
+  "noProcessSelected": "No process selected",
+  "@noProcessSelected": {
+    "description": "Subtitle when no process is selected in the inspector."
+  },
+
+  "pidPlatform": "pid {pid} · {platform}",
+  "@pidPlatform": {
+    "description": "Subtitle showing PID and platform.",
+    "placeholders": {
+      "pid": { "type": "String", "example": "1234" },
+      "platform": { "type": "String", "example": "macos" }
+    }
+  },
+
+  "tabOverview": "Overview",
+  "@tabOverview": {
+    "description": "Tab label for the overview inspector tab."
+  },
+
+  "tabDetails": "Details",
+  "@tabDetails": {
+    "description": "Tab label for the process details inspector tab."
+  },
+
+  "tabFiles": "Files",
+  "@tabFiles": {
+    "description": "Tab label for the files inspector tab."
+  },
+
+  "tabSockets": "Sockets",
+  "@tabSockets": {
+    "description": "Tab label for the sockets inspector tab."
+  },
+
+  "tabFilesAndSockets": "Files & Sockets",
+  "@tabFilesAndSockets": {
+    "description": "Tab label for the combined files and sockets inspector tab."
+  },
+
+  "tabNetwork": "Network",
+  "@tabNetwork": {
+    "description": "Tab label for the network inspector tab."
+  },
+
+  "tabThreads": "Threads",
+  "@tabThreads": {
+    "description": "Tab label for the threads inspector tab."
+  },
+
+  "tabSecurity": "Security",
+  "@tabSecurity": {
+    "description": "Tab label for the security inspector tab."
+  },
+
+  "networkIn": "Network In",
+  "@networkIn": {
+    "description": "Detail label for network input rate."
+  },
+
+  "networkOut": "Network Out",
+  "@networkOut": {
+    "description": "Detail label for network output rate."
+  },
+
+  "totalIn": "Total In",
+  "@totalIn": {
+    "description": "Detail label for total network input."
+  },
+
+  "totalOut": "Total Out",
+  "@totalOut": {
+    "description": "Detail label for total network output."
+  },
+
+  "treeNetworkIn": "Tree Network In",
+  "@treeNetworkIn": {
+    "description": "Graph row label for tree network input."
+  },
+
+  "treeNetworkOut": "Tree Network Out",
+  "@treeNetworkOut": {
+    "description": "Graph row label for tree network output."
+  },
+
+  "storageRead": "Storage Read",
+  "@storageRead": {
+    "description": "Detail and graph label for storage read throughput."
+  },
+
+  "storageWrite": "Storage Write",
+  "@storageWrite": {
+    "description": "Detail and graph label for storage write throughput."
+  },
+
+  "totalStorageRead": "Total Storage Read",
+  "@totalStorageRead": {
+    "description": "Detail label for cumulative process storage reads."
+  },
+
+  "totalStorageWrite": "Total Storage Write",
+  "@totalStorageWrite": {
+    "description": "Detail label for cumulative process storage writes."
+  },
+
+  "storageHistory": "Storage history",
+  "@storageHistory": {
+    "description": "Combined storage throughput history graph title."
+  },
+
+  "networkHistory": "Network history",
+  "@networkHistory": {
+    "description": "Combined network throughput history graph title."
+  },
+
+  "networkOutIn": "Out / In",
+  "@networkOutIn": {
+    "description": "Compact direction label for network output above input in the throughput graph."
+  },
+
+  "storageReadWrite": "Read / Write",
+  "@storageReadWrite": {
+    "description": "Compact direction label for paired storage throughput values."
+  },
+
+  "overviewMemory": "Memory",
+  "@overviewMemory": {
+    "description": "Memory summary label in the process inspector overview."
+  },
+
+  "overviewStorage": "Storage",
+  "@overviewStorage": {
+    "description": "Storage throughput summary label in the process inspector overview."
+  },
+
+  "metricUnavailable": "Unavailable",
+  "@metricUnavailable": {
+    "description": "Value shown when the operating system does not expose a metric."
+  },
+
+  "tree": "Tree",
+  "@tree": {
+    "description": "Scope label for tree metrics."
+  },
+
+  "processScope": "Process",
+  "@processScope": {
+    "description": "Scope label for process metrics."
+  },
+
+  "descendants": "Descendants",
+  "@descendants": {
+    "description": "Metric card label for descendant count."
+  },
+
+  "parentPid": "Parent PID",
+  "@parentPid": {
+    "description": "Detail label for parent PID."
+  },
+
+  "userId": "User ID",
+  "@userId": {
+    "description": "Detail label for user ID."
+  },
+
+  "status": "Status",
+  "@status": {
+    "description": "Detail label for process status."
+  },
+
+  "threads": "Threads",
+  "@threads": {
+    "description": "Detail label for thread count."
+  },
+
+  "openFiles": "Open Files",
+  "@openFiles": {
+    "description": "Detail label for open file count."
+  },
+
+  "virtualMemory": "Virtual Memory",
+  "@virtualMemory": {
+    "description": "Detail label for virtual memory size."
+  },
+
+  "nice": "Nice",
+  "@nice": {
+    "description": "Detail label for process nice value."
+  },
+
+  "priority": "Priority",
+  "@priority": {
+    "description": "Detail label for process priority."
+  },
+
+  "summary": "Summary",
+  "@summary": {
+    "description": "Detail label for a section summary row."
+  },
+
+  "signing": "Signing",
+  "@signing": {
+    "description": "Security detail label for code signing status."
+  },
+
+  "authority": "Authority",
+  "@authority": {
+    "description": "Security detail label for signing authority."
+  },
+
+  "teamId": "Team ID",
+  "@teamId": {
+    "description": "Security detail label for Apple Developer Team ID."
+  },
+
+  "bundleId": "Bundle ID",
+  "@bundleId": {
+    "description": "Security detail label for bundle identifier."
+  },
+
+  "entitlements": "Entitlements",
+  "@entitlements": {
+    "description": "Security detail label for entitlements."
+  },
+
+  "origin": "Origin",
+  "@origin": {
+    "description": "Security detail label for Gatekeeper origin."
+  },
+
+  "sandbox": "Sandbox",
+  "@sandbox": {
+    "description": "Security detail label for sandbox state."
+  },
+
+  "hardenedRuntime": "Hardened RT",
+  "@hardenedRuntime": {
+    "description": "Security detail label for hardened runtime state."
+  },
+
+  "architecture": "Architecture",
+  "@architecture": {
+    "description": "Security detail label for executable architecture."
+  },
+
+  "rosetta": "Rosetta",
+  "@rosetta": {
+    "description": "Security detail label for Rosetta translation state."
+  },
+
+  "yes": "Yes",
+  "@yes": {
+    "description": "Generic affirmative value."
+  },
+
+  "no": "No",
+  "@no": {
+    "description": "Generic negative value."
+  },
+
+  "noPathAvailable": "-",
+  "@noPathAvailable": {
+    "description": "Fallback when an open file path is unavailable."
+  },
+
+  "noOpenFilesReported": "No open files reported for this process.",
+  "@noOpenFilesReported": {
+    "description": "Empty state for the inspector files tab."
+  },
+
+  "openFilesTruncated": "Showing the first 500 open files.",
+  "@openFilesTruncated": {
+    "description": "Notice when the open file list is capped."
+  },
+
+  "noSocketsReported": "No sockets reported for this process.",
+  "@noSocketsReported": {
+    "description": "Empty state for the inspector sockets tab."
+  },
+
+  "noThreadsReported": "No threads reported for this process.",
+  "@noThreadsReported": {
+    "description": "Empty state for the inspector threads tab."
+  },
+
+  "noSecurityMetadataReported": "No security metadata reported for this process.",
+  "@noSecurityMetadataReported": {
+    "description": "Empty state for the inspector security tab."
+  },
+
+  "restrictedByMacos": "Restricted access: {reason}",
+  "@restrictedByMacos": {
+    "description": "Restricted state shown when the operating system denies process detail access.",
+    "placeholders": {
+      "reason": { "type": "String", "example": "permission denied" }
+    }
+  },
+
+  "gpu": "GPU",
+  "@gpu": {
+    "description": "Detail label for GPU usage."
+  },
+
+  "netIn": "Net in",
+  "@netIn": {
+    "description": "Detail label for network input rate in overview."
+  },
+
+  "netOut": "Net out",
+  "@netOut": {
+    "description": "Detail label for network output rate in overview."
+  },
+
+  "identity": "Identity",
+  "@identity": {
+    "description": "Detail label for process identity."
+  },
+
+  "executable": "Executable",
+  "@executable": {
+    "description": "Detail label for executable path."
+  },
+
+  "applicationBundle": "Application bundle",
+  "@applicationBundle": {
+    "description": "Detail label for application bundle path."
+  },
+
+  "commandLine": "Command line",
+  "@commandLine": {
+    "description": "Detail label for command line."
+  },
+
+  "pinned": "Pinned",
+  "@pinned": {
+    "description": "Section header for pinned processes in the navigation rail."
+  },
+
+  "pinRowsForQuickAccess": "Pin rows for quick access.",
+  "@pinRowsForQuickAccess": {
+    "description": "Empty text for the pinned section."
+  },
+
+  "snapshots": "Snapshots",
+  "@snapshots": {
+    "description": "Section header for snapshots in the navigation rail."
+  },
+
+  "livePlatform": "Live · {platform}",
+  "@livePlatform": {
+    "description": "Label for the live snapshot entry.",
+    "placeholders": {
+      "platform": { "type": "String", "example": "macos" }
+    }
+  },
+
+  "now": "now",
+  "@now": {
+    "description": "Trailing badge for the live snapshot entry."
+  },
+
+  "filters": "Filters",
+  "@filters": {
+    "description": "Section header for filters in the navigation rail."
+  },
+
+  "pollingStatus": "Polling every {interval} ms",
+  "@pollingStatus": {
+    "description": "Footer polling status text.",
+    "placeholders": {
+      "interval": { "type": "String", "example": "1000" }
+    }
+  },
+
+  "exportedPath": "Exported {path}",
+  "@exportedPath": {
+    "description": "SnackBar message after successful export.",
+    "placeholders": {
+      "path": { "type": "String", "example": "/tmp/snapshot.json" }
+    }
+  },
+
+  "exportFailed": "Export failed: {error}",
+  "@exportFailed": {
+    "description": "SnackBar message after export failure.",
+    "placeholders": {
+      "error": { "type": "String", "example": "Permission denied" }
+    }
+  },
+
+  "exportSnapshot": "Export snapshot\u2026",
+  "@exportSnapshot": {
+    "description": "Context menu item for exporting a saved snapshot."
+  },
+
+  "renameSnapshot": "Rename snapshot\u2026",
+  "@renameSnapshot": {
+    "description": "Context menu item for renaming a saved snapshot."
+  },
+
+  "renameSnapshotTitle": "Rename snapshot",
+  "@renameSnapshotTitle": {
+    "description": "Dialog title for renaming a saved snapshot."
+  },
+
+  "snapshotName": "Snapshot name",
+  "@snapshotName": {
+    "description": "Text field label for a saved snapshot name."
+  },
+
+  "deleteSnapshot": "Delete snapshot",
+  "@deleteSnapshot": {
+    "description": "Context menu item for deleting a saved snapshot."
+  },
+  "deleteFilter": "Delete filter",
+  "@deleteFilter": {
+    "description": "Context menu item for deleting a saved filter."
+  },
+
+  "snapshotTaken": "Snapshot taken",
+  "@snapshotTaken": {
+    "description": "SnackBar message after taking a snapshot."
+  },
+
+  "snapshotFailed": "Snapshot failed: {error}",
+  "@snapshotFailed": {
+    "description": "SnackBar message after snapshot failure.",
+    "placeholders": {
+      "error": { "type": "String", "example": "Permission denied" }
+    }
+  },
+
+  "snapshotLoaded": "Snapshot loaded",
+  "@snapshotLoaded": {
+    "description": "SnackBar message after loading a snapshot."
+  },
+
+  "snapshotLoadFailed": "Load failed: {error}",
+  "@snapshotLoadFailed": {
+    "description": "SnackBar message after snapshot load failure.",
+    "placeholders": {
+      "error": { "type": "String", "example": "File not found" }
+    }
+  },
+
+  "snapshotDeleted": "Snapshot deleted",
+  "@snapshotDeleted": {
+    "description": "SnackBar message after deleting a snapshot."
+  },
+
+  "snapshotRenamed": "Snapshot renamed",
+  "@snapshotRenamed": {
+    "description": "SnackBar message after renaming a snapshot."
+  },
+
+  "snapshotRenameFailed": "Rename failed: {error}",
+  "@snapshotRenameFailed": {
+    "description": "SnackBar message after snapshot rename failure.",
+    "placeholders": {
+      "error": { "type": "String", "example": "Permission denied" }
+    }
+  },
+
+  "snapshotDeleteFailed": "Delete failed: {error}",
+  "@snapshotDeleteFailed": {
+    "description": "SnackBar message after snapshot delete failure.",
+    "placeholders": {
+      "error": { "type": "String", "example": "Permission denied" }
+    }
+  },
+
+  "bootstrapErrorTitle": "ProcessLama could not finish starting.",
+  "@bootstrapErrorTitle": {
+    "description": "Title shown when the app fails to bootstrap."
+  },
+
+  "bootstrapErrorDescription": "The app window is alive, but one of the startup services failed.",
+  "@bootstrapErrorDescription": {
+    "description": "Description shown when the app fails to bootstrap."
+  },
+
+  "featureProcessEnumeration": "Process enumeration",
+  "@featureProcessEnumeration": {
+    "description": "Platform feature name for process enumeration."
+  },
+
+  "featureProcessTreeSynthesis": "Process tree synthesis",
+  "@featureProcessTreeSynthesis": {
+    "description": "Platform feature name for process tree synthesis."
+  },
+
+  "featureFilesAndSockets": "Files and sockets",
+  "@featureFilesAndSockets": {
+    "description": "Platform feature name for files and sockets."
+  },
+
+  "featureNetworkThroughput": "Network throughput",
+  "@featureNetworkThroughput": {
+    "description": "Platform feature name for network throughput."
+  },
+
+  "featureSecurityMetadata": "Security metadata",
+  "@featureSecurityMetadata": {
+    "description": "Platform feature name for security metadata."
+  },
+
+  "featureRestrictedProcessHints": "Restricted process hints",
+  "@featureRestrictedProcessHints": {
+    "description": "Platform feature name for permission restricted process hints."
+  },
+
+  "featureSnapshotDocuments": "Snapshot documents",
+  "@featureSnapshotDocuments": {
+    "description": "Platform feature name for snapshot documents."
+  },
+
+  "noSavedFilters": "No saved filters.",
+  "@noSavedFilters": {
+    "description": "Empty state text when no filters are saved."
+  },
+
+  "statusTreeLocked": "Process tree locked",
+  "toolbarLock": "Lock",
+  "toolbarSnapshot": "Snapshot",
+  "toolbarUpdates": "Updates",
+  "snapshotOptions": "More snapshot options",
+  "appearance": "Appearance",
+  "selectProcessToInspect": "Select a process to inspect it.",
+  "selectProcessToInspectNetwork": "Select a process to inspect its network throughput.",
+  "bootstrapModeMessage": "Bootstrap mode: {error}",
+  "@bootstrapModeMessage": {"placeholders": {"error": {"type": "String"}}},
+  "sortedAscending": "sorted ascending",
+  "sortedDescending": "sorted descending",
+  "resizeInspector": "Resize inspector",
+  "morePreferencesOptions": "More preferences options",
+  "minimizeWindow": "Minimize window",
+  "maximizeWindow": "Maximize or restore window",
+  "closeWindow": "Close window",
+  "installNetworkTelemetry": "Install network telemetry…",
+  "networkTelemetryInstallDescription": "Linux network activity needs a system service. Installing or repairing it requires administrator authorization and enables per-process network throughput for all users on this machine.",
+  "networkTelemetryUnavailable": "Network telemetry unavailable",
+  "networkTelemetryUnavailableDescription": "The Linux network service is missing or has stopped. Install or repair it to see live network activity.",
+  "networkTelemetryInstalled": "Network service installed and started.",
+  "networkTelemetryInstallerMissing": "This build does not include the network service. Install a current ProcessLama package or portable bundle.",
+  "networkTelemetryAuthorizationUnavailable": "System authorization is unavailable. Install the DEB or RPM package to enable network telemetry.",
+  "networkTelemetryAuthorizationCancelled": "Network service installation was cancelled.",
+  "networkTelemetryInstallFailed": "Network service installation failed. Check the system journal for processlama-network.service.",
+  "searchMatchPosition": "{current} of {count} matches",
+  "@searchMatchPosition": {"placeholders": {"current": {"type": "String"}, "count": {"type": "String"}}},
+  "aboutApp": "About ProcessLama",
+  "makerLine": "by Devmil Solutions",
+  "brandTooltip": "ProcessLama · by Devmil Solutions",
+  "aboutProductName": "ProcessLama",
+  "aboutVersion": "Version {version} · build {build}",
+  "lamaFamily": "The Lama family",
+  "closeAbout": "Close",
+  "filterNoMatchesHelp": "Try a broader name or clear the CPU threshold.",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+
+  "remoteTabLocal": "Local",
+
+  "remoteTabOpenMenu": "Open remote host",
+
+  "remoteTabClose": "Close {tab}",
+  "@remoteTabClose": {
+    "placeholders": { "tab": { "type": "String" } }
+  },
+
+  "remoteTabMoveLeft": "Move tab left",
+
+  "remoteTabMoveRight": "Move tab right",
+
+  "remoteTabMore": "All tabs",
+
+  "remoteTabTooltip": "{alias} · {platform} · helper {version}",
+  "@remoteTabTooltip": {
+    "placeholders": { "alias": { "type": "String" }, "platform": { "type": "String" }, "version": { "type": "String" } }
+  },
+
+  "remoteTabSemantics": "{name}, {status}",
+  "@remoteTabSemantics": {
+    "placeholders": { "name": { "type": "String" }, "status": { "type": "String" } }
+  },
+
+  "remoteTabLimit": "You can open up to {count} remote tabs.",
+  "@remoteTabLimit": {
+    "placeholders": { "count": { "type": "String" } }
+  },
+
+  "remoteHostAddMenu": "Add remote host…",
+
+  "remoteHostManageMenu": "Manage remote hosts…",
+
+  "remoteHostMenuEmpty": "No other saved hosts",
+
+  "remotePhaseIdle": "Not connected",
+
+  "remotePhaseConnecting": "Connecting",
+
+  "remotePhaseInstalling": "Installing helper",
+
+  "remotePhaseLive": "Connected",
+
+  "remotePhaseReconnecting": "Reconnecting",
+
+  "remotePhaseDisconnected": "Disconnected",
+
+  "remotePhaseFailed": "Failed",
+
+  "remoteFailureSshMissing": "OpenSSH is not installed on this computer.",
+
+  "remoteFailureSshTooOld": "OpenSSH on this computer is older than 8.9.",
+
+  "remoteFailureSshConnectionFailed": "SSH could not connect. Check the host, the network and your ~/.ssh/config.",
+
+  "remoteFailureHostKeyUntrusted": "The host key is not trusted yet. Connect once with ssh in a terminal.",
+
+  "remoteFailureAuthenticationInteractive": "SSH asks for a password or a confirmation. Set up key-based login or an agent.",
+
+  "remoteFailureUnsupportedPlatform": "This host's system is not supported.",
+
+  "remoteFailureHelperNotInstalled": "The ProcessLama helper is not installed on this host.",
+
+  "remoteFailureHelperOutdated": "The helper on this host is outdated.",
+
+  "remoteFailureHelperDamaged": "The helper on this host is damaged.",
+
+  "remoteFailureHelperStartFailed": "The helper did not start. A login script may print text or read input.",
+
+  "remoteFailureInstallFailed": "Installing the helper failed.",
+
+  "remoteFailureInstallNoSpace": "The host has no space left for the helper.",
+
+  "remoteFailureInstallNoexec": "The home directory on this host does not allow running programs (noexec).",
+
+  "remoteFailureInstallRefused": "The install directory is unsafe: a symbolic link or a directory owned by someone else.",
+
+  "remoteFailureProtocolMismatch": "The helper speaks a different protocol version.",
+
+  "remoteFailureHeartbeatLost": "The host stopped responding.",
+
+  "remoteFailureFrameTooLarge": "The host sent more data than allowed.",
+
+  "remoteFailureRemoteRestricted": "The host denied the request.",
+
+  "remoteFailureCanceled": "Canceled.",
+
+  "remoteFailureInternal": "An unexpected error occurred.",
+
+  "remoteHostProbeSshUnreachable": "SSH unreachable",
+
+  "remoteHostProbeHostKeyUntrusted": "Host key not trusted",
+
+  "remoteHostProbeAuthenticationInteractive": "Authentication needs interaction",
+
+  "remoteHostProbeUnsupportedPlatform": "Unsupported platform",
+
+  "remoteHostProbeHelperMissing": "Helper missing",
+
+  "remoteHostProbeHelperOutdated": "Helper outdated",
+
+  "remoteHostProbeReady": "Ready: {platform}, helper {version}",
+  "@remoteHostProbeReady": {
+    "placeholders": { "platform": { "type": "String" }, "version": { "type": "String" } }
+  },
+
+  "remoteHostProbeRunning": "Testing the connection…",
+
+  "remoteHostEditorAddTitle": "Add remote host",
+
+  "remoteHostEditorEditTitle": "Edit remote host",
+
+  "remoteHostDisplayName": "Display name",
+
+  "remoteHostAlias": "SSH host alias",
+
+  "remoteHostAliasHelp": "A Host entry of your ~/.ssh/config. User names, ports, keys and jump hosts belong there; ProcessLama stores only the alias.",
+
+  "remoteHostAliasInvalid": "Use letters, digits, dots, dashes and underscores, starting with a letter or digit.",
+
+  "remoteHostDisplayNameInvalid": "Use 1 to 64 characters.",
+
+  "remoteHostAutoInstall": "Install helper automatically",
+
+  "remoteHostAutoReconnect": "Reconnect automatically",
+
+  "remoteHostOpenOnStartup": "Open on startup",
+
+  "remoteHostOpenOnStartupRemember": "As at quit",
+
+  "remoteHostOpenOnStartupAlways": "Always",
+
+  "remoteHostOpenOnStartupNever": "Never",
+
+  "remoteHostBackgroundRefresh": "Background refresh",
+
+  "remoteHostBackgroundRefreshDefault": "Default",
+
+  "remoteRefreshSlow": "Slow (5 s)",
+
+  "remoteRefreshLive": "Live",
+
+  "remoteRefreshPaused": "Paused",
+
+  "remoteHostTestConnection": "Test connection",
+
+  "remoteHostSetupGuide": "Setup guide",
+
+  "remoteHostSave": "Save",
+
+  "remoteHostCancel": "Cancel",
+
+  "remoteHostSaveFailed": "The remote host could not be saved.",
+
+  "remoteHostTooMany": "You have reached the maximum number of remote hosts.",
+
+  "remoteHelperInstallTitle": "Install helper on {host}?",
+  "@remoteHelperInstallTitle": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteHelperUpdateTitle": "Update helper on {host}?",
+  "@remoteHelperUpdateTitle": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteHelperInstallBody": "ProcessLama copies a small helper program to this host and runs it as your SSH user. It never uses sudo.",
+
+  "remoteHelperInstallPath": "Path",
+
+  "remoteHelperInstallVersion": "Version",
+
+  "remoteHelperInstallSize": "Size",
+
+  "remoteHelperInstallChecksum": "SHA-256",
+
+  "remoteHelperInstallAction": "Install",
+
+  "remoteHelperInstallAlways": "Install and always install for this host",
+
+  "remoteHelperUpdateAction": "Update",
+
+  "remoteHelperUpdateAlways": "Update and always install for this host",
+
+  "remoteHelperInstalled": "Helper installed on {host}.",
+  "@remoteHelperInstalled": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteHelperInstallFailed": "Could not install the helper on {host}. {reason}",
+  "@remoteHelperInstallFailed": {
+    "placeholders": { "host": { "type": "String" }, "reason": { "type": "String" } }
+  },
+
+  "remoteHelperInstallUnavailable": "This build of ProcessLama has no helper for {host}.",
+  "@remoteHelperInstallUnavailable": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteHelperRemoveMenu": "Remove helper from host…",
+
+  "remoteHelperRemoveTitle": "Remove helper from {host}?",
+  "@remoteHelperRemoveTitle": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteHelperRemoveBody": "ProcessLama disconnects and deletes its helper and caches under ~/.local/lib/processlama and ~/.cache/processlama on this host.",
+
+  "remoteHelperRemoveAction": "Remove helper",
+
+  "remoteHelperRemoved": "Helper removed from {host}.",
+  "@remoteHelperRemoved": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteHelperRemoveFailed": "Could not remove the helper from {host}.",
+  "@remoteHelperRemoveFailed": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteHostConnectFailed": "Could not connect to {host}. {reason}",
+  "@remoteHostConnectFailed": {
+    "placeholders": { "host": { "type": "String" }, "reason": { "type": "String" } }
+  },
+
+  "remoteHostsEmpty": "No remote hosts yet. Add one to watch its processes in a tab.",
+
+  "remoteHostAdd": "Add remote host",
+
+  "remoteHostEdit": "Edit",
+
+  "remoteHostConnect": "Connect",
+
+  "remoteHostDisconnect": "Disconnect",
+
+  "remoteHostDuplicate": "Duplicate",
+
+  "remoteHostRemove": "Remove",
+
+  "remoteHostRemoveTitle": "Remove {host}?",
+  "@remoteHostRemoveTitle": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteHostRemoveBody": "The profile and its tab are removed. The helper stays on the host until you remove it.",
+
+  "remoteHostActions": "Actions for {host}",
+  "@remoteHostActions": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteHostLastSeen": "{platform} · helper {version}",
+  "@remoteHostLastSeen": {
+    "placeholders": { "platform": { "type": "String" }, "version": { "type": "String" } }
+  },
+
+  "remoteHostNeverConnected": "Not connected yet",
+
+  "remoteHostAutoInstallOn": "Installs the helper automatically",
+
+  "remoteHostsDefaultRefresh": "Default background refresh",
+
+  "remoteIconCache": "Remote icon cache",
+
+  "remoteIconCacheUsage": "{used} used of {limit}",
+  "@remoteIconCacheUsage": {
+    "placeholders": { "used": { "type": "String" }, "limit": { "type": "String" } }
+  },
+
+  "remoteIconCacheClear": "Clear icon cache",
+
+  "remoteIconCacheCleared": "Icon cache cleared.",
+
+  "remoteTabConnecting": "Connecting to {host}…",
+  "@remoteTabConnecting": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteTabStaleTitle": "{host} is not responding",
+  "@remoteTabStaleTitle": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteTabReconnectingTitle": "Reconnecting to {host}…",
+  "@remoteTabReconnectingTitle": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteTabStaleMessage": "Showing data from {time}. {reason}",
+  "@remoteTabStaleMessage": {
+    "placeholders": { "time": { "type": "String" }, "reason": { "type": "String" } }
+  },
+
+  "remoteTabFailedTitle": "Could not connect to {host}",
+  "@remoteTabFailedTitle": {
+    "placeholders": { "host": { "type": "String" } }
+  },
+
+  "remoteTabReconnect": "Reconnect",
+
+  "remoteTabInstallHelper": "Install helper…",
+
+  "remoteTabHidepid": "Showing only your processes: this host hides other users' processes.",
+
+  "remoteStatusConnected": "{host} · connected {duration}",
+  "@remoteStatusConnected": {
+    "placeholders": { "host": { "type": "String" }, "duration": { "type": "String" } }
+  },
+
+  "remoteStatusLastUpdated": "{host} · last updated {time}",
+  "@remoteStatusLastUpdated": {
+    "placeholders": { "host": { "type": "String" }, "time": { "type": "String" } }
+  },
+
+  "remoteStatusRefreshLive": "refresh: live · {interval}",
+  "@remoteStatusRefreshLive": {
+    "placeholders": { "interval": { "type": "String" } }
+  },
+
+  "remoteStatusRefreshBackground": "background · {interval}",
+  "@remoteStatusRefreshBackground": {
+    "placeholders": { "interval": { "type": "String" } }
+  },
+
+  "remoteStatusRefreshPaused": "refresh: paused",
+
+  "remoteDurationSeconds": "{count} s",
+  "@remoteDurationSeconds": {
+    "placeholders": { "count": { "type": "String" } }
+  },
+
+  "remoteDurationMinutes": "{count} min",
+  "@remoteDurationMinutes": {
+    "placeholders": { "count": { "type": "String" } }
+  },
+
+  "remoteDurationHours": "{hours} h {minutes} min",
+  "@remoteDurationHours": {
+    "placeholders": { "hours": { "type": "String" }, "minutes": { "type": "String" } }
+  },
+
+  "remoteTerminateConfirmBody": "Send SIGTERM to \"{name}\" (pid {pid}) on {host}. The process can clean up before exiting.",
+  "@remoteTerminateConfirmBody": {
+    "placeholders": { "name": { "type": "String" }, "pid": { "type": "String" }, "host": { "type": "String" } }
+  },
+
+  "remoteKillConfirmBody": "Send SIGKILL to \"{name}\" (pid {pid}) on {host}. The process stops immediately and cannot clean up.",
+  "@remoteKillConfirmBody": {
+    "placeholders": { "name": { "type": "String" }, "pid": { "type": "String" }, "host": { "type": "String" } }
+  },
+
+  "remoteSuspendConfirmBody": "Send SIGSTOP to \"{name}\" (pid {pid}) on {host}. The process pauses until it is resumed.",
+  "@remoteSuspendConfirmBody": {
+    "placeholders": { "name": { "type": "String" }, "pid": { "type": "String" }, "host": { "type": "String" } }
+  },
+
+  "processSignalDenied": "Not allowed: the process belongs to another user.",
+
+  "processSignalNotFound": "The process has already exited.",
+
+  "processSignalUnknown": "The signal may not have arrived. It was not sent again.",
+
+  "remoteCapabilityNetworkMissing": "Per-process network rates need the ProcessLama network service on this host.",
+
+  "remoteCapabilityNetworkUnsupported": "This host cannot report per-process network rates.",
+
+  "remoteCapabilityCopyInstallCommand": "Copy install command",
+
+  "remoteCapabilityInstallCommandCopied": "Install command copied. Run it on the host.",
+  "remoteHostsProfiles": "Hosts",
+  "remoteHostConnection": "Connection",
+  "preferencesPageAppearanceDetail": "How ProcessLama looks and how tightly it packs the process rows.",
+  "preferencesPageProcessTree": "Process tree",
+  "preferencesPageProcessTreeDetail": "How often processes refresh and what the tree remembers.",
+  "preferencesPageColumnsDetail": "Which columns the process tree shows, and in which order.",
+  "preferencesPageRemoteHosts": "Remote hosts",
+  "preferencesPageRemoteHostsDetail": "Computers ProcessLama reaches through your SSH configuration, how often their background tabs refresh and how many of their icons it keeps.",
+  "preferencesPageUpdates": "Updates",
+  "preferencesPageUpdatesDetail": "Which ProcessLama builds the updater offers you.",
+  "preferencesTheme": "Theme",
+  "searchAspect": "Search aspect",
+  "searchAll": "Process text",
+  "searchName": "Process name",
+  "searchPid": "Process ID",
+  "searchUser": "User",
+  "searchCommand": "Command line",
+  "searchPath": "Executable path",
+  "searchPort": "Local port",
+  "searchPortHint": "Local port (e.g. 8080)",
+  "occupiedPorts": "Occupied ports",
+  "localPorts": "Local TCP / UDP ports",
+  "portsNotReported": "No ports reported (none or access restricted)",
+  "noOccupiedPorts": "No occupied ports",
+  "localPortsExplanation": "Listening ports accept connections: TCP listeners and UDP sockets on well-known ports (below 1024). Other local ports are mostly outgoing connections. Select a port to show every process using it. Permissions may hide ports owned by other users.",
+  "listeningPorts": "Listening",
+  "listeningPortsLabel": "Listening ports",
+  "otherLocalPorts": "Other local ports",
+  "showPortProcesses": "Show processes using port {port}",
+  "@showPortProcesses": {
+    "placeholders": { "port": { "type": "int" } }
+  },
+  "goToPortOwner": "{name} ({pid})",
+  "@goToPortOwner": {
+    "description": "A process listening on the port a socket connects to.",
+    "placeholders": { "name": { "type": "String" }, "pid": { "type": "int" } }
+  },
+  "goToPortOwnerLabel": "Go to {name}, PID {pid}, listening on port {port}",
+  "@goToPortOwnerLabel": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "pid": { "type": "int" },
+      "port": { "type": "int" }
+    }
+  },
+  "columnPorts": "Ports",
+  "socketPeers": "Local processes these sockets connect to",
+  "diagnosticsTitle": "Diagnostics",
+  "@diagnosticsTitle": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsTitle"
+  },
+  "diagnosticsDescription": "Recent safe events stay in memory only (up to 1,000 events or 256 KiB). Detailed capture lasts up to 15 minutes or until the session ends. No credentials or private content are included. Preview before saving or sharing. Nothing is uploaded automatically. Clear history does not remove copies you saved or shared.",
+  "@diagnosticsDescription": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsDescription"
+  },
+  "diagnosticsEnable": "Enable detailed diagnostics for 15 minutes",
+  "@diagnosticsEnable": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsEnable"
+  },
+  "diagnosticsDisable": "Detailed diagnostics active — stop recording details",
+  "@diagnosticsDisable": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsDisable"
+  },
+  "diagnosticsClear": "Clear history",
+  "@diagnosticsClear": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsClear"
+  },
+  "diagnosticsPreview": "Preview export",
+  "@diagnosticsPreview": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsPreview"
+  },
+  "diagnosticsCancel": "Close preview",
+  "@diagnosticsCancel": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsCancel"
+  },
+  "diagnosticsSave": "Save to file",
+  "@diagnosticsSave": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsSave"
+  },
+  "diagnosticsShare": "Share…",
+  "@diagnosticsShare": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsShare"
+  },
+  "diagnosticsFailed": "Could not export diagnostics. Try another destination.",
+  "@diagnosticsFailed": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsFailed"
+  },
+  "diagnosticsSaved": "Diagnostics saved.",
+  "@diagnosticsSaved": {
+    "description": "User-controlled diagnostic capture and export: diagnosticsSaved"
+  }
+}

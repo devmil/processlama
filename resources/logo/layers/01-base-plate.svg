@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="plateGradient" x1="200" y1="160" x2="824" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3fc8c0"/>
+      <stop offset="0.35" stop-color="#1f9aa0"/>
+      <stop offset="0.7" stop-color="#16505f"/>
+      <stop offset="1" stop-color="#0a2230"/>
+    </linearGradient>
+  </defs>
+  <g id="01-base-plate">
+    <rect x="112" y="112" width="800" height="800" rx="184" fill="url(#plateGradient)"/>
+  </g>
+</svg>

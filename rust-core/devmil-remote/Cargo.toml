@@ -1,0 +1,23 @@
+[package]
+name = "devmil_remote"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+description = "Product-neutral helper transport: frames, a stdio server runtime, descriptor isolation and owned child processes"
+
+[dependencies]
+serde_json = "1"
+getrandom = "0.3"
+
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1", features = ["fs", "process", "stdio"] }
+
+[lints.rust]
+unsafe_code = "deny"
+
+# Test fixture: proves descriptor isolation keeps stray prints off the protocol stream.
+[[bin]]
+name = "devmil-remote-isolation-probe"
+path = "tests/support/isolation_probe.rs"
+test = false
+doc = false

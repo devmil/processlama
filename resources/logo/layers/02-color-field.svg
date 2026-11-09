@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="warmGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(770 250) rotate(125) scale(520 400)">
+      <stop offset="0" stop-color="#ffd36a" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#e9a73c" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#e9a73c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="coolGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(250 770) rotate(-35) scale(560 430)">
+      <stop offset="0" stop-color="#56e7df" stop-opacity="0.7"/>
+      <stop offset="0.6" stop-color="#1aa0a8" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#1aa0a8" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="iconClip"><rect x="112" y="112" width="800" height="800" rx="184"/></clipPath>
+  </defs>
+  <g id="02-color-field" clip-path="url(#iconClip)">
+    <rect x="112" y="112" width="800" height="800" fill="url(#warmGlow)"/>
+    <rect x="112" y="112" width="800" height="800" fill="url(#coolGlow)"/>
+    <path d="M112 118h800v240c-120 30-220 6-300-44-90-56-170-118-262-120-86-2-160 22-238 70z" fill="#ffffff" opacity="0.14"/>
+  </g>
+</svg>

@@ -1,0 +1,32 @@
+# ProcessLama's Rust workspace.
+# - core (processlama_core): the flutter_rust_bridge facade; the library Flutter loads.
+# - telemetry (processlama_telemetry): use cases over processtree, shared by the
+#   desktop core and the remote helper.
+# - devmil-remote (devmil_remote): product-neutral helper transport; it must not
+#   depend on any processlama crate.
+# The Flutter build hook builds only processlama_core.
+[workspace]
+resolver = "3"
+members = ["core", "telemetry", "wire", "devmil-remote", "remote-helper"]
+
+[workspace.package]
+edition = "2024"
+publish = false
+
+[workspace.dependencies]
+processlama_telemetry = { path = "telemetry" }
+devmil_remote = { path = "devmil-remote" }
+processlama_wire = { path = "wire" }
+processtree = { git = "https://github.com/devmil/processtree-rust.git", rev = "fa710ffa9e2344d8bf27c97f7ffa5cfd57355f00" }
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+# The build hook's remote helper for development builds: optimized enough for telemetry,
+# without the release profile's whole-program optimization.
+[profile.helper-dev]
+inherits = "release"
+lto = false
+codegen-units = 16
+incremental = true

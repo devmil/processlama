@@ -1,0 +1,14 @@
+name: devmil_remote
+description: >-
+  Transport mechanics for desktop apps that run a helper over SSH: the OpenSSH
+  launcher, length-prefixed strict JSON frames, the request channel, bootstrap
+  markers and reconnect scheduling. Product-neutral; no app imports.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.12.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

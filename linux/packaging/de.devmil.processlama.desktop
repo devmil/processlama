@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=ProcessLama
+Comment=Inspect running processes and their resource usage
+Exec=processlama
+Icon=de.devmil.processlama
+Terminal=false
+Categories=System;Monitor;
+Keywords=process;task;system;monitor;
+StartupNotify=true
+StartupWMClass=de.devmil.processlama

@@ -1,0 +1,33 @@
+# Builds processlama-remote-helper for Linux x86_64 and aarch64 against the glibc 2.35 floor
+# (Ubuntu 22.04) with cargo-zigbuild. scripts/build-remote-helpers-linux.sh runs it with the
+# workspace and a prefetched Cargo home mounted; the build itself is offline.
+FROM --platform=linux/amd64 docker.io/library/ubuntu:22.04
+
+ARG RUST_VERSION=1.99.0
+ARG ZIG_VERSION=0.13.0
+ARG ZIG_SHA256=d45312e61ebcc48032b77bc4cf7fd6915c11fa16e4aad116b66c9468211230ea
+ARG CARGO_ZIGBUILD_VERSION=0.23.4
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:/usr/local/zig:$PATH
+
+RUN apt-get update -qq \
+ && apt-get install -y --no-install-recommends \
+      ca-certificates curl xz-utils build-essential pkg-config python3 \
+      binutils binutils-aarch64-linux-gnu \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN curl --proto '=https' --tlsv1.2 -sSfL -o /tmp/zig.tar.xz \
+      "https://ziglang.org/download/${ZIG_VERSION}/zig-linux-x86_64-${ZIG_VERSION}.tar.xz" \
+ && echo "${ZIG_SHA256}  /tmp/zig.tar.xz" | sha256sum --check --strict \
+ && mkdir -p /usr/local/zig \
+ && tar -xJf /tmp/zig.tar.xz -C /usr/local/zig --strip-components=1 \
+ && rm /tmp/zig.tar.xz
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+      | sh -s -- -y --no-modify-path --profile minimal --default-toolchain "${RUST_VERSION}" \
+ && rustup target add x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu \
+ && cargo install --locked cargo-zigbuild --version "${CARGO_ZIGBUILD_VERSION}" \
+ && rm -rf "${CARGO_HOME}/registry" "${CARGO_HOME}/git"

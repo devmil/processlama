@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+      Name="ProcessLama"
+      Manufacturer="devmil"
+      Version="$(var.ProductVersion)"
+      UpgradeCode="{63310399-5785-4D60-A7B4-FFC140DE3348}"
+      Language="1033"
+      Scope="perMachine"
+      InstallerVersion="500">
+    <SummaryInformation Description="ProcessLama process explorer" Manufacturer="devmil" />
+    <MajorUpgrade
+        AllowSameVersionUpgrades="no"
+        DowngradeErrorMessage="A newer version of ProcessLama is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+    <Property Id="PROCESSLAMA_MARKETING_VERSION" Value="$(var.MarketingVersion)" />
+    <Property Id="PROCESSLAMA_BUILD_NUMBER" Value="$(var.BuildNumber)" />
+    <Property Id="ARPCOMMENTS" Value="Desktop process explorer" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="ProcessLama" />
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="ProcessLama" />
+    </StandardDirectory>
+
+    <ComponentGroup Id="ProcessLamaFiles" Directory="INSTALLFOLDER">
+      <Files Include="$(var.StageDir)\**">
+        <Exclude Files="$(var.StageDir)\processlama.exe" />
+        <Exclude Files="$(var.StageDir)\**\*.pdb" />
+      </Files>
+      <Component Id="ProcessLamaExecutable" Guid="{07E0A8DC-014F-42DC-B3D8-4B29B13E0CD3}" Bitness="always64">
+        <File Id="ProcessLamaExe" Source="$(var.StageDir)\processlama.exe" KeyPath="yes">
+          <Shortcut
+              Id="ProcessLamaStartMenuShortcut"
+              Directory="ApplicationProgramsFolder"
+              Name="ProcessLama"
+              WorkingDirectory="INSTALLFOLDER"
+              Advertise="yes" />
+        </File>
+      </Component>
+      <Component Id="ProcessLamaInstallRegistration" Bitness="always64">
+        <RegistryValue
+            Root="HKLM"
+            Key="Software\devmil\ProcessLama"
+            Name="InstallLocation"
+            Value="[INSTALLFOLDER]"
+            Type="string"
+            KeyPath="yes" />
+        <RemoveFolder Id="RemoveProcessLamaInstallFolder" Directory="INSTALLFOLDER" On="uninstall" />
+        <RemoveFolder Id="RemoveProcessLamaProgramsFolder" Directory="ApplicationProgramsFolder" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="MainFeature" Title="ProcessLama" Level="1" AllowAbsent="no">
+      <ComponentGroupRef Id="ProcessLamaFiles" />
+    </Feature>
+  </Package>
+</Wix>

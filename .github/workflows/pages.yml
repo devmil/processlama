@@ -20,6 +20,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.repository == 'devmil/processlama' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

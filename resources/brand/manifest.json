@@ -1,0 +1,209 @@
+{
+  "productName": "ProcessLama",
+  "sourceCommit": "637ff2e9ffa9d5455a93217409f53a189dd20d70",
+  "sourceRepository": "Devmil/brand, vendored committed masters",
+  "generator": "scripts/generate-brand-assets.py",
+  "masters": {
+    "app-icon-mimameidr.svg": "3c6a3d3545c03227c043a21f7f6cc62624e22b2081733454005010f66c791e9d",
+    "app-icon-mimameidr-desktop.svg": "4cf3bb7d09f3c040a1861a4988fd6595040579e919f0afb0bc5d7fc3ceaa1c05",
+    "tile-mimameidr-small.svg": "1a6d4b06ba73b8c4c2b0d516f111feb2e33f77f2665689bc0690eb2331620114",
+    "tile-mimameidr.svg": "bace8b080641152a97600f8494d234e917f63eac1f2ffa1e894fe46587fa548a",
+    "lama-signature.svg": "f42d5d84b9d979dc196b4c098b1331d33189fc195feb1f0165b3085927b26497",
+    "lama-proud.svg": "a8d927b48be195500783fb4e70a816bb774285a858f1abfd918df759a0889600",
+    "lama-resting.svg": "a92936df666c5aaff7ad874e7653914b922f5e81b9531e89c51bb19d85775b27",
+    "lama-standing-nod.svg": "5c385b984c760528dbfb951d9a9700286594d051a2fcb6de300a15859b0e6bb3",
+    "herd-mimameidr.svg": "a0545ce41f76697ab68d37e5c61d90f08885b0276bdd8bc42258cccf86e99622",
+    "lama-standing.svg": "516278e37d017b20890118bac7303bcaec929fefd1f19eb652d31a3ef264831f",
+    "lama-nod.svg": "fffbdbba65ace92e79931bc8ec54e62b53beeba3767c212959ab7e6e24fcbf8b",
+    "lama-proud-shades-up.svg": "a24d0e3d3b25a4a979d71be776f62939e7a7329ef3b9c117fdd157ed76a806cd",
+    "web/lama-antics.js": "fd9d7d8235fa71c2d4f814b8dd54570b54a98f7296f9f4513d98ce8d17ff1633",
+    "web/lama-antics.css": "926d01e9bae21fc20c35910e6f56f8ae315d16d5ffe58cd523716afbec6eb670",
+    "icon-composer/mimameidr/01-background.svg": "31432ee78b3e1b431e2d4e3adc138d24fb0d18da573ab9f6d805c880ddec7673",
+    "icon-composer/mimameidr/02-lama.svg": "0b59e9db5cfa4a2a84f60ce1843aceeb81286eab443e2146aafef506f51e6527",
+    "icon-composer/mimameidr/03-prop.svg": "21aaff54e83ba10d79e6fbbdaa1dcea9641742cab6b98b6b8323f4eb9d40cb90"
+  },
+  "outputs": {
+    "resources/logo/processlama-icon.svg": {
+      "sha256": "3c6a3d3545c03227c043a21f7f6cc62624e22b2081733454005010f66c791e9d"
+    },
+    "resources/logo/processlama-icon-app.svg": {
+      "sha256": "3c6a3d3545c03227c043a21f7f6cc62624e22b2081733454005010f66c791e9d"
+    },
+    "website/assets/brand/processlama-icon.svg": {
+      "sha256": "3c6a3d3545c03227c043a21f7f6cc62624e22b2081733454005010f66c791e9d"
+    },
+    "website/assets/lama/lama-proud.svg": {
+      "sha256": "a8d927b48be195500783fb4e70a816bb774285a858f1abfd918df759a0889600"
+    },
+    "website/assets/lama/lama-standing-nod.svg": {
+      "sha256": "5c385b984c760528dbfb951d9a9700286594d051a2fcb6de300a15859b0e6bb3"
+    },
+    "website/assets/lama/lama-signature.svg": {
+      "sha256": "f42d5d84b9d979dc196b4c098b1331d33189fc195feb1f0165b3085927b26497"
+    },
+    "website/assets/lama/lama-standing.svg": {
+      "sha256": "516278e37d017b20890118bac7303bcaec929fefd1f19eb652d31a3ef264831f"
+    },
+    "website/assets/lama/lama-resting.svg": {
+      "sha256": "a92936df666c5aaff7ad874e7653914b922f5e81b9531e89c51bb19d85775b27"
+    },
+    "website/assets/lama/lama-nod.svg": {
+      "sha256": "fffbdbba65ace92e79931bc8ec54e62b53beeba3767c212959ab7e6e24fcbf8b"
+    },
+    "website/assets/lama/lama-proud-shades-up.svg": {
+      "sha256": "a24d0e3d3b25a4a979d71be776f62939e7a7329ef3b9c117fdd157ed76a806cd"
+    },
+    "website/assets/lama/lama-antics.js": {
+      "sha256": "fd9d7d8235fa71c2d4f814b8dd54570b54a98f7296f9f4513d98ce8d17ff1633"
+    },
+    "website/assets/lama/lama-antics.css": {
+      "sha256": "926d01e9bae21fc20c35910e6f56f8ae315d16d5ffe58cd523716afbec6eb670"
+    },
+    "resources/logo/processlama-icon-app.png": {
+      "sha256": "1e5590d96fd0db8d963ca9e52af65991d6ea060bab2e841d61d1f9ac34fce2bc",
+      "dimensions": [
+        1024,
+        1024
+      ]
+    },
+    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_16.png": {
+      "sha256": "a2257fa591c51fd572f996380730e12c5669e60015627a1a71511012312657cd",
+      "dimensions": [
+        16,
+        16
+      ]
+    },
+    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png": {
+      "sha256": "64290ed52d2a166f6f9f0d50d20c07cad48bc668acd10288374f3753924742dd",
+      "dimensions": [
+        32,
+        32
+      ]
+    },
+    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_64.png": {
+      "sha256": "5b30a61859ea8329757439014abc82b3d51555de943a8e189164c255b7a1ce2c",
+      "dimensions": [
+        64,
+        64
+      ]
+    },
+    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_128.png": {
+      "sha256": "ff7f42f8494ef32a7d34a57a651591330aaeab231cba378dd5cc0633fa2074f1",
+      "dimensions": [
+        128,
+        128
+      ]
+    },
+    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png": {
+      "sha256": "05045fbceaa4fb4813cc7a8114320b657ec969f4c1d95c65cf2053d5108d93d5",
+      "dimensions": [
+        256,
+        256
+      ]
+    },
+    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png": {
+      "sha256": "427e0b60346e0debcf62d6979efdea6f9be4e621fa29022f4b03c601e6f67653",
+      "dimensions": [
+        512,
+        512
+      ]
+    },
+    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png": {
+      "sha256": "710fcb56381fa1ab918adda53adabc10a1329a5e6ecb67781b54e70db7a810df",
+      "dimensions": [
+        1024,
+        1024
+      ]
+    },
+    "linux/packaging/de.devmil.processlama.png": {
+      "sha256": "427e0b60346e0debcf62d6979efdea6f9be4e621fa29022f4b03c601e6f67653",
+      "dimensions": [
+        512,
+        512
+      ]
+    },
+    "website/assets/icons/favicon-16.png": {
+      "sha256": "a2257fa591c51fd572f996380730e12c5669e60015627a1a71511012312657cd",
+      "dimensions": [
+        16,
+        16
+      ]
+    },
+    "website/assets/icons/favicon-32.png": {
+      "sha256": "70ec80852d4ac8f90a0a5457e0c94f2b9cb61734195b66250de96b63236648cb",
+      "dimensions": [
+        32,
+        32
+      ]
+    },
+    "website/assets/icons/apple-touch-icon.png": {
+      "sha256": "20a163e9b2f7c749ca779195d79daebbb42465a2fe4b8d6bd490e561c1a32bcc",
+      "dimensions": [
+        180,
+        180
+      ]
+    },
+    "website/assets/icons/icon-192.png": {
+      "sha256": "c4dc68c6333a6dc68957cc4cf255046320613c3cbefb8c5ae6fca1e1585359a2",
+      "dimensions": [
+        192,
+        192
+      ]
+    },
+    "website/assets/icons/icon-512.png": {
+      "sha256": "71541b468862125efcaccd906b8a6911c753949c4acb276d7bf248a0bf32e21d",
+      "dimensions": [
+        512,
+        512
+      ]
+    },
+    "website/assets/icons/icon-512-maskable.png": {
+      "sha256": "71541b468862125efcaccd906b8a6911c753949c4acb276d7bf248a0bf32e21d",
+      "dimensions": [
+        512,
+        512
+      ]
+    },
+    "website/favicon.ico": {
+      "sha256": "40686994f20207826a3fa1a73aee066234fa9486b842fba25231a1dd61d636b9"
+    },
+    "windows/runner/resources/app_icon.ico": {
+      "sha256": "82ef7b163437e2d7f02c778b57aa19a31ad0def327bab0078ea30c3f4060acfd"
+    },
+    "resources/logo/iconapp_icon.icon/Assets/01-background.svg": {
+      "sha256": "31432ee78b3e1b431e2d4e3adc138d24fb0d18da573ab9f6d805c880ddec7673"
+    },
+    "resources/logo/iconapp_icon.icon/Assets/02-lama.svg": {
+      "sha256": "0b59e9db5cfa4a2a84f60ce1843aceeb81286eab443e2146aafef506f51e6527"
+    },
+    "resources/logo/iconapp_icon.icon/Assets/03-prop.svg": {
+      "sha256": "21aaff54e83ba10d79e6fbbdaa1dcea9641742cab6b98b6b8323f4eb9d40cb90"
+    },
+    "resources/logo/iconapp_icon.icon/icon.json": {
+      "sha256": "5f035c0a4bc195ceea150e90cc2329dde900fbfaaf963101219f6feee2a81508"
+    },
+    "resources/logo/processlama-feature-graphic.svg": {
+      "sha256": "baf0ffe6fff527a83206ca883a21102ec9f600dc5b2784cc4cc5e7c98d093146"
+    },
+    "resources/logo/processlama-logo.svg": {
+      "sha256": "baf0ffe6fff527a83206ca883a21102ec9f600dc5b2784cc4cc5e7c98d093146"
+    },
+    "resources/logo/processlama-feature-graphic.png": {
+      "sha256": "0f01a3331868daf2a2582a46e7336f793d65f7c73b606fd6118c5c23e9c59baa",
+      "dimensions": [
+        1024,
+        500
+      ]
+    },
+    "website/assets/brand/processlama-feature-graphic.svg": {
+      "sha256": "baf0ffe6fff527a83206ca883a21102ec9f600dc5b2784cc4cc5e7c98d093146"
+    },
+    "website/assets/brand/processlama-feature-graphic.png": {
+      "sha256": "0f01a3331868daf2a2582a46e7336f793d65f7c73b606fd6118c5c23e9c59baa",
+      "dimensions": [
+        1024,
+        500
+      ]
+    }
+  }
+}

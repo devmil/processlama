@@ -1,0 +1,26 @@
+{
+  "fill": {
+    "solid": "extended-srgb:0.05490,0.48627,0.34902,1.00000"
+  },
+  "groups": [
+    {
+      "layers": [
+        {
+          "image-name": "01-background.svg",
+          "name": "01-background"
+        },
+        {
+          "image-name": "02-lama.svg",
+          "name": "02-lama"
+        },
+        {
+          "image-name": "03-prop.svg",
+          "name": "03-prop"
+        }
+      ]
+    }
+  ],
+  "supported-platforms": {
+    "squares": "shared"
+  }
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>de.devmil.processlama</id>
+  <name>ProcessLama</name>
+  <summary>A Flutter and Rust process explorer</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <developer id="de.devmil">
+    <name>devmil</name>
+  </developer>
+  <description>
+    <p>ProcessLama is a dense desktop process explorer with live resource metrics, process trees, inspection, search, and snapshots.</p>
+  </description>
+  <launchable type="desktop-id">de.devmil.processlama.desktop</launchable>
+  <provides><binary>processlama</binary></provides>
+  <categories><category>System</category><category>Monitor</category></categories>
+  <url type="homepage">https://devmil.de/processlama/</url>
+  <content_rating type="oars-1.1" />
+</component>
