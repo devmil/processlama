@@ -400,6 +400,9 @@ jobs:
           rustc --version
           cargo --version
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+      - name: Install macOS application Rust targets
+        shell: bash
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
       # Fetch before Flutter's native-assets hook filters the Git/Cargo auth
       # environment. Restored Cargo caches may not contain the pinned revision.
       - name: Fetch locked Rust dependencies
@@ -481,6 +484,8 @@ jobs:
           export APPLE_API_KEY_ID="$api_key_id"
           export APPLE_API_ISSUER_ID="$api_issuer_id"
             ./scripts/package-release.sh
+          lipo -verify_arch arm64 x86_64 build/macos/Build/Products/Release/processlama.app/Contents/MacOS/processlama
+          lipo -verify_arch arm64 x86_64 build/macos/Build/Products/Release/processlama.app/Contents/Frameworks/processlama_core.framework/processlama_core
           ./scripts/notarize-release.sh build/archive/ProcessLama.dmg
           mkdir -p build/release-upload
           dmg="build/release-upload/ProcessLama-${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.build }}.dmg"
@@ -661,7 +666,7 @@ jobs:
                   *.tar.gz) format=tar ;;
                   *) echo "::error::Unexpected network service artifact $filename" >&2; exit 1 ;;
                 esac ;;
-              *.dmg) platform=macos; format=dmg; arch="Apple Silicon"; minimum="macOS 14.0"; extra=(--sparkle-signature "$signature") ;;
+              *.dmg) platform=macos; format=dmg; arch="Apple Silicon & Intel"; minimum="macOS 14.0"; extra=(--sparkle-signature "$signature") ;;
               *.AppImage) platform=linux; format=appimage; arch="x86_64"; minimum="Linux"; extra=() ;;
               *.rpm) platform=linux; format=rpm; arch="x86_64"; minimum="Linux"; extra=() ;;
               *.deb) platform=linux; format=deb; arch="x86_64"; minimum="Linux"; extra=() ;;
