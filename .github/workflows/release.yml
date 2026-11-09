@@ -44,6 +44,21 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+      - name: Verify native universal architecture checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          probe="$(mktemp -d)"
+          trap 'rm -rf -- "$probe"' EXIT
+          echo 'int architecture_fixture(void) { return 0; }' > "$probe/input.c"
+          clang -arch arm64 -c "$probe/input.c" -o "$probe/arm64.o"
+          clang -arch x86_64 -c "$probe/input.c" -o "$probe/x86_64.o"
+          lipo "$probe/arm64.o" "$probe/x86_64.o" -create -output "$probe/universal.o"
+          lipo "$probe/universal.o" -verify_arch arm64 x86_64
+          if lipo "$probe/arm64.o" -verify_arch arm64 x86_64 2>/dev/null; then
+            echo "::error::Architecture validation accepted a missing Intel slice" >&2
+            exit 1
+          fi
       - name: Setup Flutter
         uses: ./.github/actions/flutter
       - uses: actions/setup-python@v5
@@ -484,8 +499,8 @@ jobs:
           export APPLE_API_KEY_ID="$api_key_id"
           export APPLE_API_ISSUER_ID="$api_issuer_id"
             ./scripts/package-release.sh
-          lipo -verify_arch arm64 x86_64 build/macos/Build/Products/Release/processlama.app/Contents/MacOS/processlama
-          lipo -verify_arch arm64 x86_64 build/macos/Build/Products/Release/processlama.app/Contents/Frameworks/processlama_core.framework/processlama_core
+          lipo build/macos/Build/Products/Release/processlama.app/Contents/MacOS/processlama -verify_arch arm64 x86_64
+          lipo build/macos/Build/Products/Release/processlama.app/Contents/Frameworks/processlama_core.framework/processlama_core -verify_arch arm64 x86_64
           ./scripts/notarize-release.sh build/archive/ProcessLama.dmg
           mkdir -p build/release-upload
           dmg="build/release-upload/ProcessLama-${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.build }}.dmg"
