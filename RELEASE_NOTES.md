@@ -133,6 +133,8 @@
 
 ## [Unreleased Beta]
 
+## [1.0.0-beta.35] - 2026-11-09
+
 ### Added
 
 - ProcessLama is now open source under the MIT license, with public build and contribution instructions.

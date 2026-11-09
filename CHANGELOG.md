@@ -192,6 +192,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ## [Unreleased Beta]
 
+## [1.0.0-beta.35] - 2026-11-09
+
 ### Added
 
 - ProcessLama is now open source under the MIT license, with public build and contribution instructions.
@@ -617,6 +619,6 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   sparklines.
 
 
-[Unreleased Stable]: https://github.com/devmil/processlama/compare/v1.0.0-beta.34-41...HEAD
-[Unreleased Beta]: https://github.com/devmil/processlama/compare/v1.0.0-beta.34-41...HEAD
-[1.0.0-beta.34]: https://github.com/devmil/processlama/releases/tag/v1.0.0-beta.34-41
+[Unreleased Stable]: https://github.com/devmil/processlama/compare/v1.0.0-beta.35-42...HEAD
+[Unreleased Beta]: https://github.com/devmil/processlama/compare/v1.0.0-beta.35-42...HEAD
+[1.0.0-beta.35]: https://github.com/devmil/processlama/releases/tag/v1.0.0-beta.35-42
