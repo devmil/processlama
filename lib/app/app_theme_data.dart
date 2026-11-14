@@ -31,6 +31,9 @@ class ProcessLamaTheme extends ThemeExtension<ProcessLamaTheme> {
 
   // Brand composition sizes; the shared signature itself uses MeridianSize.icon.
   static const double aboutTileSize = 96;
+
+  /// The app mark at the top of the license dialog's package list.
+  static const double licenseTileSize = 40;
   static const double emptyLamaHeight = 48;
 
   /// Opacity of [rowHeat] on a row whose subtree uses 100% CPU.

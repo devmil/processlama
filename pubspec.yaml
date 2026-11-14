@@ -59,7 +59,7 @@ dependencies:
   meridian_ui:
     git:
       url: https://github.com/devmil/meridian_ui.git
-      ref: 7ab7f1ccb9b0c41c1b282b5248ed64d4d5d45079
+      ref: 77ad5a983dd153fe3b3fc15076f0775be0fe4bde
   two_dimensional_scrollables: ^0.5.2
   url_launcher: ^6.3.2
 
@@ -94,6 +94,9 @@ flutter:
   assets:
     - assets/fonts/geist/OFL.txt
     - resources/brand/
+    # Shown in the license dialog (lib/app/app_licenses.dart).
+    - LICENSE
+    - LICENSES/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
