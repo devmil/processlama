@@ -1144,6 +1144,10 @@
   "aboutVersion": "Version {version} · build {build}",
   "lamaFamily": "The Lama family",
   "closeAbout": "Close",
+  "aboutLicenses": "Licenses",
+  "@aboutLicenses": {
+    "description": "About dialog button that opens the bundled license notices."
+  },
   "filterNoMatchesHelp": "Try a broader name or clear the CPU threshold.",
   "@aboutVersion": {
     "placeholders": {

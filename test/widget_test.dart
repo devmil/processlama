@@ -221,6 +221,19 @@ void main() {
           findsOneWidget,
         );
         expect(tester.takeException(), isNull);
+        // Licenses open the Meridian license dialog over About.
+        await tester.tap(find.byKey(const ValueKey('about-licenses')));
+        await tester.pumpAndSettle();
+        expect(find.byType(MeridianLicenseDialog), findsOneWidget);
+        expect(
+          find.text(language == 'de' ? 'Lizenzen' : 'Licenses'),
+          findsWidgets,
+        );
+        expect(tester.takeException(), isNull);
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+        expect(find.byType(MeridianLicenseDialog), findsNothing);
+        expect(find.text('by Devmil Solutions'), findsOneWidget);
         await tester.sendKeyEvent(LogicalKeyboardKey.escape);
         await tester.pumpAndSettle();
         expect(find.text('by Devmil Solutions'), findsNothing);

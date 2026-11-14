@@ -2224,7 +2224,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    limitations under the License.
 ```
 
-## meridian_ui 1.17.2
+## meridian_ui 1.18.0
 
 ### LICENSE
 
