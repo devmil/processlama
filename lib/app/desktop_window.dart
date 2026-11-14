@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:meridian_ui/meridian_ui.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'platform_capabilities.dart';
@@ -98,7 +99,7 @@ class _DesktopWindowSurfaceState extends State<DesktopWindowSurface> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!PlatformCapabilities.isLinux) return;
-    final background = Theme.of(context).scaffoldBackgroundColor;
+    final background = MeridianTheme.of(context).colors.ground;
     if (_background == background) return;
     _background = background;
     WidgetsBinding.instance.addPostFrameCallback((_) {

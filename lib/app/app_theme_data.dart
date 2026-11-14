@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:meridian_ui/meridian_ui.dart';
 
 import '../models/models.dart';
@@ -9,7 +9,7 @@ import '../models/models.dart';
 /// Everything else (surfaces, ink, status colours, type, spacing, motion)
 /// comes from `context.meridian` and the ProcessLama brand.
 @immutable
-class ProcessLamaTheme extends ThemeExtension<ProcessLamaTheme> {
+class ProcessLamaTheme extends MeridianThemeExtension<ProcessLamaTheme> {
   const ProcessLamaTheme({
     required this.rowHeat,
     required this.searchMatchRow,
@@ -64,7 +64,7 @@ class ProcessLamaTheme extends ThemeExtension<ProcessLamaTheme> {
   final Color chartLower;
 
   static ProcessLamaTheme of(BuildContext context) =>
-      Theme.of(context).extension<ProcessLamaTheme>() ??
+      MeridianTheme.of(context).extension<ProcessLamaTheme>() ??
       ProcessLamaTheme.resolve(context.meridian.colors);
 
   @override
@@ -85,7 +85,10 @@ class ProcessLamaTheme extends ThemeExtension<ProcessLamaTheme> {
   );
 
   @override
-  ProcessLamaTheme lerp(ThemeExtension<ProcessLamaTheme>? other, double t) {
+  ProcessLamaTheme lerp(
+    MeridianThemeExtension<ProcessLamaTheme>? other,
+    double t,
+  ) {
     if (other is! ProcessLamaTheme) {
       return this;
     }
@@ -102,7 +105,7 @@ class ProcessLamaTheme extends ThemeExtension<ProcessLamaTheme> {
 
 /// The ProcessLama theme: Meridian with the ProcessLama brand (signal blue,
 /// Geist and Geist Mono) at the chosen row [density] plus [ProcessLamaTheme].
-ThemeData buildProcessLamaTheme({
+MeridianTheme buildProcessLamaTheme({
   Brightness brightness = Brightness.light,
   AppRowDensity density = AppSettings.defaultRowDensity,
 }) {
@@ -110,7 +113,7 @@ ThemeData buildProcessLamaTheme({
     brand: MeridianBrands.mimameidr,
     brightness: brightness,
   ).colors;
-  return buildMeridianTheme(
+  return MeridianTheme.resolve(
     brand: MeridianBrands.mimameidr,
     brightness: brightness,
     density: switch (density) {

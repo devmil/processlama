@@ -201,7 +201,7 @@ class _NavigationSidebar extends StatelessWidget {
             child: Semantics(
               button: true,
               label: l10n.aboutApp,
-              child: Tooltip(
+              child: MeridianTooltip(
                 message: l10n.brandTooltip,
                 excludeFromSemantics: true,
                 child: MeridianInteraction(

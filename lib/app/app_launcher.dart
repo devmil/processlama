@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:meridian_ui/meridian_ui.dart';
 
 import '../l10n/l10n.dart';
@@ -34,7 +34,7 @@ class _AppLauncherState extends State<AppLauncher> {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           _scheduleLaunchScreenDismissal();
-          return MaterialApp(
+          return MeridianApp(
             debugShowCheckedModeBanner: false,
             onGenerateTitle: (context) => context.l10n.appTitle,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -53,7 +53,7 @@ class _AppLauncherState extends State<AppLauncher> {
           return snapshot.data!;
         }
 
-        return MaterialApp(
+        return MeridianApp(
           debugShowCheckedModeBanner: false,
           onGenerateTitle: (context) => context.l10n.appTitle,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -131,7 +131,7 @@ class _BootstrapErrorScreen extends StatelessWidget {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(MeridianSpace.space5),
-                        child: SelectableText(
+                        child: MeridianSelectableText(
                           details,
                           style: meridian.text.codeSm.copyWith(
                             color: meridian.colors.inkMuted,
