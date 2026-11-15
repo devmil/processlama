@@ -88,6 +88,8 @@
 
 ### Fixed
 
+- Text fields no longer show a touch-style drop under the cursor when a dialog opens with a prefilled name. Right-clicking selectable text on desktop opens the copy menu again.
+
 - Fixed a macOS process refresh error during busy builds or other bursts of
   process activity. Existing remote hosts require a helper update.
 
@@ -136,6 +138,10 @@
   process tree.
 
 ## [Unreleased Beta]
+
+### Fixed
+
+- Text fields no longer show a touch-style drop under the cursor when a dialog opens with a prefilled name. Right-clicking selectable text on desktop opens the copy menu again.
 
 ## [1.0.0-beta.36] - 2026-11-15
 
