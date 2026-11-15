@@ -130,6 +130,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ### Fixed
 
+- Hide the touch selection handle on desktop text fields (Meridian 2.0.2). A field filled in and focused when it opens, such as the name in a dialog, showed a drop under the caret on macOS, Linux and Windows until clicked. Right-click menus on selectable text, such as copying from a read-only label, open again on desktop.
+
 - macOS process refresh now tolerates rapid process creation during builds,
   avoiding a bootstrap error when the process table grows while being read.
   Remote helper compatibility is now version 3; update existing remote helpers.
@@ -195,6 +197,10 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   process tree instead of looking like another copy of the parent app bundle.
 
 ## [Unreleased Beta]
+
+### Fixed
+
+- Hide the touch selection handle on desktop text fields (Meridian 2.0.2). A field filled in and focused when it opens, such as the name in a dialog, showed a drop under the caret on macOS, Linux and Windows until clicked. Right-click menus on selectable text, such as copying from a read-only label, open again on desktop.
 
 ## [1.0.0-beta.36] - 2026-11-15
 
