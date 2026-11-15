@@ -137,6 +137,8 @@
 
 ## [Unreleased Beta]
 
+## [1.0.0-beta.36] - 2026-11-15
+
 ### Added
 
 - About › Licenses now opens a licenses window that matches the rest of ProcessLama. Filter the package list, move through it with the arrow keys and read each license beside it.

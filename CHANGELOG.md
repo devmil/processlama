@@ -196,6 +196,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ## [Unreleased Beta]
 
+## [1.0.0-beta.36] - 2026-11-15
+
 ### Added
 
 - Open-source licenses (About › Licenses) now open in ProcessLama's own licenses window from the Meridian design system: a filterable package list with arrow-key navigation beside the selected package's license text. It lists ProcessLama, the GPL-2.0 network eBPF program, libbpf, the Geist font and the bundled Flutter and Rust dependency inventories.
@@ -632,6 +634,6 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   sparklines.
 
 
-[Unreleased Stable]: https://github.com/devmil/processlama/compare/v1.0.0-beta.35-42...HEAD
-[Unreleased Beta]: https://github.com/devmil/processlama/compare/v1.0.0-beta.35-42...HEAD
-[1.0.0-beta.35]: https://github.com/devmil/processlama/releases/tag/v1.0.0-beta.35-42
+[Unreleased Stable]: https://github.com/devmil/processlama/compare/v1.0.0-beta.36-43...HEAD
+[Unreleased Beta]: https://github.com/devmil/processlama/compare/v1.0.0-beta.36-43...HEAD
+[1.0.0-beta.36]: https://github.com/devmil/processlama/releases/tag/v1.0.0-beta.36-43
