@@ -139,6 +139,8 @@
 
 ## [Unreleased Beta]
 
+## [1.0.0-beta.37] - 2026-11-15
+
 ### Fixed
 
 - Text fields no longer show a touch-style drop under the cursor when a dialog opens with a prefilled name. Right-clicking selectable text on desktop opens the copy menu again.

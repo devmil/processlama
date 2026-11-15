@@ -198,6 +198,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ## [Unreleased Beta]
 
+## [1.0.0-beta.37] - 2026-11-15
+
 ### Fixed
 
 - Hide the touch selection handle on desktop text fields (Meridian 2.0.2). A field filled in and focused when it opens, such as the name in a dialog, showed a drop under the caret on macOS, Linux and Windows until clicked. Right-click menus on selectable text, such as copying from a read-only label, open again on desktop.
@@ -640,6 +642,6 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   sparklines.
 
 
-[Unreleased Stable]: https://github.com/devmil/processlama/compare/v1.0.0-beta.36-43...HEAD
-[Unreleased Beta]: https://github.com/devmil/processlama/compare/v1.0.0-beta.36-43...HEAD
-[1.0.0-beta.36]: https://github.com/devmil/processlama/releases/tag/v1.0.0-beta.36-43
+[Unreleased Stable]: https://github.com/devmil/processlama/compare/v1.0.0-beta.37-44...HEAD
+[Unreleased Beta]: https://github.com/devmil/processlama/compare/v1.0.0-beta.37-44...HEAD
+[1.0.0-beta.37]: https://github.com/devmil/processlama/releases/tag/v1.0.0-beta.37-44
