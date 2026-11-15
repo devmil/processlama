@@ -4,6 +4,8 @@
 
 ### Added
 
+- About › Licenses now opens a licenses window that matches the rest of ProcessLama. Filter the package list, move through it with the arrow keys and read each license beside it.
+
 - ProcessLama is now open source under the MIT license, with public build and contribution instructions.
 
 - Diagnostics now keep bounded recent history in memory instead of writing logs automatically. Settings lets you temporarily enable detailed diagnostics, review an export, save it, or share it where supported. Nothing is sent automatically.
@@ -67,6 +69,8 @@
 
 ### Changed
 
+- Tooltips, text fields, text selection, scrolling and dialogs were rebuilt on ProcessLama's own design system instead of Flutter's Material library. They should look and behave as before; please report anything that feels different.
+- Built with Flutter 3.50.0.
 - Preferences are now organized into pages, so each setting is easier to find.
 - ProcessLama is now green: a new accent colour and app icon tell it apart
   from the other Lama apps at a glance.
@@ -132,6 +136,15 @@
   process tree.
 
 ## [Unreleased Beta]
+
+### Added
+
+- About › Licenses now opens a licenses window that matches the rest of ProcessLama. Filter the package list, move through it with the arrow keys and read each license beside it.
+
+### Changed
+
+- Tooltips, text fields, text selection, scrolling and dialogs were rebuilt on ProcessLama's own design system instead of Flutter's Material library. They should look and behave as before; please report anything that feels different.
+- Built with Flutter 3.50.0.
 
 ## [1.0.0-beta.35] - 2026-11-09
 

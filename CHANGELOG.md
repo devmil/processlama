@@ -6,6 +6,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ### Added
 
+- Open-source licenses (About › Licenses) now open in ProcessLama's own licenses window from the Meridian design system: a filterable package list with arrow-key navigation beside the selected package's license text. It lists ProcessLama, the GPL-2.0 network eBPF program, libbpf, the Geist font and the bundled Flutter and Rust dependency inventories.
+
 - ProcessLama is now open source under the MIT license, with public build and contribution instructions.
 
 - Adopt shared devmil-logging: bounded memory history, session-limited detailed capture, clear controls, and preview-gated Save/Share export; no automatic application log files or release console output.
@@ -95,6 +97,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ### Changed
 
+- Move to Meridian 2.0, which no longer depends on Flutter's Material library: the app shell, tooltips, text fields, selectable text and its menus, scrolling and scrollbars, dialogs and date formatting now come from Meridian's own widgets-layer components.
+- Upgrade Flutter to 3.50.0.
 - Preferences are split into pages (Appearance, Process tree, Columns, Remote
   hosts and Updates) listed beside the selected page, instead of one long
   column. "Manage remote hosts…" in the tab strip opens the Remote hosts page.
@@ -191,6 +195,15 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   process tree instead of looking like another copy of the parent app bundle.
 
 ## [Unreleased Beta]
+
+### Added
+
+- Open-source licenses (About › Licenses) now open in ProcessLama's own licenses window from the Meridian design system: a filterable package list with arrow-key navigation beside the selected package's license text. It lists ProcessLama, the GPL-2.0 network eBPF program, libbpf, the Geist font and the bundled Flutter and Rust dependency inventories.
+
+### Changed
+
+- Move to Meridian 2.0, which no longer depends on Flutter's Material library: the app shell, tooltips, text fields, selectable text and its menus, scrolling and scrollbars, dialogs and date formatting now come from Meridian's own widgets-layer components.
+- Upgrade Flutter to 3.50.0.
 
 ## [1.0.0-beta.35] - 2026-11-09
 
