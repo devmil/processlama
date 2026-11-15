@@ -102,7 +102,7 @@ class _ExplorerStatusBar extends StatelessWidget {
           ),
         if (remote != null) remote.$2,
         if (lock.isOrderLockedByInteraction)
-          Tooltip(
+          MeridianTooltip(
             key: const ValueKey('order-locked-hint'),
             message: l10n.liveOrderingPausedTooltip,
             child: Row(

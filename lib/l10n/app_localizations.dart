@@ -1536,6 +1536,12 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get closeAbout;
 
+  /// About dialog button that opens the bundled license notices.
+  ///
+  /// In en, this message translates to:
+  /// **'Licenses'**
+  String get aboutLicenses;
+
   /// No description provided for @filterNoMatchesHelp.
   ///
   /// In en, this message translates to:

@@ -805,6 +805,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get closeAbout => 'Schließen';
 
   @override
+  String get aboutLicenses => 'Lizenzen';
+
+  @override
   String get filterNoMatchesHelp =>
       'Versuch es mit einem allgemeineren Namen oder entferne den CPU-Schwellenwert.';
 

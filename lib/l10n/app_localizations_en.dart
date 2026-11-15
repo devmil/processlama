@@ -797,6 +797,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get closeAbout => 'Close';
 
   @override
+  String get aboutLicenses => 'Licenses';
+
+  @override
   String get filterNoMatchesHelp =>
       'Try a broader name or clear the CPU threshold.';
 

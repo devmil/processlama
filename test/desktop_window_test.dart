@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:meridian_ui/meridian_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:processlama/app/app_theme_data.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:processlama/app/desktop_window.dart';
 
@@ -69,23 +71,23 @@ void main() {
     tester,
   ) async {
     Future<void> show(Color color) => tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(scaffoldBackgroundColor: color),
+      MeridianApp(
+        theme: _themeWithGround(color),
         themeAnimationDuration: Duration.zero,
         home: const DesktopWindowSurface(child: SizedBox()),
       ),
     );
-    await show(Colors.white);
+    await show(const Color(0xFFFFFFFF));
     await tester.pump();
     var backgrounds = calls.where(
       (call) => call.method == 'setBackgroundColor',
     );
     expect(backgrounds, hasLength(1));
     expect((backgrounds.last.arguments as Map)['backgroundColorR'], 255);
-    await show(Colors.white);
+    await show(const Color(0xFFFFFFFF));
     await tester.pump();
     expect(backgrounds, hasLength(1));
-    await show(Colors.black);
+    await show(const Color(0xFF000000));
     await tester.pump();
     expect(backgrounds, hasLength(2));
     expect((backgrounds.last.arguments as Map)['backgroundColorR'], 0);
@@ -95,7 +97,10 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(home: DesktopWindowSurface(child: SizedBox())),
+      MeridianApp(
+        theme: buildProcessLamaTheme(),
+        home: const DesktopWindowSurface(child: SizedBox()),
+      ),
     );
     await tester.pump();
     expect(calls.where((call) => call.method == 'setBackgroundColor'), isEmpty);
@@ -115,4 +120,14 @@ void main() {
       );
     });
   }
+}
+
+MeridianTheme _themeWithGround(Color ground) {
+  final theme = buildProcessLamaTheme();
+  return MeridianTheme.resolve(
+    brand: theme.brand,
+    brightness: theme.brightness,
+    density: theme.density,
+    colors: theme.colors.copyWith(ground: ground),
+  );
 }

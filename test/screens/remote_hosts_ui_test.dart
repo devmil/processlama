@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import '../support/meridian_test_support.dart';
+import 'package:meridian_ui/meridian_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:processlama/app/app_theme_data.dart';
 import 'package:processlama/l10n/l10n.dart';
@@ -35,12 +38,12 @@ Widget _app(
   String language = 'en',
 }) => MultiProvider(
   providers: providers,
-  child: MaterialApp(
+  child: MeridianApp(
     locale: Locale(language),
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: processLamaLocalizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     theme: buildProcessLamaTheme(),
-    home: Scaffold(body: child),
+    home: MeridianScaffold(body: child),
   ),
 );
 
@@ -280,8 +283,8 @@ void main() {
     await tester.pumpWidget(
       _app(
         Builder(
-          builder: (context) => TextButton(
-            onPressed: () async => choice = await showDialog(
+          builder: (context) => TestButton(
+            onPressed: () async => choice = await showMeridianDialog(
               context: context,
               builder: (_) => RemoteHelperInstallDialog(
                 request: RemoteInstallRequest(
@@ -324,7 +327,7 @@ void main() {
     await tester.pumpWidget(
       _app(
         Builder(
-          builder: (context) => TextButton(
+          builder: (context) => TestButton(
             onPressed: () async => saved = await showRemoteHostEditor(context),
             child: const Text('open'),
           ),

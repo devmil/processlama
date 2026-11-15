@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'support/meridian_test_support.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meridian_ui/meridian_ui.dart';
@@ -81,9 +82,9 @@ void main() {
             Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
             ...remoteUiProviders(),
           ],
-          child: MaterialApp(
+          child: MeridianApp(
             locale: Locale(language),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            localizationsDelegates: processLamaLocalizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             theme: buildProcessLamaTheme(),
             home: const ProcessExplorerScreen(),
@@ -130,7 +131,7 @@ void main() {
       final menuLabel = language == 'en'
           ? 'Search aspect: Process text'
           : 'Suchkriterium: Prozesstext';
-      await tester.tap(find.byTooltip(menuLabel));
+      await tester.tap(findTooltip(menuLabel));
       await tester.pumpAndSettle();
       await tester.tap(
         find.text(language == 'en' ? 'Local port' : 'Lokaler Port'),
@@ -179,9 +180,9 @@ void main() {
               Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
               ...remoteUiProviders(),
             ],
-            child: MaterialApp(
+            child: MeridianApp(
               locale: Locale(language),
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: processLamaLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               theme: buildProcessLamaTheme(brightness: brightness),
               builder: (context, child) => MediaQuery(
@@ -199,7 +200,7 @@ void main() {
             ? 'Über ProcessLama'
             : 'About ProcessLama';
         expect(find.bySemanticsLabel(label), findsOneWidget);
-        final signature = find.byTooltip('ProcessLama · by Devmil Solutions');
+        final signature = findTooltip('ProcessLama · by Devmil Solutions');
         expect(signature, findsOneWidget);
         expect(tester.getBottomLeft(signature).dy, greaterThan(500));
         await tester.tap(signature);
@@ -221,6 +222,19 @@ void main() {
           findsOneWidget,
         );
         expect(tester.takeException(), isNull);
+        // Licenses open the Meridian license dialog over About.
+        await tester.tap(find.byKey(const ValueKey('about-licenses')));
+        await tester.pumpAndSettle();
+        expect(find.byType(MeridianLicenseDialog), findsOneWidget);
+        expect(
+          find.text(language == 'de' ? 'Lizenzen' : 'Licenses'),
+          findsWidgets,
+        );
+        expect(tester.takeException(), isNull);
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+        expect(find.byType(MeridianLicenseDialog), findsNothing);
+        expect(find.text('by Devmil Solutions'), findsOneWidget);
         await tester.sendKeyEvent(LogicalKeyboardKey.escape);
         await tester.pumpAndSettle();
         expect(find.text('by Devmil Solutions'), findsNothing);
@@ -260,8 +274,8 @@ void main() {
           Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
           ...remoteUiProviders(),
         ],
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+        child: MeridianApp(
+          localizationsDelegates: processLamaLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildProcessLamaTheme(),
           home: const ProcessExplorerScreen(),
@@ -316,9 +330,9 @@ void main() {
           Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
           ...remoteUiProviders(),
         ],
-        child: MaterialApp(
+        child: MeridianApp(
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: processLamaLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildProcessLamaTheme(),
           home: const ProcessExplorerScreen(),
@@ -358,9 +372,9 @@ void main() {
           Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
           ...remoteUiProviders(),
         ],
-        child: MaterialApp(
+        child: MeridianApp(
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: processLamaLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildProcessLamaTheme(),
           home: const ProcessExplorerScreen(),
@@ -409,9 +423,9 @@ void main() {
             Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
             ...remoteUiProviders(),
           ],
-          child: MaterialApp(
+          child: MeridianApp(
             debugShowCheckedModeBanner: false,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            localizationsDelegates: processLamaLocalizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             theme: buildProcessLamaTheme(density: density),
             home: const ProcessExplorerScreen(),
@@ -452,9 +466,9 @@ void main() {
           Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
           ...remoteUiProviders(),
         ],
-        child: MaterialApp(
+        child: MeridianApp(
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: processLamaLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildProcessLamaTheme(),
           home: const ProcessExplorerScreen(),
@@ -463,7 +477,7 @@ void main() {
     );
     await tester.pump();
 
-    final chevron = find.byTooltip('Collapse');
+    final chevron = findTooltip('Collapse');
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(mouse.removePointer);
     await mouse.addPointer(location: Offset.zero);
@@ -505,8 +519,8 @@ void main() {
             Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
             ...remoteUiProviders(),
           ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+          child: MeridianApp(
+            localizationsDelegates: processLamaLocalizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             theme: buildProcessLamaTheme(),
             home: const ProcessExplorerScreen(),
@@ -586,9 +600,9 @@ void main() {
           Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
           ...remoteUiProviders(),
         ],
-        child: MaterialApp(
+        child: MeridianApp(
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: processLamaLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildProcessLamaTheme(),
           home: const ProcessExplorerScreen(),
@@ -640,9 +654,9 @@ void main() {
           Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
           ...remoteUiProviders(),
         ],
-        child: MaterialApp(
+        child: MeridianApp(
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: processLamaLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildProcessLamaTheme(),
           home: const ProcessExplorerScreen(),
@@ -683,9 +697,9 @@ void main() {
           Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
           ...remoteUiProviders(),
         ],
-        child: MaterialApp(
+        child: MeridianApp(
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: processLamaLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildProcessLamaTheme(),
           home: const ProcessExplorerScreen(),
@@ -778,9 +792,9 @@ void main() {
           Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
           ...remoteUiProviders(),
         ],
-        child: MaterialApp(
+        child: MeridianApp(
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: processLamaLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildProcessLamaTheme(),
           home: const ProcessExplorerScreen(),
@@ -791,7 +805,7 @@ void main() {
     await tester.pump();
     // The snapshots section reveals its actions while the pointer is over
     // it, as a mouse would.
-    final openSnapshot = find.byTooltip('Open snapshot…');
+    final openSnapshot = findTooltip('Open snapshot…');
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(mouse.removePointer);
     await mouse.addPointer(location: Offset.zero);
@@ -828,9 +842,9 @@ void main() {
           Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
           ...remoteUiProviders(),
         ],
-        child: MaterialApp(
+        child: MeridianApp(
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: processLamaLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildProcessLamaTheme(),
           home: const ProcessExplorerScreen(),
@@ -846,43 +860,45 @@ void main() {
 
     expect(processService.filter.value, isEmpty);
     expect(processService.tree.value.treeSearchQuery, 's');
-    expect(find.byType(TextField), findsNWidgets(2));
+    expect(find.byType(EditableText), findsNWidgets(2));
     expect(find.text('1/1'), findsOneWidget);
-    expect(find.byTooltip('Previous match'), findsOneWidget);
-    expect(find.byTooltip('Next match'), findsOneWidget);
+    expect(findTooltip('Previous match'), findsOneWidget);
+    expect(findTooltip('Next match'), findsOneWidget);
     expect(find.text('Dock'), findsOneWidget);
     expect(find.text('Safari'), findsOneWidget);
 
     final overlayField = find.byWidgetPredicate(
       (widget) =>
-          widget is TextField &&
-          widget.focusNode?.debugLabel == 'tree-search-overlay',
+          widget is MeridianEditableText &&
+          widget.focusNode.debugLabel == 'tree-search-overlay',
       description: 'tree search overlay field',
     );
-    final overlayTextField = tester.widget<TextField>(overlayField);
-    expect(overlayTextField.controller?.text, 's');
-    expect(overlayTextField.focusNode?.hasFocus, isFalse);
+    final overlayTextField = tester.widget<MeridianEditableText>(overlayField);
+    expect(overlayTextField.controller.text, 's');
+    expect(overlayTextField.focusNode.hasFocus, isFalse);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.keyA, character: 'a');
     await tester.pump();
 
     expect(processService.tree.value.treeSearchQuery, 'sa');
-    expect(overlayTextField.controller?.text, 'sa');
-    expect(overlayTextField.focusNode?.hasFocus, isFalse);
+    expect(overlayTextField.controller.text, 'sa');
+    expect(overlayTextField.focusNode.hasFocus, isFalse);
 
     await tester.showKeyboard(overlayField);
     await tester.pump();
 
-    var focusedOverlayTextField = tester.widget<TextField>(overlayField);
-    expect(focusedOverlayTextField.focusNode?.hasFocus, isTrue);
+    var focusedOverlayTextField = tester.widget<MeridianEditableText>(
+      overlayField,
+    );
+    expect(focusedOverlayTextField.focusNode.hasFocus, isTrue);
 
     await tester.enterText(overlayField, 'saf');
     await tester.pump();
 
-    focusedOverlayTextField = tester.widget<TextField>(overlayField);
+    focusedOverlayTextField = tester.widget<MeridianEditableText>(overlayField);
     expect(processService.tree.value.treeSearchQuery, 'saf');
-    expect(focusedOverlayTextField.controller?.text, 'saf');
-    expect(focusedOverlayTextField.focusNode?.hasFocus, isTrue);
+    expect(focusedOverlayTextField.controller.text, 'saf');
+    expect(focusedOverlayTextField.focusNode.hasFocus, isTrue);
 
     final findModifier = defaultTargetPlatform == TargetPlatform.macOS
         ? LogicalKeyboardKey.meta
@@ -892,10 +908,10 @@ void main() {
     await tester.sendKeyUpEvent(findModifier);
     await tester.pump();
 
-    expect(find.byType(TextField), findsNWidgets(2));
-    expect(overlayTextField.focusNode?.hasFocus, isTrue);
+    expect(find.byType(EditableText), findsNWidgets(2));
+    expect(overlayTextField.focusNode.hasFocus, isTrue);
     expect(
-      focusedOverlayTextField.controller?.selection,
+      focusedOverlayTextField.controller.selection,
       const TextSelection(baseOffset: 0, extentOffset: 3),
     );
 
@@ -903,7 +919,7 @@ void main() {
     await tester.pump();
 
     expect(processService.tree.value.treeSearchQuery, isEmpty);
-    expect(find.byType(TextField), findsOneWidget);
+    expect(find.byType(EditableText), findsOneWidget);
     expect(processService.filter.value, isEmpty);
     await tester.pump(const Duration(milliseconds: 50));
   });
@@ -932,9 +948,9 @@ void main() {
             Provider<AppUpdateService>.value(value: _FakeAppUpdateService()),
             ...remoteUiProviders(),
           ],
-          child: MaterialApp(
+          child: MeridianApp(
             debugShowCheckedModeBanner: false,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            localizationsDelegates: processLamaLocalizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             theme: buildProcessLamaTheme(),
             home: const ProcessExplorerScreen(),

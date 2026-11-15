@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:meridian_ui/meridian_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../l10n/l10n.dart';
@@ -19,11 +20,11 @@ class ProcessLamaApp extends StatelessWidget {
       child: ValueListenableBuilder<AppSettings>(
         valueListenable: settingsService.settings,
         builder: (context, settings, _) {
-          return MaterialApp(
+          return MeridianApp(
             debugShowCheckedModeBanner: false,
             onGenerateTitle: (context) => context.l10n.appTitle,
             locale: Locale(settings.languageCode),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            localizationsDelegates: processLamaLocalizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             theme: buildProcessLamaTheme(density: settings.rowDensity),
             darkTheme: buildProcessLamaTheme(
@@ -31,9 +32,9 @@ class ProcessLamaApp extends StatelessWidget {
               density: settings.rowDensity,
             ),
             themeMode: switch (settings.appearanceMode) {
-              AppAppearanceMode.light => ThemeMode.light,
-              AppAppearanceMode.dark => ThemeMode.dark,
-              AppAppearanceMode.system => ThemeMode.system,
+              AppAppearanceMode.light => MeridianThemeMode.light,
+              AppAppearanceMode.dark => MeridianThemeMode.dark,
+              AppAppearanceMode.system => MeridianThemeMode.system,
             },
             home: Builder(
               builder: (context) {

@@ -241,6 +241,7 @@
   "aboutVersion": "Version {version} · Build {build}",
   "lamaFamily": "Die Lama-Familie",
   "closeAbout": "Schließen",
+  "aboutLicenses": "Lizenzen",
   "filterNoMatchesHelp": "Versuch es mit einem allgemeineren Namen oder entferne den CPU-Schwellenwert.",
   "remoteTabLocal": "Lokal",
   "remoteTabOpenMenu": "Entfernten Host öffnen",

@@ -448,7 +448,7 @@ class _ChangeMarkerIcon extends StatelessWidget {
     if (icon == null) {
       return const SizedBox.shrink();
     }
-    return Tooltip(
+    return MeridianTooltip(
       message: label,
       child: Center(
         child: MeridianIcon(

@@ -48,6 +48,31 @@ extension _AboutDialog on _ProcessExplorerScreenState {
             ),
             actions: [
               MeridianButton(
+                key: const ValueKey('about-licenses'),
+                label: l10n.aboutLicenses,
+                variant: MeridianButtonVariant.secondary,
+                onPressed: () async {
+                  final info = await version.then<InstalledAppVersion?>(
+                    (info) => info,
+                    onError: (Object _) => null,
+                  );
+                  if (!dialogContext.mounted) return;
+                  await showMeridianLicenses(
+                    context: dialogContext,
+                    applicationName: l10n.aboutProductName,
+                    applicationVersion: info == null
+                        ? null
+                        : l10n.aboutVersion(info.version, '${info.build}'),
+                    applicationIcon: SvgPicture.asset(
+                      'resources/brand/tile-mimameidr.svg',
+                      width: ProcessLamaTheme.licenseTileSize,
+                      height: ProcessLamaTheme.licenseTileSize,
+                      excludeFromSemantics: true,
+                    ),
+                  );
+                },
+              ),
+              MeridianButton(
                 label: l10n.closeAbout,
                 autofocus: true,
                 onPressed: () => Navigator.of(dialogContext).pop(),

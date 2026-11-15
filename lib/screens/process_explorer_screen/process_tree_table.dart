@@ -301,7 +301,7 @@ class _ProcessTreeTableState extends State<_ProcessTreeTable> {
                         }
                         return false;
                       },
-                      child: Scrollbar(
+                      child: MeridianScrollbarThumb(
                         controller: _verticalScrollController,
                         child: Padding(
                           // The Meridian list inset: the rounded selection
