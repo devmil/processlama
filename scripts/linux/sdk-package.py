@@ -50,9 +50,10 @@ def safe_name(value):
 def required(mode, output):
     base = 'engine/src/out/' + output + '/'
     files = ['libflutter_linux_gtk.so', 'gen_snapshot', 'icudtl.dat',
-             'flutter_tester', 'impellerc', 'font-subset', 'args.gn',
+             'flutter_tester', 'impellerc', 'libtessellator.so', 'font-subset', 'args.gn',
              'flutter_linux/flutter_linux.h', 'flutter_linux/fl_dart_project.h',
              'gen/dart-pkg/sky_engine/pubspec.yaml',
+             'shader_lib/flutter/runtime_effect.glsl',
              'flutter_patched_sdk/platform_strong.dill',
              'dart-sdk/bin/dart', 'dart-sdk/bin/dartaotruntime',
              'dart-sdk/bin/snapshots/frontend_server_aot.dart.snapshot']
@@ -102,9 +103,9 @@ def pack(paths_file, output):
     base = 'engine/src/out/' + config['output']
     files = {}
     for name in ['libflutter_linux_gtk.so', 'gen_snapshot', 'icudtl.dat',
-                 'flutter_tester', 'impellerc', 'font-subset', 'args.gn']:
+                 'flutter_tester', 'impellerc', 'libtessellator.so', 'font-subset', 'args.gn']:
         files.update(inventory_files(producer / name, base + '/' + name, source))
-    for name in ['flutter_linux', 'flutter_patched_sdk', 'gen/dart-pkg/sky_engine',
+    for name in ['flutter_linux', 'flutter_patched_sdk', 'gen/dart-pkg/sky_engine', 'shader_lib',
                  'gen/flutter/lib/snapshot']:
         if name.startswith('gen/flutter') and not (producer / name).exists():
             continue

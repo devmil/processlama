@@ -5,3 +5,5 @@
 *.ttf binary
 *.woff2 binary
 *.zip binary
+# Unified diffs encode an empty context line as a single space.
+patches/**/*.patch whitespace=-blank-at-eol

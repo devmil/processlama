@@ -234,10 +234,10 @@ jobs:
         run: |
           set -euo pipefail
           if command -v dnf >/dev/null 2>&1; then
-            sudo dnf install -y clang cmake ninja-build pkgconf-pkg-config gtk3-devel libblkid-devel xz-devel elfutils-libelf-devel
+            sudo dnf install -y clang cmake ninja-build pkgconf-pkg-config gtk3-devel libblkid-devel xz-devel elfutils-libelf-devel patchelf
           elif command -v apt-get >/dev/null 2>&1; then
             sudo apt-get update
-            sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev liblzma-dev libelf-dev
+            sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev liblzma-dev libelf-dev patchelf
           else
             echo "Unsupported Linux runner distribution"
             exit 1
@@ -296,7 +296,9 @@ jobs:
           flutter config --enable-linux-desktop
           flutter pub get
           flutter build linux --debug
+          ./scripts/linux/repair-loader-paths.sh build/linux/x64/debug/bundle
           python3 scripts/linux/verify-engine.py build/linux/x64/debug/bundle --mode debug --write-provenance
+          python3 scripts/linux/verify-artifact.py build/linux/x64/debug/bundle > build/linux/x64/debug/bundle/processlama-linux-abi.json
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4

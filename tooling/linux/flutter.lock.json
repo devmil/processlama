@@ -22,11 +22,11 @@
     "flutter-linux-embedder": [
       {
         "path": "patches/flutter-linux-embedder/0001-painted-wayland-resize.patch",
-        "sha256": "0fd391b037a582d2180b9c94246b650de1f613ec917fd6ab0080906708edcc7f"
+        "sha256": "e4b64e796e97c6488240e9e16e859ba152f354e24110ba40d41e4ee40e8667a1"
       },
       {
         "path": "patches/flutter-linux-embedder/0002-resize-vsync.patch",
-        "sha256": "170f8eadf12dcb3ae6b185fc8490d88cd9161ff72c5283a6332520bf39b5d907"
+        "sha256": "3b936a43b98d4c65f18b37088b98116531d5e2a46182aad9443656fb421e62b3"
       },
       {
         "path": "patches/flutter-linux-embedder/0003-optional-accessibility-bridge.patch",
@@ -76,7 +76,9 @@
         "impellerc",
         "font-subset",
         "flow_unittests",
-        "flutter_linux_unittests"
+        "flutter_linux_unittests",
+        "tessellator_shared",
+        "sky_engine"
       ]
     },
     "profile": {
@@ -93,7 +95,9 @@
         "impellerc",
         "font-subset",
         "flow_unittests",
-        "flutter_linux_unittests"
+        "flutter_linux_unittests",
+        "tessellator_shared",
+        "sky_engine"
       ]
     },
     "release": {
@@ -110,7 +114,9 @@
         "impellerc",
         "font-subset",
         "flow_unittests",
-        "flutter_linux_unittests"
+        "flutter_linux_unittests",
+        "tessellator_shared",
+        "sky_engine"
       ]
     }
   },

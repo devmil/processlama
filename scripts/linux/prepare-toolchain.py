@@ -16,6 +16,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -252,12 +253,12 @@ def apply_patches(data, sdk):
     # which rejects later patches that deliberately extend files created by an
     # earlier patch. The index gives each check the result of its predecessor
     # without mutating the worktree.
-    try:
+    with tempfile.TemporaryDirectory(prefix='processlama-patch-index-') as temporary:
+        env = dict(os.environ, GIT_INDEX_FILE=str(Path(temporary) / 'index'))
+        run(['git', 'read-tree', 'HEAD'], sdk, env)
         for patch in patches:
-            run(['git', 'apply', '--cached', '--check', patch], sdk)
-            run(['git', 'apply', '--cached', patch], sdk)
-    finally:
-        run(['git', 'reset', '--mixed', 'HEAD'], sdk)
+            run(['git', 'apply', '--cached', '--check', patch], sdk, env)
+            run(['git', 'apply', '--cached', patch], sdk, env)
     for patch in patches:
         run(['git', 'apply', patch], sdk)
     # New files must participate in diff/provenance without committing them.
@@ -366,7 +367,7 @@ def prepare(data, mode, cache, jobs, offline=False):
             raise ToolchainError('Built framework version disagrees with immutable source/tag ancestry')
         # Hash all selected runtime/header/host artifacts, not Ninja objects.
         required = ['libflutter_linux_gtk.so', 'gen_snapshot', 'icudtl.dat',
-                    'impellerc', 'font-subset', 'flutter_tester', 'args.gn',
+                    'impellerc', 'libtessellator.so', 'font-subset', 'flutter_tester', 'args.gn',
                     'flow_unittests', 'flutter_linux_unittests',
                     'lib.unstripped/libflutter_linux_gtk.so']
         files = [sdk / 'bin/cache/flutter_tools.snapshot', sdk / 'bin/cache/engine.stamp',
@@ -376,7 +377,7 @@ def prepare(data, mode, cache, jobs, offline=False):
             if not path.is_file():
                 raise ToolchainError(f'Required engine artifact missing: {name}')
             files.append(path)
-        for folder in ['flutter_linux', 'flutter_patched_sdk', 'gen/dart-pkg/sky_engine']:
+        for folder in ['flutter_linux', 'flutter_patched_sdk', 'gen/dart-pkg/sky_engine', 'shader_lib']:
             paths_in_folder = [p for p in (output / folder).rglob('*') if p.is_file()]
             if not paths_in_folder:
                 raise ToolchainError(f'Required artifact directory missing: {folder}')

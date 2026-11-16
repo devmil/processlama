@@ -79,6 +79,13 @@ class ArchiveTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'incomplete'):
             self.install()
 
+    def test_missing_shader_include_refused(self):
+        name = next(n for n in self.files if n.endswith('runtime_effect.glsl'))
+        del self.files[name]
+        del self.manifest['files'][name]
+        with self.assertRaisesRegex(ValueError, 'incomplete'):
+            self.install()
+
     def test_changed_archive_checksum_refused(self):
         archive = self.archive()
         with self.assertRaisesRegex(ValueError, 'checksum'):
@@ -167,3 +174,23 @@ class ContractTest(unittest.TestCase):
             self.assertEqual(jobs[dependency]['with']['mode'], mode)
         for name in ['build-macos', 'build-windows']:
             self.assertTrue(any(s.get('uses') == './.github/actions/flutter' for s in ci[name]['steps']))
+
+
+class ElfTest(unittest.TestCase):
+    def test_numeric_runtime_floor_and_loader_boundary(self):
+        elf = module('verify-artifact')
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'lib').mkdir()
+            (root / 'lib/engine.so').write_bytes(b'\x7fELFtest')
+            def scan(version, loader):
+                def reader(args):
+                    if '--version-info' in args:
+                        return 'Version needs section: Name: GLIBC_' + version
+                    return '(RUNPATH) Library runpath: [' + loader + ']'
+                return elf.scan(root, reader=reader)
+            self.assertEqual(scan('2.9', '$ORIGIN/..')['files'][0]['abi'], {'GLIBC': '2.9'})
+            for version, loader in [('2.40', '$ORIGIN'), ('2.9', '/producer/lib'),
+                                    ('2.9', '$ORIGIN/../..'), ('2.9', '$ORIGINbad')]:
+                with self.subTest(version=version, loader=loader), self.assertRaises(elf.ArtifactError):
+                    scan(version, loader)

@@ -86,15 +86,7 @@ bundle="$(find "$ROOT/build/linux" -type d -path '*/release/bundle' -print -quit
 
 python3 "$ROOT/scripts/linux/verify-engine.py" "$bundle" --mode release --write-provenance
 
-# Flutter plugins retain absolute RUNPATH entries for the imported engine in
-# flutter/ephemeral. Replace only those build-tree paths; preserve the
-# executable's valid $ORIGIN/lib RUNPATH.
-while IFS= read -r -d '' elf; do
-  current_rpath="$(patchelf --print-rpath "$elf" 2>/dev/null || true)"
-  if [[ "$current_rpath" == *"$ROOT"* ]]; then
-    patchelf --set-rpath '$ORIGIN' "$elf"
-  fi
-done < <(find "$bundle" -type f -print0)
+"$ROOT/scripts/linux/repair-loader-paths.sh" "$bundle"
 
 python3 "$ROOT/scripts/linux/verify-engine.py" "$bundle" --mode release
 

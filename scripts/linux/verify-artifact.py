@@ -81,11 +81,20 @@ def scan(root, limits=None, reader=inspect):
                 raise ArtifactError(f'{path.relative_to(root)} needs {family}_{number}, above runtime floor')
         dynamic = reader(['readelf', '--dynamic', '--wide', str(path)])
         dependencies = re.findall(r'\(NEEDED\).*?\[([^\]]+)\]', dynamic)
+        if any('/' in name for name in dependencies):
+            raise ArtifactError(f'{path.relative_to(root)} has a nonrelocatable dependency name')
         rpaths = re.findall(r'\((?:RUNPATH|RPATH)\).*?\[([^\]]+)\]', dynamic)
         for rpath in rpaths:
             for element in rpath.split(':'):
-                if element and not element.startswith(('$ORIGIN', '${ORIGIN}')):
+                if not element:
+                    continue
+                origin = next((token for token in ('$ORIGIN', '${ORIGIN}')
+                               if element == token or element.startswith(token + '/')), None)
+                if origin is None:
                     raise ArtifactError(f'{path.relative_to(root)} has a nonrelocatable loader path')
+                target = (path.parent / element[len(origin):].lstrip('/')).resolve()
+                if not target.is_relative_to(root):
+                    raise ArtifactError(f'{path.relative_to(root)} loader path leaves its bundle')
         sha = hashlib.sha256()
         with path.open('rb') as stream:
             for block in iter(lambda: stream.read(1024 * 1024), b''):

@@ -19,7 +19,29 @@ diff --git a/engine/src/flutter/shell/platform/linux/fl_subsurface_egl.cc b/engi
    eglBindAPI(EGL_OPENGL_ES_API);
  
    static const EGLint context_attributes[] = {EGL_CONTEXT_CLIENT_VERSION, 2,
-@@ -247,48 +251,57 @@
+@@ -181,12 +185,16 @@
+     EGLDisplay egl_display = get_display(self);
+     if (self->egl_context != EGL_NO_CONTEXT) {
+       if (self->read_framebuffer != 0) {
+-        eglMakeCurrent(egl_display, self->egl_surface, self->egl_surface,
+-                       self->egl_context);
+-        glDeleteFramebuffers(1, &self->read_framebuffer);
++        // A failed drawable replacement may leave no surface. If binding fails,
++        // context destruction below releases its FBO; do not delete from the
++        // caller's unrelated current context.
++        if (eglMakeCurrent(egl_display, self->egl_surface, self->egl_surface,
++                           self->egl_context)) {
++          glDeleteFramebuffers(1, &self->read_framebuffer);
++          eglMakeCurrent(egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
++                         EGL_NO_CONTEXT);
++        }
+         self->read_framebuffer = 0;
+-        eglMakeCurrent(egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+-                       EGL_NO_CONTEXT);
+       }
+     }
+     if (self->egl_surface != EGL_NO_SURFACE) {
+@@ -247,48 +255,57 @@
    }
  }
  
@@ -112,7 +134,7 @@ diff --git a/engine/src/flutter/shell/platform/linux/fl_subsurface_egl.cc b/engi
    }
  
    // The frame and the buffer are both window sized, so their dimensions fit in
-@@ -328,11 +341,14 @@
+@@ -328,11 +345,14 @@
      glBindTexture(GL_TEXTURE_2D, texture_id);
      glDrawArrays(GL_TRIANGLES, 0, 6);
    }
@@ -231,16 +253,17 @@ diff --git a/engine/src/flutter/shell/platform/linux/fl_subsurface_egl_test.cc b
 diff --git a/engine/src/flutter/shell/platform/linux/fl_view_renderer_subsurface.cc b/engine/src/flutter/shell/platform/linux/fl_view_renderer_subsurface.cc
 --- a/engine/src/flutter/shell/platform/linux/fl_view_renderer_subsurface.cc
 +++ b/engine/src/flutter/shell/platform/linux/fl_view_renderer_subsurface.cc
-@@ -53,6 +53,8 @@
+@@ -53,6 +53,9 @@
  
    // Ensure Flutter and GTK can access the frame stored in the compositor.
    GMutex frame_mutex;
-+  size_t presented_width;
-+  size_t presented_height;
++  // Last successfully swapped frame; this is submission, not display feedback.
++  size_t submitted_width;
++  size_t submitted_height;
  };
  
  G_DEFINE_TYPE(FlViewRendererSubsurface,
-@@ -64,13 +66,8 @@
+@@ -64,13 +67,8 @@
  static void get_frame_size(FlViewRendererSubsurface* self,
                             size_t* width,
                             size_t* height) {
@@ -251,20 +274,20 @@ diff --git a/engine/src/flutter/shell/platform/linux/fl_view_renderer_subsurface
 -    *width = 0;
 -    *height = 0;
 -  }
-+  *width = self->presented_width;
-+  *height = self->presented_height;
++  *width = self->submitted_width;
++  *height = self->submitted_height;
  }
  
  // Wait for a frame matching the given size to be presented, or until the
-@@ -144,6 +141,7 @@
+@@ -144,6 +142,7 @@
      return;
    }
  
-+  self->presented_width = self->presented_height = 0;
++  self->submitted_width = self->submitted_height = 0;
    self->subsurface =
        fl_wayland_display_create_subsurface(wayland_display, parent_surface);
    update_subsurface_position(self);
-@@ -415,9 +413,12 @@
+@@ -415,9 +414,12 @@
    // context. This reads the engine's frame texture directly, as the subsurface
    // context shares resources with the engine.
    if (width > 0 && height > 0) {
@@ -274,8 +297,8 @@ diff --git a/engine/src/flutter/shell/platform/linux/fl_view_renderer_subsurface
 +    if (fl_subsurface_egl_present(
 +            self->egl, fl_framebuffer_get_texture_id(self->framebuffer), width,
 +            height, fence)) {
-+      self->presented_width = width;
-+      self->presented_height = height;
++      self->submitted_width = width;
++      self->submitted_height = height;
 +    }
    }
  

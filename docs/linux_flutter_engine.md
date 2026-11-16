@@ -54,7 +54,7 @@ Cache keys include the lock and producer/package scripts. A cache miss reruns
 flow and Linux embedder tests before publication. Cache hits are revalidated.
 
 The artifact contains the engine, headers, Dart SDK, frontend server, patched
-platform dills, sky_engine and mode-specific snapshot tools. It contains no
+platform dills, sky_engine, shader include libraries and mode-specific snapshot tools. It contains no
 producer source checkout or absolute-path symlinks. Every payload file has a
 size, executable flag and SHA-256. Archives are limited to 1 GiB compressed,
 4 GiB expanded and 40,000 regular files; links, duplicates and path escapes are
