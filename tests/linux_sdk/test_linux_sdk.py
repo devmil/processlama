@@ -161,6 +161,17 @@ class ContractTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'does not match'):
                 engine.verify(bundle, {'engine_src': str(root / 'producer'), 'engine': 'host_profile'}, 'profile')
 
+    def test_sdk_transport_has_one_upload_root(self):
+        import yaml
+        workflow = yaml.safe_load((ROOT / '.github/workflows/linux-flutter-sdk.yml').read_text())
+        uploads = [step['with'] for step in workflow['jobs']['sdk']['steps']
+                   if step.get('uses') == 'actions/upload-artifact@v4']
+        sdk_upload = next(item for item in uploads
+                          if item['name'] == 'processlama-flutter-linux-${{ inputs.mode }}')
+        # Multiple roots change the download layout to their common ancestor.
+        # The consumer contract requires the archive/checksum at its root.
+        self.assertEqual(sdk_upload['path'].splitlines(), ['build/linux-sdk'])
+
     def test_linux_workflows_require_matching_producer(self):
         import yaml
         ci = yaml.safe_load((ROOT / '.github/workflows/ci.yml').read_text())['jobs']
