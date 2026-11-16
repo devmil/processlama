@@ -72,8 +72,8 @@ pkg-config --exists libelf || {
 
 ./scripts/build-rust.sh release
 cargo build --release --manifest-path linux/network-helper/Cargo.toml
-flutter pub get
-flutter build linux --release \
+./scripts/flutter.sh pub get --enforce-lockfile
+./scripts/flutter.sh build linux --release \
   --build-name "$MIM_MARKETING_VERSION" \
   --build-number "$MIM_BUILD_NUMBER" \
   --dart-define "PROCESSLAMA_RELEASE_CHANNEL=$MIM_BUILD_RELEASE_CHANNEL"
@@ -84,6 +84,8 @@ bundle="$(find "$ROOT/build/linux" -type d -path '*/release/bundle' -print -quit
   exit 1
 }
 
+python3 "$ROOT/scripts/linux/verify-engine.py" "$bundle" --mode release --write-provenance
+
 # Flutter plugins retain absolute RUNPATH entries for the imported engine in
 # flutter/ephemeral. Replace only those build-tree paths; preserve the
 # executable's valid $ORIGIN/lib RUNPATH.
@@ -93,6 +95,8 @@ while IFS= read -r -d '' elf; do
     patchelf --set-rpath '$ORIGIN' "$elf"
   fi
 done < <(find "$bundle" -type f -print0)
+
+python3 "$ROOT/scripts/linux/verify-engine.py" "$bundle" --mode release
 
 mkdir -p "$MIM_ARCHIVE_DIR"
 work="$(mktemp -d "$ROOT/build/processlama-linux-package.XXXXXX")"
@@ -117,6 +121,7 @@ rm -rf "$bundle/lib/remote-helper"
 python3 "$ROOT/scripts/package_remote_helper.py" bundle \
   --source "${PROCESSLAMA_REMOTE_HELPER_DIR:-$ROOT/build/remote-helper}" \
   --dest "$bundle/lib/remote-helper"
+python3 "$ROOT/scripts/linux/verify-artifact.py" "$bundle" > "$ROOT/build/linux-release-elf-audit.json"
 release_date="$(git log -1 --format=%cs HEAD)"
 release_type="stable"
 [[ "$MIM_BUILD_RELEASE_CHANNEL" == "beta" ]] && release_type="development"

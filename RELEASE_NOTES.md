@@ -2,6 +2,10 @@
 
 ## [Unreleased Stable]
 
+### Changed
+
+- Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
+
 ### Added
 
 - About › Licenses now opens a licenses window that matches the rest of ProcessLama. Filter the package list, move through it with the arrow keys and read each license beside it.
@@ -138,6 +142,10 @@
   process tree.
 
 ## [Unreleased Beta]
+
+### Changed
+
+- Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
 
 ## [1.0.0-beta.37] - 2026-11-15
 

@@ -4,6 +4,10 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ## [Unreleased Stable]
 
+### Changed
+
+- Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
+
 ### Added
 
 - Open-source licenses (About › Licenses) now open in ProcessLama's own licenses window from the Meridian design system: a filterable package list with arrow-key navigation beside the selected package's license text. It lists ProcessLama, the GPL-2.0 network eBPF program, libbpf, the Geist font and the bundled Flutter and Rust dependency inventories.
@@ -197,6 +201,10 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   process tree instead of looking like another copy of the parent app bundle.
 
 ## [Unreleased Beta]
+
+### Changed
+
+- Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
 
 ## [1.0.0-beta.37] - 2026-11-15
 

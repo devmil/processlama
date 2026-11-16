@@ -2,6 +2,7 @@
 set -euo pipefail
 
 python3 scripts/check_workflows.py
+python3 -m unittest discover -s tests/linux_sdk -v
 python3 scripts/generate-brand-assets.py --check
 python3 -m unittest discover -s tests/release -v
 flutter gen-l10n
