@@ -202,6 +202,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ## [Unreleased Beta]
 
+- Linux resize gaps use the active window theme background instead of a fixed black Flutter backing.
+
 ### Changed
 
 - Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
