@@ -9,3 +9,4 @@ Categories=System;Monitor;
 Keywords=process;task;system;monitor;
 StartupNotify=true
 StartupWMClass=de.devmil.processlama
+X-Omarchy-ClientControls=true
