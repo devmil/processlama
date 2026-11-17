@@ -96,9 +96,16 @@ int main(int argc, char** argv) {
   settle();
   g_assert_no_error(gtk_gl_area_get_error(GTK_GL_AREA(content)));
   g_assert_cmpint(renders, >, 0);
-  g_assert(gtk_window_get_decorated(window));
   g_assert(gtk_window_get_resizable(window));
-  g_assert(!gtk_widget_get_visible(gtk_window_get_titlebar(window)));
+  const char* hyprland = g_getenv("HYPRLAND_INSTANCE_SIGNATURE");
+  const bool compositor_frame = hyprland && *hyprland &&
+      GDK_IS_WAYLAND_DISPLAY(gtk_widget_get_display(GTK_WIDGET(window)));
+  g_assert_cmpint(gtk_window_get_decorated(window), ==, !compositor_frame);
+  if (compositor_frame) {
+    g_assert_null(gtk_window_get_titlebar(window));
+  } else {
+    g_assert(!gtk_widget_get_visible(gtk_window_get_titlebar(window)));
+  }
   GtkStyleContext* context = gtk_widget_get_style_context(GTK_WIDGET(window));
   int radius = 0;
   gtk_style_context_get(context, gtk_style_context_get_state(context),

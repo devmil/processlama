@@ -2,6 +2,7 @@
 #define DEVMIL_ROUNDED_WINDOW_H_
 
 #include <gtk/gtk.h>
+#include <gdk/gdkwayland.h>
 #include <initializer_list>
 
 // Keep the accelerated child rectangular. A curved Cairo clip or libhandy's
@@ -40,6 +41,15 @@ inline gboolean rounded_window_state_changed(GtkWidget* window,
 
 inline GtkWindow* create_rounded_application_window(GtkApplication* application) {
   GtkWindow* window = GTK_WINDOW(gtk_application_window_new(application));
+  // Hyprland supplies its own rounded frame. GTK CSD shadow extents do not
+  // line up with its surface input geometry once the real maximize state is
+  // reported. Keep both the accelerated surface and input region frameless.
+  const char* hyprland = g_getenv("HYPRLAND_INSTANCE_SIGNATURE");
+  if (hyprland && *hyprland &&
+      GDK_IS_WAYLAND_DISPLAY(gtk_widget_get_display(GTK_WIDGET(window)))) {
+    gtk_window_set_decorated(window, FALSE);
+    return window;
+  }
   // An explicitly hidden titlebar enables native CSD without a second toolbar.
   gtk_window_set_titlebar(window, gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
   GtkStyleContext* context = gtk_widget_get_style_context(GTK_WIDGET(window));

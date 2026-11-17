@@ -2,6 +2,10 @@
 
 ## [Unreleased Stable]
 
+### Fixed
+
+- On native Hyprland, let the compositor own the window frame so the custom caption and pointer targets stay aligned. Declare app-owned controls for Omarchy titlebar integration; minimize/maximize support requires the corresponding Omarchy plugin update.
+
 ### Changed
 
 - Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
@@ -142,6 +146,10 @@
   process tree.
 
 ## [Unreleased Beta]
+
+### Fixed
+
+- On native Hyprland, let the compositor own the window frame so the custom caption and pointer targets stay aligned. Declare app-owned controls for Omarchy titlebar integration; minimize/maximize support requires the corresponding Omarchy plugin update.
 
 - Linux resize gaps use the active window theme background instead of a fixed black Flutter backing.
 

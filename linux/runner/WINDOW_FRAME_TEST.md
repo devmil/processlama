@@ -28,3 +28,9 @@ These checks cover native corners and content placement. The GL child must not
 receive a curved clip or be redirected through an offscreen Cairo surface;
 verify the actual app with `perf` as well to detect full-window GL readback. Full app appearance,
 physical input and native WebView acceptance remain separate checks.
+
+On native Hyprland, the compositor owns the frame: the window is undecorated,
+with no GTK shadow extents or rounded-content insets. Run the fixture there
+with the session's `HYPRLAND_INSTANCE_SIGNATURE` and repeat with that variable
+unset to cover the ordinary GTK frame path. An X11 backend retains GTK framing
+even when this environment variable is inherited.
