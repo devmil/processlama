@@ -1,0 +1,31 @@
+name: Setup pinned custom Linux Flutter
+description: Matching framework and verified mode-specific engine overlay
+inputs:
+  mode:
+    required: true
+    description: Engine runtime mode
+runs:
+  using: composite
+  steps:
+    - uses: ./.github/actions/flutter
+    - uses: actions/download-artifact@v4
+      with:
+        name: processlama-flutter-linux-${{ inputs.mode }}
+        path: ${{ runner.temp }}/processlama-engine-download-${{ inputs.mode }}
+    - name: Install verified overlay and select wrapper
+      shell: bash
+      env:
+        SDK_MODE: ${{ inputs.mode }}
+      run: |
+        set -euo pipefail
+        framework=$(dirname "$(dirname "$(readlink -f "$(command -v flutter)")")")
+        archive="$RUNNER_TEMP/processlama-engine-download-$SDK_MODE"
+        destination="$RUNNER_TEMP/processlama-linux-sdk-$SDK_MODE"
+        python3 scripts/linux/sdk-package.py install \
+          --archive "$archive/engine.tar.gz" --checksum-file "$archive/engine.tar.gz.sha256" \
+          --destination "$destination" --mode "$SDK_MODE"
+        echo "PROCESSLAMA_FLUTTER_FRAMEWORK_SDK=$framework" >> "$GITHUB_ENV"
+        echo "PROCESSLAMA_LINUX_SDK_DIR=$destination" >> "$GITHUB_ENV"
+        echo "PROCESSLAMA_LINUX_MODE=$SDK_MODE" >> "$GITHUB_ENV"
+        echo "$GITHUB_WORKSPACE/scripts/linux/bin" >> "$GITHUB_PATH"
+        PROCESSLAMA_FLUTTER_FRAMEWORK_SDK="$framework" python3 scripts/prepare-flutter-framework.py

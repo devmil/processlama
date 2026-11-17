@@ -14,6 +14,16 @@ permissions:
   contents: read
 
 jobs:
+  linux-sdk-debug:
+    uses: ./.github/workflows/linux-flutter-sdk.yml
+    with:
+      mode: debug
+      source-ref: ${{ github.sha }}
+  linux-sdk-release:
+    uses: ./.github/workflows/linux-flutter-sdk.yml
+    with:
+      mode: release
+      source-ref: ${{ github.sha }}
   analyze-and-test:
     runs-on: macos-15
     steps:
@@ -85,6 +95,7 @@ jobs:
       - name: Verify brand derivatives and release tooling
         run: |
           python3 scripts/check_workflows.py
+          python3 -m unittest discover -s tests/linux_sdk -v
           python3 scripts/generate-brand-assets.py --check
           python3 -m unittest discover -s tests/release -v
 
@@ -213,7 +224,7 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-24.04
-    needs: analyze-and-test
+    needs: [analyze-and-test, linux-sdk-debug]
     steps:
 
       - name: Checkout code
@@ -223,17 +234,19 @@ jobs:
         run: |
           set -euo pipefail
           if command -v dnf >/dev/null 2>&1; then
-            sudo dnf install -y clang cmake ninja-build pkgconf-pkg-config gtk3-devel libblkid-devel xz-devel elfutils-libelf-devel
+            sudo dnf install -y clang cmake ninja-build pkgconf-pkg-config gtk3-devel libblkid-devel xz-devel elfutils-libelf-devel patchelf
           elif command -v apt-get >/dev/null 2>&1; then
             sudo apt-get update
-            sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev liblzma-dev libelf-dev
+            sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev liblzma-dev libelf-dev patchelf
           else
             echo "Unsupported Linux runner distribution"
             exit 1
           fi
 
       - name: Setup Flutter
-        uses: ./.github/actions/flutter
+        uses: ./.github/actions/flutter-linux
+        with:
+          mode: debug
 
       - name: Cache Flutter dependencies
         uses: actions/cache@v4
@@ -283,6 +296,9 @@ jobs:
           flutter config --enable-linux-desktop
           flutter pub get
           flutter build linux --debug
+          ./scripts/linux/repair-loader-paths.sh build/linux/x64/debug/bundle
+          python3 scripts/linux/verify-engine.py build/linux/x64/debug/bundle --mode debug --write-provenance
+          python3 scripts/linux/verify-artifact.py build/linux/x64/debug/bundle > build/linux/x64/debug/bundle/processlama-linux-abi.json
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
@@ -482,7 +498,7 @@ jobs:
 
   package-linux:
     runs-on: ubuntu-24.04
-    needs: [remote-helper-linux, remote-helper-macos]
+    needs: [remote-helper-linux, remote-helper-macos, linux-sdk-release]
     timeout-minutes: 120
     steps:
 
@@ -519,7 +535,9 @@ jobs:
           echo "$appimage_tool_dir" >> "$GITHUB_PATH"
 
       - name: Setup Flutter
-        uses: ./.github/actions/flutter
+        uses: ./.github/actions/flutter-linux
+        with:
+          mode: release
 
       - name: Install Rust toolchain
         run: |

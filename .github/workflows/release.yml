@@ -27,6 +27,12 @@ permissions:
   contents: write
 
 jobs:
+  linux-sdk:
+    needs: prepare
+    uses: ./.github/workflows/linux-flutter-sdk.yml
+    with:
+      mode: release
+      source-ref: ${{ needs.prepare.outputs.release_sha }}
   prepare:
     if: ${{ github.ref == 'refs/heads/main' }}
     timeout-minutes: 90
@@ -291,7 +297,7 @@ jobs:
   linux:
     runs-on: ubuntu-24.04
     timeout-minutes: 180
-    needs: [prepare, remote-helper-linux, remote-helper-macos]
+    needs: [prepare, remote-helper-linux, remote-helper-macos, linux-sdk]
     steps:
       - name: Check out prepared release
         uses: actions/checkout@v4
@@ -329,7 +335,9 @@ jobs:
           export PATH="$appimage_tool_dir:$PATH"
           command -v appimagetool >/dev/null
       - name: Setup Flutter
-        uses: ./.github/actions/flutter
+        uses: ./.github/actions/flutter-linux
+        with:
+          mode: release
       - name: Install Rust toolchain
         shell: bash
         run: |

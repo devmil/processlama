@@ -63,3 +63,9 @@ website/download/*.zip
 /.fvm/
 /.claude/
 /docs/remote_hosts_evidence/
+
+# Local source-built Linux SDKs and archives.
+.ci-linux-sdk/
+build/linux-sdk/
+
+__pycache__/

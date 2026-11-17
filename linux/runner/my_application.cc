@@ -1,6 +1,7 @@
 #include "my_application.h"
 
 #include <flutter_linux/flutter_linux.h>
+#include <gdk/gdkwayland.h>
 #include "rounded_window.h"
 
 #include "flutter/generated_plugin_registrant.h"
@@ -30,14 +31,17 @@ static void my_application_activate(GApplication* application) {
   gtk_window_set_default_size(window, 1280, 720);
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
+  // This API is supplied by the locked Linux SDK. X11 keeps standard pacing.
+  fl_dart_project_set_enable_resize_vsync(
+      project, GDK_IS_WAYLAND_DISPLAY(gtk_widget_get_display(GTK_WIDGET(window))));
   fl_dart_project_set_dart_entrypoint_arguments(
       project, self->dart_entrypoint_arguments);
 
   FlView* view = fl_view_new(project);
   GdkRGBA background_color;
-  // Background defaults to black, override it here if necessary, e.g. #00000000
-  // for transparent.
-  gdk_rgba_parse(&background_color, "#000000");
+  // Let the themed GTK window fill areas not covered by a Flutter frame.
+  // An opaque black view backing otherwise flashes through during resize.
+  gdk_rgba_parse(&background_color, "#00000000");
   fl_view_set_background_color(view, &background_color);
   gtk_widget_show(GTK_WIDGET(view));
   add_rounded_window_content(window, GTK_WIDGET(view));
