@@ -8,7 +8,6 @@ ProcessLama is a Flutter desktop process explorer with a Rust telemetry core.
 - Use Meridian primitives, tokens and icons for UI. Add English and German translations.
 - Run dart format on touched Dart files, flutter analyze --no-fatal-infos and flutter test.
 - For Rust changes, run cargo test --manifest-path rust-core/Cargo.toml.
-- Use `./scripts/flutter.sh` for Linux builds/runs; keep the custom engine lock and `.fvmrc` aligned. See `docs/linux_flutter_engine.md`.
 - Run ./scripts/verify.sh before submitting. Never disable tests to hide failures.
 - Update CHANGELOG.md and RELEASE_NOTES.md in both unreleased channels for shipped behavior.
 - Update tooling/remote_wire/contract.json through its generator, and record helper compatibility decisions.

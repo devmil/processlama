@@ -10,12 +10,10 @@ and monitor Linux and macOS hosts through SSH. Linux supports an optional eBPF n
 Install the Flutter version pinned in `.fvmrc`, stable Rust, and your platform's Flutter desktop build tools.
 On Linux, install Clang, CMake, Ninja, pkg-config and GTK3 development headers.
 Building the network service also requires libelf development headers.
-Linux uses a pinned custom Flutter engine; see [engine builds](docs/linux_flutter_engine.md)
-for cold-build dependencies, portable SDK artifacts and deployment validation.
 
 ```sh
 flutter pub get
-./scripts/flutter.sh run -d linux # macOS / Windows: flutter run -d macos / windows
+flutter run -d linux # or macos / windows
 ```
 
 The native-assets hook builds the Rust bridge and development remote helper.

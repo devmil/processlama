@@ -6,7 +6,7 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ### Changed
 
-- Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
+- Build with Flutter 3.47.9 and the stock Linux engine (Meridian 2.0.3). Flutter 3.50's Wayland renderer showed black frames and black edges while a window was resized, and the pinned custom engine only patched that renderer. 3.47.9 keeps the eMudhra certificate fix from 3.47.8.
 
 ### Added
 
@@ -202,11 +202,9 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ## [Unreleased Beta]
 
-- Linux resize gaps use the active window theme background instead of a fixed black Flutter backing.
-
 ### Changed
 
-- Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
+- Build with Flutter 3.47.9 and the stock Linux engine (Meridian 2.0.3). Flutter 3.50's Wayland renderer showed black frames and black edges while a window was resized, and the pinned custom engine only patched that renderer. 3.47.9 keeps the eMudhra certificate fix from 3.47.8.
 
 ## [1.0.0-beta.37] - 2026-11-15
 

@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
+- Resizing the window on Linux no longer shows black flashes or black edges.
 
 ### Added
 
@@ -143,11 +143,9 @@
 
 ## [Unreleased Beta]
 
-- Linux resize gaps use the active window theme background instead of a fixed black Flutter backing.
-
 ### Changed
 
-- Linux Wayland builds use a pinned custom Flutter engine to reduce resize scheduling delay and avoid presenting an unpainted buffer during resizing.
+- Resizing the window on Linux no longer shows black flashes or black edges.
 
 ## [1.0.0-beta.37] - 2026-11-15
 
