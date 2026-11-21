@@ -202,6 +202,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ## [Unreleased Beta]
 
+## [1.0.0-beta.38] - 2026-11-21
+
 ### Changed
 
 - Build with Flutter 3.47.9 and the stock Linux engine (Meridian 2.0.3). Flutter 3.50's Wayland renderer showed black frames and black edges while a window was resized, and the pinned custom engine only patched that renderer. 3.47.9 keeps the eMudhra certificate fix from 3.47.8.
@@ -650,6 +652,6 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   sparklines.
 
 
-[Unreleased Stable]: https://github.com/devmil/processlama/compare/v1.0.0-beta.37-44...HEAD
-[Unreleased Beta]: https://github.com/devmil/processlama/compare/v1.0.0-beta.37-44...HEAD
-[1.0.0-beta.37]: https://github.com/devmil/processlama/releases/tag/v1.0.0-beta.37-44
+[Unreleased Stable]: https://github.com/devmil/processlama/compare/v1.0.0-beta.38-45...HEAD
+[Unreleased Beta]: https://github.com/devmil/processlama/compare/v1.0.0-beta.38-45...HEAD
+[1.0.0-beta.38]: https://github.com/devmil/processlama/releases/tag/v1.0.0-beta.38-45

@@ -143,6 +143,8 @@
 
 ## [Unreleased Beta]
 
+## [1.0.0-beta.38] - 2026-11-21
+
 ### Changed
 
 - Resizing the window on Linux no longer shows black flashes or black edges.
