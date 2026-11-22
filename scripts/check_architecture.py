@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """Enforces ProcessLama's dependency directions.
 
-Dart
-- Only repository implementations import the generated Rust bridge
-  (`lib/rust/`).
-- Widgets, app shell, models and repository contracts never import the shared
-  transport package `devmil_remote`; services may use its scheduling helpers.
-- The shared package `packages/devmil_remote` imports nothing from
-  `package:processlama/`.
-- Bridge enums are mapped by name, never by indexing `values` with a native
-  enum's `index`.
+Rust crates under rust-core/desktop (Cargo dependencies and `use` paths):
+- domain depends on no other ProcessLama crate and no Qt bridge.
+- application (the use cases and their ports) depends only on domain.
+- presentation depends only on domain and application.
+- infra-* adapters depend on domain and application (plus the telemetry,
+  wire and transport crates), never on each other, presentation or Qt.
+- qt (the bridge objects) depends on domain, application and presentation,
+  never on an adapter.
+- app is the composition root: the only crate that names adapters and Qt.
+- The shared transport crate devmil_remote imports no processlama_* crate.
 
-Rust
-- No crate except the Flutter build depends on `processlama_core`.
-- The shared crate `devmil_remote` imports no `processlama_*` crate.
-- Inside `processlama_core`, only the crate root and the generated glue name
-  the bridge facade module `crate::api`.
+QML (qml/ProcessLama):
+- The UI reaches the core only through the AppState bridge (`Store.app`) and
+  the tree model; no QML file loads a native plugin or imports a module of
+  its own beyond Meridian.
 
 Usage: check_architecture.py [--root DIR]
 """
@@ -27,148 +27,108 @@ import re
 import sys
 from pathlib import Path
 
-DART_IMPORT = re.compile(r"""^\s*(?:import|export)\s+['"]([^'"]+)['"]""", re.M)
-ENUM_INDEX = re.compile(r"\.values\s*\[[^\]]*\.index\s*\]")
-RUST_CRATE_USE = re.compile(r"\b(processlama_[a-z_]+)\b")
-FACADE_USE = re.compile(r"\bcrate::api\b")
+CRATE_USE = re.compile(r"\b(processlama_[a-z_]+|qtbridge)::")
 CARGO_DEPENDENCY = re.compile(r"^\s*([A-Za-z0-9_-]+)\s*=", re.M)
+QML_IMPORT = re.compile(r"^\s*import\s+([A-Za-z][\w.]*)", re.M)
 
 
-def dart_files(directory: Path):
-    if directory.is_dir():
-        yield from sorted(directory.rglob("*.dart"))
+# Which ProcessLama crates (and the Qt bridge) each layer may use.
+ALLOWED = {
+    "domain": set(),
+    "application": {"processlama_domain"},
+    "presentation": {"processlama_domain", "processlama_application"},
+    "infra-local": {"processlama_domain", "processlama_application", "processlama_telemetry"},
+    "infra-remote": {"processlama_domain", "processlama_application", "processlama_wire", "devmil_remote"},
+    "infra-storage": {"processlama_domain", "processlama_application"},
+    "infra-platform": {"processlama_domain", "processlama_application"},
+    "qt": {"processlama_domain", "processlama_application", "processlama_presentation", "qtbridge"},
+    "app": None,  # the composition root
+}
+
+QML_ALLOWED_IMPORTS = re.compile(r"^(Qt\w*(\.\w+)*|Meridian|ProcessLama)$")
 
 
-def rust_files(directory: Path):
-    if directory.is_dir():
-        for path in sorted(directory.rglob("*.rs")):
-            if "target" not in path.relative_to(directory).parts:
-                yield path
+def normalize(name: str) -> str:
+    return name.replace("-", "_")
 
 
-def cargo_manifests(workspace: Path):
-    if workspace.is_dir():
-        for path in sorted(workspace.rglob("Cargo.toml")):
-            if "target" not in path.relative_to(workspace).parts:
-                yield path
+def rust_sources(directory: Path):
+    for path in sorted(directory.rglob("*.rs")):
+        if "target" not in path.relative_to(directory).parts:
+            yield path
 
 
-def resolves_into(source: Path, target: str, lib: Path, prefix: Path) -> bool:
-    """Whether a Dart import from `source` names a file under `prefix`."""
-    if target.startswith("package:processlama/"):
-        resolved = lib / target.removeprefix("package:processlama/")
-    elif ":" in target:
-        return False
-    else:
-        resolved = (source.parent / target).resolve()
-    try:
-        resolved.resolve().relative_to(prefix.resolve())
-        return True
-    except ValueError:
-        return False
-
-
-def dependency_names(manifest: Path) -> set[str]:
+def dependencies(manifest: Path) -> set[str]:
+    text = manifest.read_text(encoding="utf-8")
     names: set[str] = set()
-    section = ""
-    for line in manifest.read_text().splitlines():
-        stripped = line.strip()
-        if stripped.startswith("["):
-            section = stripped
+    section = None
+    for line in text.splitlines():
+        header = re.match(r"^\s*\[([^\]]+)\]", line)
+        if header:
+            section = header.group(1)
             continue
-        if "dependencies" in section:
+        if section and section.endswith("dependencies") and not section.startswith("dev-"):
+            if "dev-dependencies" in section:
+                continue
             match = CARGO_DEPENDENCY.match(line)
             if match:
-                names.add(match.group(1).replace("-", "_"))
+                names.add(normalize(match.group(1)))
     return names
 
 
-def check(root: Path) -> list[str]:
-    problems: list[str] = []
-    lib = root / "lib"
-    rust_bridge = lib / "rust"
-    repository_impl = lib / "repositories" / "impl"
+def check_rust(root: Path) -> list[str]:
+    errors: list[str] = []
+    desktop = root / "rust-core" / "desktop"
+    if desktop.is_dir():
+        for crate in sorted(path for path in desktop.iterdir() if (path / "Cargo.toml").is_file()):
+            allowed = ALLOWED.get(crate.name)
+            if crate.name not in ALLOWED:
+                errors.append(f"{crate.relative_to(root)}: unknown desktop layer; add it to check_architecture.py")
+                continue
+            if allowed is None:
+                continue
+            own = normalize(f"processlama-{crate.name}")
+            for name in sorted(dependencies(crate / "Cargo.toml")):
+                if (name.startswith("processlama_") or name == "qtbridge") and name not in allowed and name != own:
+                    errors.append(f"{crate.relative_to(root)}/Cargo.toml: {crate.name} must not depend on {name}")
+            for source in rust_sources(crate / "src"):
+                for name in sorted(set(CRATE_USE.findall(source.read_text(encoding="utf-8")))):
+                    if name not in allowed and name != own:
+                        errors.append(f"{source.relative_to(root)}: {crate.name} must not use {name}")
+    transport = root / "rust-core" / "devmil-remote"
+    if transport.is_dir():
+        for source in rust_sources(transport / "src"):
+            if re.search(r"\bprocesslama_[a-z_]+::", source.read_text(encoding="utf-8")):
+                errors.append(f"{source.relative_to(root)}: devmil_remote must not import processlama_* crates")
+    return errors
 
-    transport_free = [
-        lib / "screens",
-        lib / "widgets",
-        lib / "app",
-        lib / "models",
-        lib / "di",
-    ]
-    for source in dart_files(lib):
-        if source.is_relative_to(rust_bridge):
-            continue
-        text = source.read_text()
-        relative = source.relative_to(root)
-        repository_contract = (
-            source.parent == lib / "repositories"
-        )
-        for target in DART_IMPORT.findall(text):
-            if not source.is_relative_to(repository_impl):
-                if resolves_into(source, target, lib, rust_bridge):
-                    problems.append(f"{relative}: imports the Rust bridge ({target})")
-            if target.startswith("package:devmil_remote/") and (
-                repository_contract
-                or any(source.is_relative_to(directory) for directory in transport_free)
-            ):
-                problems.append(f"{relative}: imports devmil_remote ({target})")
-        if ENUM_INDEX.search(text):
-            problems.append(f"{relative}: maps an enum through `values[...index]`")
 
-    shared_dart = root / "packages" / "devmil_remote"
-    for source in dart_files(shared_dart):
-        for target in DART_IMPORT.findall(source.read_text()):
-            if target.startswith("package:processlama/"):
-                problems.append(
-                    f"{source.relative_to(root)}: shared package imports {target}"
-                )
-
-    workspace = root / "rust-core"
-    core = workspace / "core"
-    shared_rust = workspace / "devmil-remote"
-    for manifest in cargo_manifests(workspace):
-        package_dir = manifest.parent
-        names = dependency_names(manifest)
-        relative = manifest.relative_to(root)
-        if package_dir != core and "processlama_core" in names:
-            problems.append(f"{relative}: depends on processlama_core")
-        if package_dir == shared_rust:
-            for name in sorted(n for n in names if n.startswith("processlama_")):
-                problems.append(f"{relative}: shared crate depends on {name}")
-
-    for source in rust_files(workspace):
-        text = source.read_text()
-        relative = source.relative_to(root)
-        crates = set(RUST_CRATE_USE.findall(text))
-        if not source.is_relative_to(core) and "processlama_core" in crates:
-            problems.append(f"{relative}: uses processlama_core")
-        if source.is_relative_to(shared_rust):
-            for name in sorted(c for c in crates if c.startswith("processlama")):
-                problems.append(f"{relative}: shared crate uses {name}")
-        if (
-            source.is_relative_to(core / "src")
-            and source.name not in {"lib.rs", "frb_generated.rs", "api.rs"}
-            and FACADE_USE.search(text)
-        ):
-            problems.append(f"{relative}: imports the bridge facade crate::api")
-
-    return problems
+def check_qml(root: Path) -> list[str]:
+    errors: list[str] = []
+    qml = root / "qml" / "ProcessLama"
+    if qml.is_dir():
+        for source in sorted(qml.rglob("*.qml")):
+            text = source.read_text(encoding="utf-8")
+            for uri in QML_IMPORT.findall(text):
+                if not QML_ALLOWED_IMPORTS.match(uri):
+                    errors.append(f"{source.relative_to(root)}: imports {uri}")
+            if re.search(r"Qt\.createQmlObject|loadLibrary|Qt\.include\s*\(", text):
+                errors.append(f"{source.relative_to(root)}: loads code at run time")
+    return errors
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
-    arguments = parser.parse_args()
-    problems = check(arguments.root.resolve())
-    for problem in problems:
-        print(problem, file=sys.stderr)
-    if problems:
-        print(f"architecture check failed: {len(problems)} problem(s)", file=sys.stderr)
+    root = parser.parse_args().root
+    errors = check_rust(root) + check_qml(root)
+    for error in errors:
+        print(error, file=sys.stderr)
+    if errors:
         return 1
-    print("architecture check passed")
+    print("architecture: ok")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

@@ -89,7 +89,9 @@ fn find_rcc() -> Option<PathBuf> {
         return Some(PathBuf::from(configured));
     }
     let exe = if cfg!(windows) { "rcc.exe" } else { "rcc" };
-    for qmake in ["qmake6", "qmake"] {
+    let configured = env::var("QMAKE").ok();
+    println!("cargo:rerun-if-env-changed=QMAKE");
+    for qmake in configured.iter().map(String::as_str).chain(["qmake6", "qmake"]) {
         for key in ["QT_HOST_LIBEXECS", "QT_HOST_BINS", "QT_INSTALL_LIBEXECS", "QT_INSTALL_BINS"] {
             if let Ok(output) = Command::new(qmake).args(["-query", key]).output()
                 && output.status.success()

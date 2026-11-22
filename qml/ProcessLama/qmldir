@@ -4,3 +4,25 @@ singleton Store 1.0 Store.qml
 singleton Format 1.0 Format.qml
 singleton Labels 1.0 Labels.qml
 singleton AppTheme 1.0 AppTheme.qml
+Actions 1.0 Actions.qml
+BrandSignature 1.0 BrandSignature.qml
+DiagnosticsSettings 1.0 DiagnosticsSettings.qml
+ExplorerScreen 1.0 ExplorerScreen.qml
+ExplorerStatusBar 1.0 ExplorerStatusBar.qml
+FilterField 1.0 FilterField.qml
+HelperInstallDialog 1.0 HelperInstallDialog.qml
+HistoryChart 1.0 HistoryChart.qml
+Inspector 1.0 Inspector.qml
+LinuxResizeEdges 1.0 LinuxResizeEdges.qml
+PreferencesDialog 1.0 PreferencesDialog.qml
+ProcessIcon 1.0 ProcessIcon.qml
+ProcessTable 1.0 ProcessTable.qml
+PropertyRows 1.0 PropertyRows.qml
+RemoteHostEditor 1.0 RemoteHostEditor.qml
+RemoteHostsSettings 1.0 RemoteHostsSettings.qml
+RemoteTabBanner 1.0 RemoteTabBanner.qml
+Sidebar 1.0 Sidebar.qml
+Sparkline 1.0 Sparkline.qml
+TreeIsland 1.0 TreeIsland.qml
+WindowToolbar 1.0 WindowToolbar.qml
+WorkspaceTabStrip 1.0 WorkspaceTabStrip.qml
