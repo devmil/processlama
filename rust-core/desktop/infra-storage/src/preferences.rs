@@ -60,7 +60,10 @@ fn read_preferences(directory: &Path) -> Option<Map<String, Value>> {
         return read_macos_defaults();
     }
     let bytes = std::fs::read(directory.join("shared_preferences.json")).ok()?;
-    serde_json::from_slice::<Value>(&bytes).ok()?.as_object().cloned()
+    serde_json::from_slice::<Value>(&bytes)
+        .ok()?
+        .as_object()
+        .cloned()
 }
 
 #[cfg(target_os = "macos")]
@@ -119,10 +122,22 @@ fn parse_value(text: &str) -> Option<(Value, usize)> {
         return Some((json!(value), used));
     }
     if let Some((value, used)) = tag("integer") {
-        return Some((value.trim().parse::<i64>().map_or(Value::Null, |n| json!(n)), used));
+        return Some((
+            value
+                .trim()
+                .parse::<i64>()
+                .map_or(Value::Null, |n| json!(n)),
+            used,
+        ));
     }
     if let Some((value, used)) = tag("real") {
-        return Some((value.trim().parse::<f64>().map_or(Value::Null, |n| json!(n)), used));
+        return Some((
+            value
+                .trim()
+                .parse::<f64>()
+                .map_or(Value::Null, |n| json!(n)),
+            used,
+        ));
     }
     if text.starts_with("<array/>") {
         return Some((json!([]), 8));
@@ -136,7 +151,10 @@ fn parse_value(text: &str) -> Option<(Value, usize)> {
             items.push(value);
             body = body[used..].trim_start();
         }
-        return Some((Value::Array(items), "<array>".len() + end + "</array>".len()));
+        return Some((
+            Value::Array(items),
+            "<array>".len() + end + "</array>".len(),
+        ));
     }
     // Anything else (dates, data, nested dicts) is skipped as null.
     let end = text.find('>')? + 1;

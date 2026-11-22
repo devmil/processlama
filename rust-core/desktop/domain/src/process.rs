@@ -222,7 +222,10 @@ impl ProcessTopology {
             HashMap::new();
         for identity in order {
             if let Some(parent) = parents.get(identity) {
-                children_by_parent.entry(*parent).or_default().push(*identity);
+                children_by_parent
+                    .entry(*parent)
+                    .or_default()
+                    .push(*identity);
             }
         }
         Self {

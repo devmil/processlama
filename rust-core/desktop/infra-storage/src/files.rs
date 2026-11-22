@@ -9,7 +9,11 @@ pub fn application_support_dir() -> PathBuf {
     if let Some(dir) = std::env::var_os("PROCESSLAMA_DATA_DIR").filter(|dir| !dir.is_empty()) {
         return PathBuf::from(dir);
     }
-    let home = || std::env::var_os("HOME").map(PathBuf::from).unwrap_or_else(std::env::temp_dir);
+    let home = || {
+        std::env::var_os("HOME")
+            .map(PathBuf::from)
+            .unwrap_or_else(std::env::temp_dir)
+    };
     if cfg!(target_os = "macos") {
         home().join("Library/Application Support/de.devmil.processlama")
     } else if cfg!(windows) {

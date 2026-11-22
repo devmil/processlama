@@ -150,7 +150,10 @@ pub struct ProcessPortOwner {
 /// Whether `address` names this host from its own point of view.
 pub fn is_loopback_address(address: &str) -> bool {
     let value = address.to_lowercase();
-    value.starts_with("127.") || value == "::1" || value == "localhost" || value.starts_with("::ffff:127.")
+    value.starts_with("127.")
+        || value == "::1"
+        || value == "localhost"
+        || value.starts_with("::ffff:127.")
 }
 
 #[cfg(test)]
@@ -177,7 +180,10 @@ mod tests {
             listening_ports: Some(Arc::from(vec![2u16])),
             ..ProcessRecord::default()
         };
-        assert_eq!(ProcessPorts::of_record(&record).unwrap().cell_text(), "2 +1");
+        assert_eq!(
+            ProcessPorts::of_record(&record).unwrap().cell_text(),
+            "2 +1"
+        );
     }
 
     #[test]

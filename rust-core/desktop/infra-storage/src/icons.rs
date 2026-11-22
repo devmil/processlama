@@ -12,16 +12,25 @@ const ICON_SOURCE_PIXELS: u32 = 512;
 const PNG_SIGNATURE: [u8; 8] = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
 fn is_hash(value: &str) -> bool {
-    value.len() == 64 && value.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    value.len() == 64
+        && value
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 
 /// A PNG whose header declares at most 512×512 pixels, at most 256 KiB, with
 /// the requested digest.
 pub fn is_acceptable_icon(sha256: &str, bytes: &[u8]) -> bool {
-    if !is_hash(sha256) || bytes.len() > ICON_BYTES || bytes.len() < 33 || bytes[..8] != PNG_SIGNATURE {
+    if !is_hash(sha256)
+        || bytes.len() > ICON_BYTES
+        || bytes.len() < 33
+        || bytes[..8] != PNG_SIGNATURE
+    {
         return false;
     }
-    if u32::from_be_bytes(bytes[8..12].try_into().expect("4 bytes")) != 13 || &bytes[12..16] != b"IHDR" {
+    if u32::from_be_bytes(bytes[8..12].try_into().expect("4 bytes")) != 13
+        || &bytes[12..16] != b"IHDR"
+    {
         return false;
     }
     let width = u32::from_be_bytes(bytes[16..20].try_into().expect("4 bytes"));
@@ -67,7 +76,13 @@ impl FileIconCache {
                     continue;
                 };
                 if is_hash(&key) && root.join(&key[..2]).join(format!("{key}.png")).exists() {
-                    entries.insert(key, Entry { bytes: size, last_used: last });
+                    entries.insert(
+                        key,
+                        Entry {
+                            bytes: size,
+                            last_used: last,
+                        },
+                    );
                 }
             }
         }
@@ -84,7 +99,12 @@ impl FileIconCache {
     fn write_index(&self, entries: &HashMap<String, Entry>) {
         let index: serde_json::Map<String, Value> = entries
             .iter()
-            .map(|(key, entry)| (key.clone(), json!({"bytes": entry.bytes, "lastUsed": entry.last_used})))
+            .map(|(key, entry)| {
+                (
+                    key.clone(),
+                    json!({"bytes": entry.bytes, "lastUsed": entry.last_used}),
+                )
+            })
             .collect();
         if let Ok(bytes) = serde_json::to_vec(&Value::Object(index)) {
             let _ = write_atomically(&self.root.join("index.json"), &bytes);
@@ -101,7 +121,9 @@ impl IconCache for FileIconCache {
     }
 
     fn total_bytes(&self) -> u64 {
-        self.entries.lock().map_or(0, |entries| entries.values().map(|e| e.bytes).sum())
+        self.entries
+            .lock()
+            .map_or(0, |entries| entries.values().map(|e| e.bytes).sum())
     }
 
     fn touch(&self, hashes: &[String]) {
@@ -135,9 +157,7 @@ impl IconCache for FileIconCache {
     }
 
     fn read(&self, sha256: &str) -> Option<Vec<u8>> {
-        if self.path_for(sha256).is_none() {
-            return None;
-        }
+        self.path_for(sha256)?;
         std::fs::read(self.path(sha256)).ok()
     }
 
@@ -191,7 +211,10 @@ mod tests {
     }
 
     fn hash(bytes: &[u8]) -> String {
-        Sha256::digest(bytes).iter().map(|b| format!("{b:02x}")).collect()
+        Sha256::digest(bytes)
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect()
     }
 
     #[test]

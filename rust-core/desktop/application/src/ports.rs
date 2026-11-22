@@ -5,8 +5,8 @@
 use crate::events::CoreEvent;
 use crate::session_types::{Cadence, SessionSource};
 use processlama_domain::{
-    AppSettings, ProcessIdentity, ProcessSignal, ProcessSnapshot, RemoteHostsState,
-    SignalOutcome, SnapshotDocument, SnapshotEntry,
+    AppSettings, ProcessIdentity, ProcessSignal, ProcessSnapshot, RemoteHostsState, SignalOutcome,
+    SnapshotDocument, SnapshotEntry,
 };
 use std::sync::Arc;
 
@@ -84,7 +84,10 @@ pub enum UpdateCheck {
     /// The platform's own updater opened its UI (Sparkle on macOS).
     NativeCheckerOpened,
     UpToDate,
-    UpdateAvailable { version: String, build: u64 },
+    UpdateAvailable {
+        version: String,
+        build: u64,
+    },
     NoPublishedRelease,
 }
 

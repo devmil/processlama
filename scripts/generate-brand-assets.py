@@ -92,7 +92,7 @@ def generate(source):
     png(icon, "resources/logo/processlama-icon-app.png", 1024)
     for size in [16, 32, 64, 128, 256, 512, 1024]:
         png("tile-mimameidr-small.svg" if size <= 24 else desktop,
-            f"macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_{size}.png", size)
+            f"packaging/macos/AppIcon.appiconset/app_icon_{size}.png", size)
     png(desktop, "linux/packaging/de.devmil.processlama.png", 512)
     for filename, size in [
         ("favicon-16.png", 16), ("favicon-32.png", 32),
@@ -103,7 +103,7 @@ def generate(source):
             f"website/assets/icons/{filename}", size)
     for dest, inputs in [
         ("website/favicon.ico", ["website/assets/icons/favicon-16.png", "website/assets/icons/favicon-32.png"]),
-        ("windows/runner/resources/app_icon.ico", [f"macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_{size}.png" for size in [16, 32, 64, 128, 256]]),
+        ("packaging/windows/app_icon.ico", [f"packaging/macos/AppIcon.appiconset/app_icon_{size}.png" for size in [16, 32, 64, 128, 256]]),
     ]:
         path = ROOT / dest
         subprocess.run(["magick", *[str(ROOT / p) for p in inputs], str(path)], check=True)

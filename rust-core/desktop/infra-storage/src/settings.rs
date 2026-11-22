@@ -1,6 +1,6 @@
 use crate::files::write_atomically;
 use processlama_application::SettingsStore;
-use processlama_domain::{AppSettings, RemoteHostsState, SUPPORTED_LANGUAGES, ReleaseChannel};
+use processlama_domain::{AppSettings, ReleaseChannel, RemoteHostsState, SUPPORTED_LANGUAGES};
 use serde_json::{Map, Value};
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -16,7 +16,11 @@ pub struct FileSettingsStore {
 impl FileSettingsStore {
     /// `system_language` picks the default language; `default_channel` the
     /// release channel a build defaults to.
-    pub fn open(directory: PathBuf, system_language: &str, default_channel: ReleaseChannel) -> Self {
+    pub fn open(
+        directory: PathBuf,
+        system_language: &str,
+        default_channel: ReleaseChannel,
+    ) -> Self {
         let path = directory.join("settings.json");
         let mut defaults = AppSettings::default();
         let language = system_language.to_lowercase();
@@ -32,7 +36,11 @@ impl FileSettingsStore {
             // First launch of the Qt build: take the Flutter preferences.
             document = crate::preferences::import_flutter_preferences(&directory);
             if let Some(imported) = &document {
-                let _ = write_atomically(&path, &serde_json::to_vec_pretty(&Value::Object(imported.clone())).unwrap_or_default());
+                let _ = write_atomically(
+                    &path,
+                    &serde_json::to_vec_pretty(&Value::Object(imported.clone()))
+                        .unwrap_or_default(),
+                );
             }
         }
         Self {
@@ -43,9 +51,13 @@ impl FileSettingsStore {
     }
 
     fn write(&self, key: &str, value: Value) -> Result<(), String> {
-        let mut document = self.document.lock().map_err(|_| "settings lock".to_owned())?;
+        let mut document = self
+            .document
+            .lock()
+            .map_err(|_| "settings lock".to_owned())?;
         document.insert(key.to_owned(), value);
-        let bytes = serde_json::to_vec_pretty(&Value::Object(document.clone())).map_err(|e| e.to_string())?;
+        let bytes = serde_json::to_vec_pretty(&Value::Object(document.clone()))
+            .map_err(|e| e.to_string())?;
         write_atomically(&self.path, &bytes).map_err(|e| e.to_string())
     }
 }
@@ -53,9 +65,10 @@ impl FileSettingsStore {
 impl SettingsStore for FileSettingsStore {
     fn load_settings(&self) -> AppSettings {
         let document = self.document.lock().map(|d| d.clone()).unwrap_or_default();
-        document
-            .get("settings")
-            .map_or_else(|| self.defaults.clone(), |value| AppSettings::from_json(value, &self.defaults))
+        document.get("settings").map_or_else(
+            || self.defaults.clone(),
+            |value| AppSettings::from_json(value, &self.defaults),
+        )
     }
 
     fn save_settings(&self, settings: &AppSettings) -> Result<(), String> {
@@ -93,6 +106,9 @@ mod tests {
         store.save_remote_hosts(&hosts).unwrap();
         let reopened = FileSettingsStore::open(dir.path().to_owned(), "en", ReleaseChannel::Stable);
         assert_eq!(reopened.load_settings().polling_interval_ms, 2000);
-        assert_eq!(reopened.load_remote_hosts().icon_cache_bytes, 2 * 1024 * 1024);
+        assert_eq!(
+            reopened.load_remote_hosts().icon_cache_bytes,
+            2 * 1024 * 1024
+        );
     }
 }

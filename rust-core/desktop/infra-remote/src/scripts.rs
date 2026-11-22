@@ -3,7 +3,8 @@
 //! other user input is ever part of a script.
 
 use processlama_wire::contract::{
-    BOOTSTRAP_PREFIX, CACHE_ROOT, HELPER_BYTES, HELPER_EXECUTABLE, INSTALL_PREFIX, INSTALL_ROOT, Target,
+    BOOTSTRAP_PREFIX, CACHE_ROOT, HELPER_BYTES, HELPER_EXECUTABLE, INSTALL_PREFIX, INSTALL_ROOT,
+    Target,
 };
 
 pub fn is_valid_build_id(value: &str) -> bool {
@@ -11,7 +12,10 @@ pub fn is_valid_build_id(value: &str) -> bool {
 }
 
 pub fn is_valid_sha256(value: &str) -> bool {
-    value.len() == 64 && value.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    value.len() == 64
+        && value
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 
 /// `case` arms mapping `uname -s`/`uname -m` to a helper target; anything
@@ -23,7 +27,12 @@ fn target_case(unsupported: &str) -> String {
         if target == Target::LinuxArm64 {
             unames.push("Linux/arm64".to_owned());
         }
-        arms.push_str(&format!("{}) t={}/{};; ", unames.join("|"), target.os(), target.arch()));
+        arms.push_str(&format!(
+            "{}) t={}/{};; ",
+            unames.join("|"),
+            target.os(),
+            target.arch()
+        ));
     }
     format!(
         "case \"$(uname -s)/$(uname -m)\" in {arms}*) {unsupported};; esac; \
@@ -59,7 +68,11 @@ const INSTALL_BASE: &str = "$HOME/.local/lib/processlama";
 /// Checks the helper bytes on stdin, makes sure they run and report the build
 /// ID, and moves them into place. Prints `<INSTALL_PREFIX> 1 <result>`.
 pub fn install(build_id: &str, sha256: &str, size: u64) -> Option<String> {
-    if !is_valid_build_id(build_id) || !is_valid_sha256(sha256) || size == 0 || size > HELPER_BYTES as u64 {
+    if !is_valid_build_id(build_id)
+        || !is_valid_sha256(sha256)
+        || size == 0
+        || size > HELPER_BYTES as u64
+    {
         return None;
     }
     let result = |word: &str| format!("{{ printf '{INSTALL_PREFIX} 1 {word}\\n'; exit 0; }}");
@@ -158,10 +171,9 @@ impl StatusMarker {
             return None;
         }
         let words: Vec<String> = parts[2..].iter().map(|word| (*word).to_owned()).collect();
-        if words
-            .iter()
-            .any(|word| word.is_empty() || word.len() > 64 || word.bytes().any(|b| !(0x21..=0x7e).contains(&b)))
-        {
+        if words.iter().any(|word| {
+            word.is_empty() || word.len() > 64 || word.bytes().any(|b| !(0x21..=0x7e).contains(&b))
+        }) {
             return None;
         }
         Some(Self { version, words })
@@ -206,6 +218,8 @@ mod tests {
         let marker = StatusMarker::parse(line.as_deref(), BOOTSTRAP_PREFIX).unwrap();
         assert_eq!(marker.version, 1);
         assert_eq!(marker.words, ["missing", "linux/x86_64"]);
-        assert!(StatusMarker::parse(Some("PROCESSLAMA-BOOTSTRAP 01 start"), BOOTSTRAP_PREFIX).is_none());
+        assert!(
+            StatusMarker::parse(Some("PROCESSLAMA-BOOTSTRAP 01 start"), BOOTSTRAP_PREFIX).is_none()
+        );
     }
 }

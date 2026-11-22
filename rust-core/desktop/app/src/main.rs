@@ -6,11 +6,17 @@ mod hooks;
 use hooks::PlatformHooks;
 use processlama_application::{AppCore, CorePorts, InstalledVersion, diagnostics};
 use processlama_domain::ReleaseChannel;
-use processlama_infra_local::{LocalTelemetryAdapter, configure_icon_cache, local_operating_system};
+use processlama_infra_local::{
+    LocalTelemetryAdapter, configure_icon_cache, local_operating_system,
+};
 use processlama_infra_platform::{LinuxNetworkService, ReleaseUpdateChecker};
 use processlama_infra_remote::SshConnector;
-use processlama_infra_storage::{FileIconCache, FileSettingsStore, FileSnapshotStore, application_support_dir};
-use processlama_qt::{AppState, Driver, Inbox, ProcessTreeModel, Pump, SystemClock, TimerThread, WorkerPool};
+use processlama_infra_storage::{
+    FileIconCache, FileSettingsStore, FileSnapshotStore, application_support_dir,
+};
+use processlama_qt::{
+    AppState, Driver, Inbox, ProcessTreeModel, Pump, SystemClock, TimerThread, WorkerPool,
+};
 use qtbridge::qtbridge_type_lib::QVariant;
 use qtbridge::{QApp, QObjectHolder};
 use serde_json::{Value, json};
@@ -53,17 +59,30 @@ fn license_packages() -> Value {
     let root = |name: &str, text: &str| json!({"name": name, "licenses": [text]});
     Value::Array(vec![
         root("ProcessLama", include_str!("../../../../LICENSE")),
-        root("ProcessLama notices", include_str!("../../../../LICENSES/NOTICE.txt")),
+        root(
+            "ProcessLama notices",
+            include_str!("../../../../LICENSES/NOTICE.txt"),
+        ),
         root(
             "ProcessLama network eBPF program",
             include_str!("../../../../LICENSES/GPL-2.0-only.txt"),
         ),
-        root("libbpf", include_str!("../../../../LICENSES/libbpf-BSD-2-Clause.txt")),
-        root("libbpf-rs", include_str!("../../../../LICENSES/libbpf-rs-BSD-2-Clause.txt")),
-        root("Geist", include_str!("../../../../LICENSES/Geist-OFL-1.1.txt")),
+        root(
+            "libbpf",
+            include_str!("../../../../LICENSES/libbpf-BSD-2-Clause.txt"),
+        ),
+        root(
+            "libbpf-rs",
+            include_str!("../../../../LICENSES/libbpf-rs-BSD-2-Clause.txt"),
+        ),
+        root(
+            "Geist",
+            include_str!("../../../../LICENSES/Geist-OFL-1.1.txt"),
+        ),
         json!({"name": "Qt", "licenses": [
             include_str!("../../../../LICENSES/QT-NOTICE.md"),
             include_str!("../../../../LICENSES/LGPL-3.0.txt"),
+            include_str!("../../../../LICENSES/GPL-3.0.txt"),
         ]}),
         root(
             "Rust production dependencies",
@@ -108,7 +127,11 @@ fn main() {
         local: Box::new(LocalTelemetryAdapter::new(inbox.clone())),
         local_os: local_operating_system(),
         snapshots: Arc::new(FileSnapshotStore::new(&support)),
-        settings: Arc::new(FileSettingsStore::open(support.clone(), &language, default_release_channel())),
+        settings: Arc::new(FileSettingsStore::open(
+            support.clone(),
+            &language,
+            default_release_channel(),
+        )),
         updates: Arc::new(ReleaseUpdateChecker::new(
             installed,
             std::env::var("PROCESSLAMA_RELEASE_MANIFEST_URL").ok(),
@@ -156,7 +179,9 @@ fn main() {
     // embedded resource, for iterating on the UI without rebuilding.
     let (import_path, main_qml) = match std::env::var("PROCESSLAMA_QML_DIR") {
         Ok(dir) if !dir.is_empty() => {
-            let dir = std::path::Path::new(&dir).canonicalize().unwrap_or_else(|_| dir.clone().into());
+            let dir = std::path::Path::new(&dir)
+                .canonicalize()
+                .unwrap_or_else(|_| dir.clone().into());
             (
                 dir.display().to_string(),
                 format!("file://{}/ProcessLama/Main.qml", dir.display()),
@@ -168,7 +193,10 @@ fn main() {
         ("app", state.borrow().as_qvariant()),
         ("treeModel", model.borrow().as_qvariant()),
         ("hooks", hooks.borrow().as_qvariant()),
-        ("licensePackages", QVariant::from(license_packages().to_string())),
+        (
+            "licensePackages",
+            QVariant::from(license_packages().to_string()),
+        ),
     ];
     let exit_code = application
         .add_import_path(&import_path)

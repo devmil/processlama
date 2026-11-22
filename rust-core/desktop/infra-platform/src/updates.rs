@@ -6,6 +6,7 @@ use serde_json::Value;
 use std::time::Duration;
 
 pub const RELEASE_MANIFEST_URL: &str = "https://devmil.de/processlama/_data/releases.json";
+#[cfg(target_os = "macos")]
 pub const SPARKLE_FEED_URL: &str = "https://devmil.de/processlama/download/appcast.xml";
 
 /// Reads the newest release of `channel` from `releases.json` (schema 2).

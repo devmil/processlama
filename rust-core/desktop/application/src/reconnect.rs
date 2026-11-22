@@ -9,7 +9,10 @@ pub const RECONNECT_WINDOW_MS: u64 = 10 * 60_000;
 /// The delay before attempt `attempt` (from 0), or None when that attempt
 /// would start after the window, `elapsed` ms after the loss.
 pub fn reconnect_delay(attempt: usize, elapsed: u64) -> Option<u64> {
-    let delay = RECONNECT_DELAYS_MS.get(attempt).copied().unwrap_or(RECONNECT_REPEAT_MS);
+    let delay = RECONNECT_DELAYS_MS
+        .get(attempt)
+        .copied()
+        .unwrap_or(RECONNECT_REPEAT_MS);
     (elapsed + delay <= RECONNECT_WINDOW_MS).then_some(delay)
 }
 

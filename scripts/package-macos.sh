@@ -7,6 +7,8 @@
 #   QMAKE                Qt's qmake (default: qmake6 on PATH)
 #   MACDEPLOYQT          macdeployqt (default: next to qmake, then PATH)
 #   MAC_SIGN_IDENTITY    Developer ID Application identity; unset signs ad hoc
+#   MAC_UNIVERSAL=1      build arm64 and x86_64 and merge them (release builds)
+#   MAC_SPARKLE=0        leave Sparkle out (updates then use the release manifest)
 #   PROCESSLAMA_REMOTE_HELPER_DIR  helpers to bundle (default build/remote-helper)
 set -euo pipefail
 
@@ -25,16 +27,30 @@ MACDEPLOYQT="${MACDEPLOYQT:-$(command -v "$qt_bins/macdeployqt" || command -v ma
 [[ -n "$MACDEPLOYQT" ]] || { echo "package-macos.sh: macdeployqt not found" >&2; exit 1; }
 channel="${MIM_RELEASE_CHANNEL:-stable}"
 [[ -z "${MIM_RELEASE_CHANNEL:-}" && "$MIM_MARKETING_VERSION" =~ -(beta|rc)\. ]] && channel=beta
-minimum_system="${MACOSX_DEPLOYMENT_TARGET:-12.0}"
+minimum_system="${MACOSX_DEPLOYMENT_TARGET:-13.0}"
 export MACOSX_DEPLOYMENT_TARGET="$minimum_system"
 
-PROCESSLAMA_RELEASE_CHANNEL="$channel" cargo build --release --locked --manifest-path rust-core/Cargo.toml -p processlama
+binary=rust-core/target/release/processlama
+if [[ "${MAC_UNIVERSAL:-0}" == 1 ]]; then
+  rustup target add aarch64-apple-darwin x86_64-apple-darwin >/dev/null
+  for triple in aarch64-apple-darwin x86_64-apple-darwin; do
+    PROCESSLAMA_RELEASE_CHANNEL="$channel" cargo build --release --locked \
+      --manifest-path rust-core/Cargo.toml -p processlama --target "$triple"
+  done
+  binary=rust-core/target/universal/processlama
+  mkdir -p "$(dirname "$binary")"
+  lipo -create -output "$binary" \
+    rust-core/target/aarch64-apple-darwin/release/processlama \
+    rust-core/target/x86_64-apple-darwin/release/processlama
+else
+  PROCESSLAMA_RELEASE_CHANNEL="$channel" cargo build --release --locked --manifest-path rust-core/Cargo.toml -p processlama
+fi
 
 out="$ROOT/build/macos"
 app="$out/ProcessLama.app"
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
-cp rust-core/target/release/processlama "$app/Contents/MacOS/ProcessLama"
+cp "$binary" "$app/Contents/MacOS/ProcessLama"
 sed -e "s/@VERSION@/$MIM_MARKETING_VERSION/" -e "s/@BUILD@/$MIM_BUILD_NUMBER/" \
   -e "s/@MINIMUM_SYSTEM@/$minimum_system/" packaging/macos/Info.plist.in >"$app/Contents/Info.plist"
 printf 'APPL????' >"$app/Contents/PkgInfo"
@@ -61,12 +77,51 @@ python3 scripts/package_remote_helper.py bundle \
 
 "$MACDEPLOYQT" "$app" -qmldir="$ROOT/qml" -always-overwrite
 
-if [[ -n "${MAC_SIGN_IDENTITY:-}" ]]; then
-  codesign --force --deep --timestamp --options runtime \
-    --entitlements packaging/macos/ProcessLama.entitlements --sign "$MAC_SIGN_IDENTITY" "$app"
-else
-  codesign --force --deep --sign - --entitlements packaging/macos/ProcessLama.entitlements "$app"
+if [[ "${MAC_SPARKLE:-1}" != 0 ]]; then
+  # shellcheck source=lib/sparkle-tools.sh
+  source scripts/lib/sparkle-tools.sh
+  sparkle="$(mim_sparkle_fetch)"
+  ditto "$sparkle/Sparkle.framework" "$app/Contents/Frameworks/Sparkle.framework"
 fi
+
+# Inside out: nested code first, the app last. Sparkle's helpers keep their
+# own identifiers; everything gets the hardened runtime when signing for
+# distribution.
+if [[ -n "${MAC_SIGN_IDENTITY:-}" ]]; then
+  sign=(codesign --force --timestamp --options runtime --sign "$MAC_SIGN_IDENTITY")
+else
+  sign=(codesign --force --sign -)
+fi
+sparkle_app="$app/Contents/Frameworks/Sparkle.framework"
+if [[ -d "$sparkle_app" ]]; then
+  for nested in Versions/B/XPCServices/Installer.xpc Versions/B/XPCServices/Downloader.xpc \
+    Versions/B/Autoupdate Versions/B/Updater.app; do
+    [[ -e "$sparkle_app/$nested" ]] || continue
+    if [[ "$nested" == *Downloader.xpc ]]; then
+      "${sign[@]}" --preserve-metadata=entitlements "$sparkle_app/$nested"
+    else
+      "${sign[@]}" "$sparkle_app/$nested"
+    fi
+  done
+  "${sign[@]}" "$sparkle_app"
+fi
+while IFS= read -r -d '' code; do
+  "${sign[@]}" "$code"
+done < <(find "$app/Contents/Frameworks" "$app/Contents/PlugIns" "$app/Contents/Resources" \
+  \( -name '*.dylib' -o -name '*.so' \) -type f -print0)
+# The macOS helpers ship with the Developer ID too; their descriptors then
+# describe the re-signed bytes. Linux helpers are ELF and stay as built.
+if [[ -n "${MAC_SIGN_IDENTITY:-}" ]]; then
+  for helper in "$app"/Contents/Resources/remote-helper/macos-*/processlama-remote-helper; do
+    [[ -f "$helper" ]] && "${sign[@]}" "$helper"
+  done
+  python3 scripts/package_remote_helper.py refresh --dir "$app/Contents/Resources/remote-helper"
+fi
+while IFS= read -r -d '' framework; do
+  [[ "$framework" == "$sparkle_app" ]] && continue
+  "${sign[@]}" "$framework"
+done < <(find "$app/Contents/Frameworks" -maxdepth 1 -name '*.framework' -print0)
+"${sign[@]}" --entitlements packaging/macos/ProcessLama.entitlements "$app"
 codesign --verify --deep --strict "$app"
 
 dmg="$ROOT/build/archive/$(mim_dmg_filename)"

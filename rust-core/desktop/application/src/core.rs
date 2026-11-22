@@ -11,11 +11,11 @@ use crate::ports::{
 };
 use crate::remote::RemoteHosts;
 use crate::remote_ports::{IconCache, RemoteConnector};
-use crate::session::{Cadence, ProcessSession, SourceState, DEFAULT_BACKGROUND_REFRESH_MS};
+use crate::session::{Cadence, DEFAULT_BACKGROUND_REFRESH_MS, ProcessSession, SourceState};
 use processlama_domain::{
-    AppSettings, HostCapabilities, HostOperatingSystem, ProcessSignal, RemoteHostsState,
-    SearchQuery, SignalOutcome, SnapshotDocument, SnapshotEntry, CURRENT_SCHEMA_VERSION,
+    AppSettings, CURRENT_SCHEMA_VERSION, HostCapabilities, HostOperatingSystem,
     MAX_INSPECTOR_WIDTH, MAX_POLLING_INTERVAL_MS, MIN_INSPECTOR_WIDTH, MIN_POLLING_INTERVAL_MS,
+    ProcessSignal, RemoteHostsState, SearchQuery, SignalOutcome, SnapshotDocument, SnapshotEntry,
     normalize_saved_filters, normalized_visible_columns,
 };
 use std::sync::Arc;
@@ -290,7 +290,8 @@ impl AppCore {
             if index == active {
                 self.changes.tree |= session.tree;
                 self.changes.inspector |= session.inspector;
-                self.changes.session_meta |= session.tree || session.filter || session.loaded_snapshot;
+                self.changes.session_meta |=
+                    session.tree || session.filter || session.loaded_snapshot;
             }
         }
         std::mem::take(&mut self.changes)
@@ -397,9 +398,10 @@ impl AppCore {
             CoreEvent::SampleFailed { source, error } => {
                 let now = self.now();
                 if let Some(index) = self.tab_index_for_source(source) {
-                    self.tabs[index]
-                        .session
-                        .on_sample(Arc::new(processlama_domain::ProcessSnapshot::empty(Some(error))), now);
+                    self.tabs[index].session.on_sample(
+                        Arc::new(processlama_domain::ProcessSnapshot::empty(Some(error))),
+                        now,
+                    );
                 }
             }
             CoreEvent::Detail {
@@ -409,7 +411,9 @@ impl AppCore {
                 detail,
             } => {
                 if let Some(index) = self.tab_index_for_source(source) {
-                    self.tabs[index].session.on_detail(identity, generation, detail);
+                    self.tabs[index]
+                        .session
+                        .on_detail(identity, generation, detail);
                 }
             }
             CoreEvent::SignalSent {
@@ -433,7 +437,11 @@ impl AppCore {
                 }
                 self.refresh_snapshot_list();
             }
-            CoreEvent::SnapshotOpened { tab, path: _, result } => self.on_snapshot_opened(&tab, result),
+            CoreEvent::SnapshotOpened {
+                tab,
+                path: _,
+                result,
+            } => self.on_snapshot_opened(&tab, result),
             CoreEvent::SnapshotExported { target, result } => match result {
                 Ok(()) => self.toast("exportedPath", vec![target], ToastTone::Success),
                 Err(error) => self.toast("exportFailed", vec![error], ToastTone::Error),
@@ -461,7 +469,9 @@ impl AppCore {
                 self.refresh_snapshot_list();
             }
             CoreEvent::SettingsSaved(_) => {}
-            CoreEvent::RemoteHostsSaved { section, result } => self.on_remote_hosts_saved(section, result),
+            CoreEvent::RemoteHostsSaved { section, result } => {
+                self.on_remote_hosts_saved(section, result)
+            }
             CoreEvent::UpdateChecked(result) => self.on_update_checked(result),
             CoreEvent::NetworkAvailability(available) => {
                 if self.network_available != available {
@@ -480,7 +490,8 @@ impl AppCore {
                 }
                 Err(failure) => {
                     use crate::ports::NetworkSetupFailure::{
-                        AuthorizationCancelled, AuthorizationUnavailable, InstallFailed, InstallerMissing,
+                        AuthorizationCancelled, AuthorizationUnavailable, InstallFailed,
+                        InstallerMissing,
                     };
                     let key = match failure {
                         InstallerMissing => "networkTelemetryInstallerMissing",
@@ -505,7 +516,9 @@ impl AppCore {
             Command::SetSearchWholeWord(value) => session.set_search_whole_word(value, now),
             Command::SetTreeSearch(value) => session.set_tree_search(&value, now),
             Command::SelectNextTreeSearchMatch => session.select_next_tree_search_match(now),
-            Command::SelectPreviousTreeSearchMatch => session.select_previous_tree_search_match(now),
+            Command::SelectPreviousTreeSearchMatch => {
+                session.select_previous_tree_search_match(now)
+            }
             Command::ToggleExpansion(identity) => session.toggle_expansion(identity, now),
             Command::SelectProcess(identity) => session.select_process(identity, now),
             Command::SelectNextVisible => session.select_next_visible(now),
@@ -527,7 +540,9 @@ impl AppCore {
             }
             Command::TogglePin(identity) => session.toggle_pin(identity, now),
             Command::SetTreeHovering(value) => session.set_tree_hovering(value, now),
-            Command::SetTreeContextMenuOpen(value) => session.set_tree_context_menu_open(value, now),
+            Command::SetTreeContextMenuOpen(value) => {
+                session.set_tree_context_menu_open(value, now)
+            }
             Command::SetModalOverlayOpen(value) => session.set_modal_overlay_open(value, now),
             Command::MarkTreeInteraction => session.mark_tree_interaction(now),
             Command::SetWindowResizing(value) => {
@@ -563,7 +578,8 @@ impl AppCore {
                 self.add_saved_filter(&saved);
             }
             Command::ApplySavedFilter(saved) => {
-                let query = SearchQuery::parse(&saved, processlama_domain::SearchOptions::default());
+                let query =
+                    SearchQuery::parse(&saved, processlama_domain::SearchOptions::default());
                 let value = query.options.saved_query(&query.text);
                 self.tabs[self.active].session.set_filter(&value, now);
             }
@@ -575,7 +591,9 @@ impl AppCore {
                     .filter(|filter| **filter != saved)
                     .cloned()
                     .collect();
-                self.change_settings(true, |settings| settings.saved_filters = normalize_saved_filters(&filters));
+                self.change_settings(true, |settings| {
+                    settings.saved_filters = normalize_saved_filters(&filters)
+                });
             }
             Command::SetVisibleColumns(columns) => {
                 let normalized = normalized_visible_columns(&columns);
@@ -603,9 +621,15 @@ impl AppCore {
                     settings.inspector_width = processlama_domain::DEFAULT_INSPECTOR_WIDTH;
                 });
             }
-            Command::SetAppearance(mode) => self.change_settings(true, |settings| settings.appearance_mode = mode),
-            Command::SetRowHeatmap(value) => self.change_settings(true, |settings| settings.row_heatmap = value),
-            Command::SetRowDensity(value) => self.change_settings(true, |settings| settings.row_density = value),
+            Command::SetAppearance(mode) => {
+                self.change_settings(true, |settings| settings.appearance_mode = mode)
+            }
+            Command::SetRowHeatmap(value) => {
+                self.change_settings(true, |settings| settings.row_heatmap = value)
+            }
+            Command::SetRowDensity(value) => {
+                self.change_settings(true, |settings| settings.row_density = value)
+            }
             Command::SetReleaseChannel(channel) => {
                 self.change_settings(true, |settings| settings.release_channel = channel);
                 self.ports.updates.configure(channel);
@@ -647,7 +671,9 @@ impl AppCore {
             Command::InstallNetworkTelemetry => {
                 let network = Arc::clone(&self.ports.network);
                 let sink = self.sink();
-                self.spawn(move || sink.post(CoreEvent::NetworkInstalled(network.install_or_repair())));
+                self.spawn(move || {
+                    sink.post(CoreEvent::NetworkInstalled(network.install_or_repair()))
+                });
             }
         }
     }
@@ -656,7 +682,11 @@ impl AppCore {
 
     /// Applies a settings change. `save_now` writes at once; otherwise the
     /// write is debounced (drags change values many times per second).
-    pub(crate) fn change_settings(&mut self, save_now: bool, change: impl FnOnce(&mut AppSettings)) {
+    pub(crate) fn change_settings(
+        &mut self,
+        save_now: bool,
+        change: impl FnOnce(&mut AppSettings),
+    ) {
         let mut next = self.settings.clone();
         change(&mut next);
         if next == self.settings {
@@ -701,7 +731,9 @@ impl AppCore {
                 .filter(|filter| filter.to_lowercase() != normalized.to_lowercase())
                 .cloned(),
         );
-        self.change_settings(true, |settings| settings.saved_filters = normalize_saved_filters(&filters));
+        self.change_settings(true, |settings| {
+            settings.saved_filters = normalize_saved_filters(&filters)
+        });
     }
 
     /// Writes the remote hosts value; on failure `restore` is applied.
@@ -766,9 +798,16 @@ impl AppCore {
             .filter_map(|tab| tab.profile_id.clone())
             .collect();
         let active = Some(self.tabs[self.active].key.clone());
-        let known: std::collections::HashSet<&str> =
-            self.remote_state.profiles.iter().map(|profile| profile.id.as_str()).collect();
-        let open: Vec<String> = open.into_iter().filter(|id| known.contains(id.as_str())).collect();
+        let known: std::collections::HashSet<&str> = self
+            .remote_state
+            .profiles
+            .iter()
+            .map(|profile| profile.id.as_str())
+            .collect();
+        let open: Vec<String> = open
+            .into_iter()
+            .filter(|id| known.contains(id.as_str()))
+            .collect();
         if open == self.remote_state.open_tabs && active == self.remote_state.active_tab {
             return;
         }
@@ -816,7 +855,11 @@ impl AppCore {
         let active_key = self.tabs[self.active].key.clone();
         let tab = self.tabs.remove(from);
         self.tabs.insert(target, tab);
-        self.active = self.tabs.iter().position(|tab| tab.key == active_key).unwrap_or(0);
+        self.active = self
+            .tabs
+            .iter()
+            .position(|tab| tab.key == active_key)
+            .unwrap_or(0);
         self.mark(CoreChanges {
             tabs: true,
             ..CoreChanges::default()
@@ -835,7 +878,10 @@ impl AppCore {
     fn take_snapshot(&mut self) {
         let tab = &self.tabs[self.active];
         let snapshot = Arc::clone(tab.session.snapshot());
-        let context = tab.profile_id.as_deref().map(|profile| self.remote_snapshot_context(profile, &snapshot));
+        let context = tab
+            .profile_id
+            .as_deref()
+            .map(|profile| self.remote_snapshot_context(profile, &snapshot));
         let store = Arc::clone(&self.ports.snapshots);
         let sink = self.sink();
         let wall = self.wall();
@@ -848,7 +894,11 @@ impl AppCore {
                 None => (None, Default::default()),
             };
             let document = SnapshotDocument {
-                schema_version: if host.is_some() { CURRENT_SCHEMA_VERSION } else { 1 },
+                schema_version: if host.is_some() {
+                    CURRENT_SCHEMA_VERSION
+                } else {
+                    1
+                },
                 exported_at_unix_ms: wall,
                 source: "ProcessLama".into(),
                 display_name: None,
@@ -867,7 +917,11 @@ impl AppCore {
         let sink = self.sink();
         self.spawn(move || {
             let result = (|| {
-                let stored = if saved { path.clone() } else { store.import(&path)? };
+                let stored = if saved {
+                    path.clone()
+                } else {
+                    store.import(&path)?
+                };
                 let document = store.read(&stored)?;
                 Ok((stored, document))
             })();
@@ -875,13 +929,18 @@ impl AppCore {
         });
     }
 
-    fn on_snapshot_opened(&mut self, tab: &str, result: Result<(String, SnapshotDocument), String>) {
+    fn on_snapshot_opened(
+        &mut self,
+        tab: &str,
+        result: Result<(String, SnapshotDocument), String>,
+    ) {
         match result {
             Ok((stored, document)) => {
                 self.import_snapshot_icons(&document);
                 let now = self.now();
                 if let Some(tab) = self.tabs.iter_mut().find(|candidate| candidate.key == tab) {
-                    tab.session.load_snapshot(stored, Arc::new(document.snapshot), now);
+                    tab.session
+                        .load_snapshot(stored, Arc::new(document.snapshot), now);
                 }
                 self.toast("snapshotLoaded", vec![], ToastTone::Neutral);
                 self.refresh_snapshot_list();
@@ -891,7 +950,12 @@ impl AppCore {
     }
 
     fn export_snapshot(&mut self, path: String, target: String) {
-        let Some(entry) = self.snapshots.iter().find(|entry| entry.path == path).cloned() else {
+        let Some(entry) = self
+            .snapshots
+            .iter()
+            .find(|entry| entry.path == path)
+            .cloned()
+        else {
             return;
         };
         let store = Arc::clone(&self.ports.snapshots);
@@ -903,7 +967,12 @@ impl AppCore {
     }
 
     fn rename_snapshot(&mut self, path: String, name: String) {
-        let Some(entry) = self.snapshots.iter().find(|entry| entry.path == path).cloned() else {
+        let Some(entry) = self
+            .snapshots
+            .iter()
+            .find(|entry| entry.path == path)
+            .cloned()
+        else {
             return;
         };
         let name = name.trim().to_owned();
@@ -916,7 +985,12 @@ impl AppCore {
     }
 
     fn delete_snapshot(&mut self, path: String) {
-        let Some(entry) = self.snapshots.iter().find(|entry| entry.path == path).cloned() else {
+        let Some(entry) = self
+            .snapshots
+            .iter()
+            .find(|entry| entry.path == path)
+            .cloned()
+        else {
             return;
         };
         let store = Arc::clone(&self.ports.snapshots);
@@ -929,7 +1003,11 @@ impl AppCore {
 
     // Signals
 
-    fn send_signal(&mut self, identity: processlama_domain::ProcessIdentity, signal: ProcessSignal) {
+    fn send_signal(
+        &mut self,
+        identity: processlama_domain::ProcessIdentity,
+        signal: ProcessSignal,
+    ) {
         let tab = &self.tabs[self.active];
         let source = tab.source;
         if let Some(profile) = tab.profile_id.clone() {
@@ -949,7 +1027,12 @@ impl AppCore {
         });
     }
 
-    fn on_signal_sent(&mut self, source: SourceId, signal: ProcessSignal, outcome: Result<SignalOutcome, String>) {
+    fn on_signal_sent(
+        &mut self,
+        source: SourceId,
+        signal: ProcessSignal,
+        outcome: Result<SignalOutcome, String>,
+    ) {
         match outcome {
             Ok(SignalOutcome::Sent) => {
                 let key = match signal {
@@ -960,9 +1043,15 @@ impl AppCore {
                 };
                 self.toast(key, vec![], ToastTone::Success);
             }
-            Ok(SignalOutcome::Denied) => self.toast("processSignalDenied", vec![], ToastTone::Error),
-            Ok(SignalOutcome::NotFound) => self.toast("processSignalNotFound", vec![], ToastTone::Error),
-            Ok(SignalOutcome::Unknown) => self.toast("processSignalUnknown", vec![], ToastTone::Error),
+            Ok(SignalOutcome::Denied) => {
+                self.toast("processSignalDenied", vec![], ToastTone::Error)
+            }
+            Ok(SignalOutcome::NotFound) => {
+                self.toast("processSignalNotFound", vec![], ToastTone::Error)
+            }
+            Ok(SignalOutcome::Unknown) => {
+                self.toast("processSignalUnknown", vec![], ToastTone::Error)
+            }
             Err(error) => self.toast("processActionFailed", vec![error], ToastTone::Error),
         }
         if let Some(index) = self.tab_index_for_source(source) {
@@ -991,13 +1080,17 @@ impl AppCore {
                 vec![installed.version, installed.build.to_string()],
                 ToastTone::Success,
             ),
-            Ok(UpdateCheck::NoPublishedRelease) => self.toast("updateNoPublishedRelease", vec![], ToastTone::Neutral),
-            Ok(UpdateCheck::UpdateAvailable { version, build }) => self.emit(UiEvent::UpdateAvailable {
-                installed_version: installed.version,
-                installed_build: installed.build,
-                version,
-                build,
-            }),
+            Ok(UpdateCheck::NoPublishedRelease) => {
+                self.toast("updateNoPublishedRelease", vec![], ToastTone::Neutral)
+            }
+            Ok(UpdateCheck::UpdateAvailable { version, build }) => {
+                self.emit(UiEvent::UpdateAvailable {
+                    installed_version: installed.version,
+                    installed_build: installed.build,
+                    version,
+                    build,
+                })
+            }
             Err(error) => self.toast("updateCheckFailed", vec![error], ToastTone::Error),
         }
     }

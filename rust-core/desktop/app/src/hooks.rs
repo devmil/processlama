@@ -33,7 +33,12 @@ mod platform_hooks {
                     .output()
                     .ok()
                     .filter(|output| output.status.success())
-                    .and_then(|output| String::from_utf8_lossy(&output.stdout).trim().parse::<f64>().ok())
+                    .and_then(|output| {
+                        String::from_utf8_lossy(&output.stdout)
+                            .trim()
+                            .parse::<f64>()
+                            .ok()
+                    })
                     .filter(|scale| scale.is_finite())
                     .map_or(1.0, |scale| scale.clamp(0.5, 3.0))
             }

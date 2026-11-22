@@ -13,7 +13,10 @@ use qtbridge::qobject;
 use std::collections::HashSet;
 use std::sync::Arc;
 
-pub(crate) fn icon_url(record_icon: Option<&ProcessIconRef>, cache: Option<&Arc<dyn IconCache>>) -> String {
+pub(crate) fn icon_url(
+    record_icon: Option<&ProcessIconRef>,
+    cache: Option<&Arc<dyn IconCache>>,
+) -> String {
     match record_icon {
         Some(ProcessIconRef::File(uri)) => {
             if uri.starts_with("file:") {
@@ -110,9 +113,21 @@ mod process_tree_model {
     impl ProcessTreeModel {
         qproperty!("columnIds", Member = column_ids, Notify = columns_changed);
         qproperty!("rowTotal", Member = row_total, Notify = rows_changed);
-        qproperty!("selectedRow", Member = selected_row, Notify = selection_changed);
-        qproperty!("selectedKey", Member = selected_key, Notify = selection_changed);
-        qproperty!("cpuScaleMax", Member = cpu_scale_max, Notify = scale_changed);
+        qproperty!(
+            "selectedRow",
+            Member = selected_row,
+            Notify = selection_changed
+        );
+        qproperty!(
+            "selectedKey",
+            Member = selected_key,
+            Notify = selection_changed
+        );
+        qproperty!(
+            "cpuScaleMax",
+            Member = cpu_scale_max,
+            Notify = scale_changed
+        );
         qproperty!("resetCount", Member = reset_count, Notify = rows_changed);
 
         #[qsignal]
@@ -142,9 +157,17 @@ mod process_tree_model {
 
         /// Reconciles the published tree. `source_key` names the tab: a tab
         /// switch replaces the rows outright.
-        pub fn apply(&mut self, view: &TreeView, visible_columns: &[String], source_key: &str, icon_revision: u64) {
-            let columns: Vec<&'static ColumnDefinition> =
-                visible_columns.iter().filter_map(|id| column_definition(id)).collect();
+        pub fn apply(
+            &mut self,
+            view: &TreeView,
+            visible_columns: &[String],
+            source_key: &str,
+            icon_revision: u64,
+        ) {
+            let columns: Vec<&'static ColumnDefinition> = visible_columns
+                .iter()
+                .filter_map(|id| column_definition(id))
+                .collect();
             let matcher = (!view.tree_search_query.is_empty()).then(|| {
                 TextMatcher::new(
                     &view.tree_search_query,
@@ -152,8 +175,8 @@ mod process_tree_model {
                     view.search_options.whole_word,
                 )
             });
-            let search_changed =
-                view.tree_search_query != self.search_query || view.search_options != self.search_options;
+            let search_changed = view.tree_search_query != self.search_query
+                || view.search_options != self.search_options;
             let icons_changed = icon_revision != self.icon_revision;
             let columns_changed = columns != self.columns;
             let source_changed = source_key != self.source_key;
@@ -223,7 +246,8 @@ mod process_tree_model {
             let new_end = next.len() - suffix;
             if prefix < old_end {
                 // Publish the shortened list while Qt asks for data.
-                let mut remaining: Vec<TreeRow> = Vec::with_capacity(before.len() - (old_end - prefix));
+                let mut remaining: Vec<TreeRow> =
+                    Vec::with_capacity(before.len() - (old_end - prefix));
                 remaining.extend_from_slice(&before[..prefix]);
                 remaining.extend_from_slice(&before[old_end..]);
                 self.begin_remove_rows(&QModelIndex::default(), prefix as i32, old_end as i32 - 1);
@@ -241,9 +265,14 @@ mod process_tree_model {
             let column_count = self.columns.len();
             let mut spans: Vec<(usize, usize, usize)> = Vec::new();
             let mut compare = |old: &TreeRow, new: &TreeRow, index: usize, this: &Self| {
-                if let Some((first, last)) =
-                    this.changed_columns(old, new, pinned_before, search_changed, icons_changed, column_count)
-                {
+                if let Some((first, last)) = this.changed_columns(
+                    old,
+                    new,
+                    pinned_before,
+                    search_changed,
+                    icons_changed,
+                    column_count,
+                ) {
                     spans.push((index, first, last));
                 }
             };
@@ -345,11 +374,19 @@ mod process_tree_model {
         }
 
         fn row_count(&self, parent: &QModelIndex) -> i32 {
-            if parent.is_valid() { 0 } else { self.rows.len() as i32 }
+            if parent.is_valid() {
+                0
+            } else {
+                self.rows.len() as i32
+            }
         }
 
         fn column_count(&self, parent: &QModelIndex) -> i32 {
-            if parent.is_valid() { 0 } else { self.columns.len() as i32 }
+            if parent.is_valid() {
+                0
+            } else {
+                self.columns.len() as i32
+            }
         }
 
         fn data(&self, index: &QModelIndex, role: i32) -> QVariant {
@@ -364,10 +401,16 @@ mod process_tree_model {
                 HAS_CHILDREN_ROLE => QVariant::from(row.has_children),
                 EXPANDED_ROLE => QVariant::from(row.is_expanded),
                 NAME_ROLE => QVariant::from(record.display_name().to_owned()),
-                ICON_ROLE => QVariant::from(icon_url(record.icon.as_ref(), self.icon_cache.as_ref())),
+                ICON_ROLE => {
+                    QVariant::from(icon_url(record.icon.as_ref(), self.icon_cache.as_ref()))
+                }
                 DESCENDANTS_ROLE => QVariant::from(row.descendant_count as i32),
                 HISTORY_ROLE => {
-                    let samples: Vec<f64> = row.cpu_history.iter().map(|sample| f64::from(*sample)).collect();
+                    let samples: Vec<f64> = row
+                        .cpu_history
+                        .iter()
+                        .map(|sample| f64::from(*sample))
+                        .collect();
                     QVariant::from(&samples)
                 }
                 MARKER_ROLE => QVariant::from(match row.change_marker {
@@ -376,7 +419,11 @@ mod process_tree_model {
                     ChangeMarker::Terminated => 2,
                 }),
                 PINNED_ROLE => QVariant::from(self.pinned.contains(&row.identity)),
-                USAGE_ROLE => QVariant::from(if column.id == "treeCpu" { row.tree_cpu } else { record.cpu_usage }),
+                USAGE_ROLE => QVariant::from(if column.id == "treeCpu" {
+                    row.tree_cpu
+                } else {
+                    record.cpu_usage
+                }),
                 STATUS_ROLE => QVariant::from(match record.status {
                     processlama_domain::ProcessStatus::Running => 0,
                     processlama_domain::ProcessStatus::Sleeping => 1,
@@ -388,13 +435,16 @@ mod process_tree_model {
                 CELL_MATCH_ROLE => QVariant::from(row.search_matches_column(column.id)),
                 MATCH_START_ROLE | MATCH_END_ROLE => {
                     let range = if row.search_matches_column(column.id) {
-                        self.matcher
-                            .as_ref()
-                            .and_then(|matcher| matcher.first_match_utf16(&cell_text(row, column.id)))
+                        self.matcher.as_ref().and_then(|matcher| {
+                            matcher.first_match_utf16(&cell_text(row, column.id))
+                        })
                     } else {
                         None
                     };
-                    let value = range.map_or(-1, |(start, end)| if role == MATCH_START_ROLE { start } else { end } as i32);
+                    let value = range.map_or(
+                        -1,
+                        |(start, end)| if role == MATCH_START_ROLE { start } else { end } as i32,
+                    );
                     QVariant::from(value)
                 }
                 ROW_MATCH_ROLE => QVariant::from(row.matches_tree_search()),

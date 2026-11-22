@@ -4,11 +4,14 @@
 use base64::Engine;
 use processlama_domain::{
     DetailSection, FileDescriptorInfo, HostCapabilities, HostOperatingSystem, NetworkEndpointInfo,
-    NetworkRateSource, NetworkUnavailableReason, ProcessDetail, ProcessIconRef, ProcessIdentity, ProcessRecord,
-    ProcessSignal, ProcessSnapshot, ProcessStatus, ProcessTopology, RemoteHelperHello, RemoteHelperTarget,
-    RemoteHostFacts, SecurityDetailInfo, SignalOutcome, TaskSummaryInfo, ThreadInfo, ThreadInspectionInfo,
+    NetworkRateSource, NetworkUnavailableReason, ProcessDetail, ProcessIconRef, ProcessIdentity,
+    ProcessRecord, ProcessSignal, ProcessSnapshot, ProcessStatus, ProcessTopology,
+    RemoteHelperHello, RemoteHelperTarget, RemoteHostFacts, SecurityDetailInfo, SignalOutcome,
+    TaskSummaryInfo, ThreadInfo, ThreadInspectionInfo,
 };
-use processlama_wire::contract::{ICON_BYTES, ICON_FETCH_BYTES, ICONS_PER_FETCH, PROCESSES_PER_SAMPLE};
+use processlama_wire::contract::{
+    ICON_BYTES, ICON_FETCH_BYTES, ICONS_PER_FETCH, PROCESSES_PER_SAMPLE,
+};
 use serde_json::{Map, Value, json};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
@@ -18,8 +21,15 @@ pub struct Invalid(pub &'static str);
 
 type Result<T> = std::result::Result<T, Invalid>;
 
+/// One sample's ports per row; None where the helper did not report them.
+type PortColumn = Vec<Option<Arc<[u16]>>>;
+
 /// An object with exactly `keys`.
-fn object<'a>(value: &'a Value, keys: &[&str], what: &'static str) -> Result<&'a Map<String, Value>> {
+fn object<'a>(
+    value: &'a Value,
+    keys: &[&str],
+    what: &'static str,
+) -> Result<&'a Map<String, Value>> {
     let map = value.as_object().ok_or(Invalid(what))?;
     if map.len() != keys.len() || !keys.iter().all(|key| map.contains_key(*key)) {
         return Err(Invalid(what));
@@ -27,7 +37,12 @@ fn object<'a>(value: &'a Value, keys: &[&str], what: &'static str) -> Result<&'a
     Ok(map)
 }
 
-fn string<'a>(map: &'a Map<String, Value>, key: &str, max: usize, what: &'static str) -> Result<&'a str> {
+fn string<'a>(
+    map: &'a Map<String, Value>,
+    key: &str,
+    max: usize,
+    what: &'static str,
+) -> Result<&'a str> {
     let text = map.get(key).and_then(Value::as_str).ok_or(Invalid(what))?;
     if text.chars().count() > max {
         return Err(Invalid(what));
@@ -52,11 +67,17 @@ fn boolean(map: &Map<String, Value>, key: &str, what: &'static str) -> Result<bo
 }
 
 fn is_lower_hex(text: &str, length: usize) -> bool {
-    text.len() == length && text.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    text.len() == length
+        && text
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 
 fn column<'a>(map: &'a Map<String, Value>, key: &str, length: usize) -> Result<&'a Vec<Value>> {
-    let values = map.get(key).and_then(Value::as_array).ok_or(Invalid("column"))?;
+    let values = map
+        .get(key)
+        .and_then(Value::as_array)
+        .ok_or(Invalid("column"))?;
     if values.len() != length {
         return Err(Invalid("column"));
     }
@@ -65,10 +86,29 @@ fn column<'a>(map: &'a Map<String, Value>, key: &str, length: usize) -> Result<&
 
 /// Metric columns of `telemetry.snapshot`, in wire order.
 pub const METRIC_COLUMNS: [&str; 19] = [
-    "cpu", "gpu", "rss", "vmem", "cpuTimeMs", "threads", "files", "nice", "prio", "status", "netIn", "netOut",
-    "netInTotal", "netOutTotal", "ioRead", "ioWrite", "ioReadTotal", "ioWriteTotal", "ioAvail",
+    "cpu",
+    "gpu",
+    "rss",
+    "vmem",
+    "cpuTimeMs",
+    "threads",
+    "files",
+    "nice",
+    "prio",
+    "status",
+    "netIn",
+    "netOut",
+    "netInTotal",
+    "netOutTotal",
+    "ioRead",
+    "ioWrite",
+    "ioReadTotal",
+    "ioWriteTotal",
+    "ioAvail",
 ];
-const TOPOLOGY_COLUMNS: [&str; 11] = ["pid", "start", "parent", "ppid", "uid", "user", "name", "exe", "cmd", "bundle", "icon"];
+const TOPOLOGY_COLUMNS: [&str; 11] = [
+    "pid", "start", "parent", "ppid", "uid", "user", "name", "exe", "cmd", "bundle", "icon",
+];
 
 #[derive(Clone)]
 struct StaticRow {
@@ -96,7 +136,13 @@ pub struct TelemetryDecoder {
 impl TelemetryDecoder {
     pub fn decode(&mut self, data: &Value) -> Result<ProcessSnapshot> {
         let map = data.as_object().ok_or(Invalid("sample"))?;
-        let mut keys = vec!["capturedAtMs", "platform", "topologyVersion", "topology", "metrics"];
+        let mut keys = vec![
+            "capturedAtMs",
+            "platform",
+            "topologyVersion",
+            "topology",
+            "metrics",
+        ];
         if map.contains_key("localPorts") {
             keys.push("localPorts");
         }
@@ -139,7 +185,7 @@ impl TelemetryDecoder {
             }
             metrics.push(values);
         }
-        let ports = |name: &str| -> Result<Option<Vec<Option<Arc<[u16]>>>>> {
+        let ports = |name: &str| -> Result<Option<PortColumn>> {
             let Some(_) = sample.get(name) else {
                 return Ok(None);
             };
@@ -187,7 +233,10 @@ impl TelemetryDecoder {
 
     fn read_topology(&mut self, value: &Value, version: u64) -> Result<()> {
         let map = object(value, &TOPOLOGY_COLUMNS, "topology")?;
-        let pids = map.get("pid").and_then(Value::as_array).ok_or(Invalid("topology"))?;
+        let pids = map
+            .get("pid")
+            .and_then(Value::as_array)
+            .ok_or(Invalid("topology"))?;
         if pids.len() > PROCESSES_PER_SAMPLE {
             return Err(Invalid("topology size"));
         }
@@ -198,7 +247,9 @@ impl TelemetryDecoder {
         }
         let int = |name: &str, row: usize| integer(&columns[name][row], "topology integer");
         let text = |name: &str, row: usize, max: usize| -> Result<String> {
-            let value = columns[name][row].as_str().ok_or(Invalid("topology text"))?;
+            let value = columns[name][row]
+                .as_str()
+                .ok_or(Invalid("topology text"))?;
             if value.chars().count() > max {
                 return Err(Invalid("topology text"));
             }
@@ -206,6 +257,7 @@ impl TelemetryDecoder {
         };
         let mut rows = Vec::with_capacity(length);
         let mut seen = HashSet::with_capacity(length);
+        #[allow(clippy::needless_range_loop)] // `row` indexes every column of the topology.
         for row in 0..length {
             let pid = int("pid", row)?;
             let start = int("start", row)?;
@@ -239,10 +291,17 @@ impl TelemetryDecoder {
             if parent < -1 || parent >= length as i64 || parent == row as i64 {
                 return Err(Invalid("parent"));
             }
-            parents.insert(rows[row].identity, (parent >= 0).then(|| rows[parent as usize].identity));
+            parents.insert(
+                rows[row].identity,
+                (parent >= 0).then(|| rows[parent as usize].identity),
+            );
         }
         let order: Vec<ProcessIdentity> = rows.iter().map(|row| row.identity).collect();
-        self.topology = Some(Arc::new(ProcessTopology::new(Some(version), parents, &order)));
+        self.topology = Some(Arc::new(ProcessTopology::new(
+            Some(version),
+            parents,
+            &order,
+        )));
         self.rows = rows;
         self.version = Some(version);
         Ok(())
@@ -308,14 +367,20 @@ pub fn telemetry_arguments(cadence_ms: Option<u32>, polling_ms: u32) -> Value {
 
 fn section<T>(value: &Value, decode: impl FnOnce(&Value) -> Result<T>) -> Result<DetailSection<T>> {
     let map = object(value, &["state", "reason", "value"], "section")?;
-    let state = map.get("state").and_then(Value::as_str).ok_or(Invalid("section"))?;
+    let state = map
+        .get("state")
+        .and_then(Value::as_str)
+        .ok_or(Invalid("section"))?;
     if state == "available" {
         if !map["reason"].is_null() {
             return Err(Invalid("section"));
         }
         return Ok(DetailSection::Available(decode(&map["value"])?));
     }
-    let reason = map["reason"].as_str().filter(|r| r.chars().count() <= 256).ok_or(Invalid("section"))?;
+    let reason = map["reason"]
+        .as_str()
+        .filter(|r| r.chars().count() <= 256)
+        .ok_or(Invalid("section"))?;
     if !map["value"].is_null() {
         return Err(Invalid("section"));
     }
@@ -329,7 +394,10 @@ fn section<T>(value: &Value, decode: impl FnOnce(&Value) -> Result<T>) -> Result
 }
 
 fn list(value: &Value) -> Result<&Vec<Value>> {
-    value.as_array().filter(|items| items.len() <= 4096).ok_or(Invalid("list"))
+    value
+        .as_array()
+        .filter(|items| items.len() <= 4096)
+        .ok_or(Invalid("list"))
 }
 
 fn port(map: &Map<String, Value>, key: &str) -> Result<u16> {
@@ -338,7 +406,11 @@ fn port(map: &Map<String, Value>, key: &str) -> Result<u16> {
 
 /// Decodes a `process.detail` result.
 pub fn decode_detail(value: &Value) -> Result<ProcessDetail> {
-    let map = object(value, &["pid", "start", "files", "sockets", "threads", "security"], "detail")?;
+    let map = object(
+        value,
+        &["pid", "start", "files", "sockets", "threads", "security"],
+        "detail",
+    )?;
     let pid = i32::try_from(unsigned(map, "pid", "pid")?).map_err(|_| Invalid("pid"))?;
     let identity = ProcessIdentity::new(pid, unsigned(map, "start", "start")?);
     let files = section(&map["files"], |value| {
@@ -346,7 +418,10 @@ pub fn decode_detail(value: &Value) -> Result<ProcessDetail> {
             .iter()
             .map(|entry| {
                 let file = object(entry, &["fd", "kind", "path"], "file")?;
-                let fd = file["fd"].as_i64().and_then(|fd| i32::try_from(fd).ok()).ok_or(Invalid("fd"))?;
+                let fd = file["fd"]
+                    .as_i64()
+                    .and_then(|fd| i32::try_from(fd).ok())
+                    .ok_or(Invalid("fd"))?;
                 Ok(FileDescriptorInfo {
                     fd,
                     kind: string(file, "kind", 64, "kind")?.to_owned(),
@@ -361,7 +436,16 @@ pub fn decode_detail(value: &Value) -> Result<ProcessDetail> {
             .map(|entry| {
                 let socket = object(
                     entry,
-                    &["protocol", "localAddress", "localPort", "localApproximate", "remoteAddress", "remotePort", "remoteApproximate", "state"],
+                    &[
+                        "protocol",
+                        "localAddress",
+                        "localPort",
+                        "localApproximate",
+                        "remoteAddress",
+                        "remotePort",
+                        "remoteApproximate",
+                        "state",
+                    ],
                     "socket",
                 )?;
                 Ok(NetworkEndpointInfo {
@@ -382,7 +466,11 @@ pub fn decode_detail(value: &Value) -> Result<ProcessDetail> {
         let summary = match &inspection["summary"] {
             Value::Null => None,
             value => {
-                let summary = object(value, &["threadCount", "machSyscallCount", "rosettaTranslated"], "summary")?;
+                let summary = object(
+                    value,
+                    &["threadCount", "machSyscallCount", "rosettaTranslated"],
+                    "summary",
+                )?;
                 Some(TaskSummaryInfo {
                     thread_count: unsigned(summary, "threadCount", "summary")?,
                     mach_syscall_count: unsigned(summary, "machSyscallCount", "summary")?,
@@ -393,7 +481,11 @@ pub fn decode_detail(value: &Value) -> Result<ProcessDetail> {
         let threads = list(&inspection["threads"])?
             .iter()
             .map(|entry| {
-                let thread = object(entry, &["id", "cpuTenths", "approximate", "state"], "thread")?;
+                let thread = object(
+                    entry,
+                    &["id", "cpuTenths", "approximate", "state"],
+                    "thread",
+                )?;
                 Ok(ThreadInfo {
                     thread_id: unsigned(thread, "id", "thread")?,
                     cpu_percent: unsigned(thread, "cpuTenths", "thread")? as f64 / 10.0,
@@ -408,8 +500,16 @@ pub fn decode_detail(value: &Value) -> Result<ProcessDetail> {
         let s = object(
             value,
             &[
-                "signingStatus", "signingAuthority", "teamId", "bundleId", "entitlementsSummary",
-                "entitlementsApproximate", "gatekeeperOrigin", "sandbox", "hardenedRuntime", "architecture",
+                "signingStatus",
+                "signingAuthority",
+                "teamId",
+                "bundleId",
+                "entitlementsSummary",
+                "entitlementsApproximate",
+                "gatekeeperOrigin",
+                "sandbox",
+                "hardenedRuntime",
+                "architecture",
                 "rosettaTranslated",
             ],
             "security",
@@ -459,9 +559,15 @@ pub fn decode_signal_outcome(value: &Value) -> Result<SignalOutcome> {
 }
 
 /// Canonical base64 PNG bytes by hash; only requested hashes are accepted.
-pub fn decode_icons(value: &Value, requested: &HashSet<String>) -> Result<HashMap<String, Vec<u8>>> {
+pub fn decode_icons(
+    value: &Value,
+    requested: &HashSet<String>,
+) -> Result<HashMap<String, Vec<u8>>> {
     let map = object(value, &["icons"], "icons")?;
-    let icons = map["icons"].as_array().filter(|icons| icons.len() <= ICONS_PER_FETCH).ok_or(Invalid("icons"))?;
+    let icons = map["icons"]
+        .as_array()
+        .filter(|icons| icons.len() <= ICONS_PER_FETCH)
+        .ok_or(Invalid("icons"))?;
     let engine = base64::engine::general_purpose::STANDARD;
     let mut result = HashMap::new();
     for entry in icons {
@@ -471,7 +577,9 @@ pub fn decode_icons(value: &Value, requested: &HashSet<String>) -> Result<HashMa
             return Err(Invalid("unrequested icon"));
         }
         let encoded = string(icon, "png", ICON_FETCH_BYTES * 2, "icon")?;
-        let bytes = engine.decode(encoded).map_err(|_| Invalid("icon encoding"))?;
+        let bytes = engine
+            .decode(encoded)
+            .map_err(|_| Invalid("icon encoding"))?;
         if engine.encode(&bytes) != encoded || bytes.len() > ICON_BYTES {
             return Err(Invalid("icon encoding"));
         }
@@ -482,19 +590,26 @@ pub fn decode_icons(value: &Value, requested: &HashSet<String>) -> Result<HashMa
 
 /// The domain hello from the helper's validated hello body.
 pub fn hello(body: &Value, build_id: &str) -> Result<RemoteHelperHello> {
-    let parsed = processlama_wire::messages::HelloBody::parse(body).map_err(|_| Invalid("hello"))?;
+    let parsed =
+        processlama_wire::messages::HelloBody::parse(body).map_err(|_| Invalid("hello"))?;
     let target = RemoteHelperTarget::parse(parsed.target.as_str()).ok_or(Invalid("target"))?;
     if !is_lower_hex(&parsed.host_instance_id, 32)
         || !is_lower_hex(&parsed.hostname_hash, 16)
-        || !parsed.processtree_revision.bytes().all(|b| b.is_ascii_hexdigit())
+        || !parsed
+            .processtree_revision
+            .bytes()
+            .all(|b| b.is_ascii_hexdigit())
     {
         return Err(Invalid("identity"));
     }
     let capabilities = &parsed.capabilities;
-    let network_source = NetworkRateSource::parse(capabilities.network.source.as_str()).ok_or(Invalid("network"))?;
+    let network_source =
+        NetworkRateSource::parse(capabilities.network.source.as_str()).ok_or(Invalid("network"))?;
     let network_unavailable_reason = match capabilities.network.reason {
         None => None,
-        Some(reason) => Some(NetworkUnavailableReason::parse(reason.as_str()).ok_or(Invalid("network"))?),
+        Some(reason) => {
+            Some(NetworkUnavailableReason::parse(reason.as_str()).ok_or(Invalid("network"))?)
+        }
     };
     Ok(RemoteHelperHello {
         facts: RemoteHostFacts {
@@ -508,7 +623,11 @@ pub fn hello(body: &Value, build_id: &str) -> Result<RemoteHelperHello> {
             uid: parsed.uid,
         },
         capabilities: HostCapabilities {
-            operating_system: if target.os() == "macos" { HostOperatingSystem::Macos } else { HostOperatingSystem::Linux },
+            operating_system: if target.os() == "macos" {
+                HostOperatingSystem::Macos
+            } else {
+                HostOperatingSystem::Linux
+            },
             gpu: capabilities.gpu,
             storage_io: capabilities.storage_io,
             network_source,
@@ -522,4 +641,141 @@ pub fn hello(body: &Value, build_id: &str) -> Result<RemoteHelperHello> {
             hidepid: capabilities.hidepid,
         },
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hello_vectors_match_the_contract() {
+        let text = include_str!("../../../../fixtures/remote_contract_vectors.json");
+        let vectors: Value = serde_json::from_str(text).unwrap();
+        for vector in vectors["vectors"].as_array().unwrap() {
+            if vector["type"] != "helloBody" {
+                continue;
+            }
+            let accepted = hello(&vector["value"], "0".repeat(40).as_str()).is_ok();
+            assert_eq!(
+                accepted,
+                vector["valid"].as_bool().unwrap(),
+                "{}",
+                vector["name"]
+            );
+        }
+    }
+
+    fn sample(topology: Option<Value>, cpu: Value) -> Value {
+        json!({
+            "capturedAtMs": 1000,
+            "platform": "linux",
+            "topologyVersion": 7,
+            "topology": topology,
+            "metrics": METRIC_COLUMNS.iter().map(|name| {
+                let value = if *name == "cpu" { cpu.clone() } else { json!([1, 1]) };
+                (name.to_string(), value)
+            }).collect::<Map<String, Value>>(),
+            "listeningPorts": [[8080], null],
+        })
+    }
+
+    fn topology() -> Value {
+        json!({
+            "pid": [1, 2], "start": [10, 20], "parent": [-1, 0], "ppid": [0, 1], "uid": [0, 1000],
+            "user": ["root", "me"], "name": ["init", "shell"], "exe": ["/sbin/init", "/bin/sh"],
+            "cmd": ["init", "sh"], "bundle": ["", ""], "icon": [null, "a".repeat(64)],
+        })
+    }
+
+    #[test]
+    fn telemetry_keeps_the_topology_and_fills_nulls() {
+        let mut decoder = TelemetryDecoder::default();
+        let first = decoder
+            .decode(&sample(Some(topology()), json!([125, 5])))
+            .unwrap();
+        assert_eq!(first.processes.len(), 2);
+        assert_eq!(first.processes[0].cpu_usage, 12.5);
+        assert_eq!(
+            first.processes[0].listening_ports.as_deref(),
+            Some(&[8080_u16][..])
+        );
+        assert!(matches!(
+            first.processes[1].icon,
+            Some(ProcessIconRef::Remote(_))
+        ));
+        let topology = first.topology.as_ref().unwrap();
+        assert_eq!(
+            topology.parent_by_identity[&ProcessIdentity::new(2, 20)],
+            Some(ProcessIdentity::new(1, 10))
+        );
+
+        // A metric-only sample: null keeps the previous value.
+        let second = decoder.decode(&sample(None, json!([null, 50]))).unwrap();
+        assert_eq!(second.processes[0].cpu_usage, 12.5);
+        assert_eq!(second.processes[1].cpu_usage, 5.0);
+    }
+
+    #[test]
+    fn telemetry_rejects_unknown_topologies_and_bad_parents() {
+        assert!(
+            TelemetryDecoder::default()
+                .decode(&sample(None, json!([1, 1])))
+                .is_err()
+        );
+        // Row 0 naming itself as its parent.
+        let mut bad = topology();
+        bad["parent"] = json!([0, 0]);
+        assert!(
+            TelemetryDecoder::default()
+                .decode(&sample(Some(bad), json!([1, 1])))
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn detail_sections_decode() {
+        let detail = decode_detail(&json!({
+            "pid": 5, "start": 9,
+            "files": {"state": "available", "reason": null, "value": [{"fd": 3, "kind": "file", "path": "/tmp/x"}]},
+            "sockets": {"state": "restricted", "reason": "sandbox", "value": null},
+            "threads": {"state": "available", "reason": null, "value": {"summary": null,
+                "threads": [{"id": 1, "cpuTenths": 15, "approximate": true, "state": "running"}]}},
+            "security": {"state": "unsupported", "reason": "linux", "value": null},
+        }))
+        .unwrap();
+        assert!(matches!(&detail.files, DetailSection::Available(files) if files[0].fd == 3));
+        assert!(
+            matches!(&detail.sockets, DetailSection::Restricted(reason) if reason == "sandbox")
+        );
+        assert!(
+            matches!(&detail.threads, DetailSection::Available(t) if t.threads[0].cpu_percent == 1.5)
+        );
+        assert!(decode_detail(&json!({"pid": 5})).is_err());
+    }
+
+    #[test]
+    fn icons_must_be_requested_and_canonical() {
+        let hash = "b".repeat(64);
+        let requested: HashSet<String> = [hash.clone()].into();
+        let png = base64::engine::general_purpose::STANDARD.encode([1_u8, 2, 3]);
+        let icons = decode_icons(
+            &json!({"icons": [{"sha256": hash, "png": png}]}),
+            &requested,
+        )
+        .unwrap();
+        assert_eq!(icons[&"b".repeat(64)], vec![1, 2, 3]);
+        let other = json!({"icons": [{"sha256": "c".repeat(64), "png": png}]});
+        assert!(decode_icons(&other, &requested).is_err());
+        let padded = json!({"icons": [{"sha256": "b".repeat(64), "png": "AQID\n"}]});
+        assert!(decode_icons(&padded, &requested).is_err());
+    }
+
+    #[test]
+    fn signal_outcomes_decode() {
+        assert_eq!(
+            decode_signal_outcome(&json!({"outcome": "denied"})),
+            Ok(SignalOutcome::Denied)
+        );
+        assert!(decode_signal_outcome(&json!({"outcome": "maybe"})).is_err());
+    }
 }

@@ -85,7 +85,11 @@ pub trait RemoteConnection: Send + Sync {
         on_sample: Box<dyn Fn(TelemetryResult) + Send + Sync>,
     ) -> Result<Arc<dyn TelemetrySubscription>, String>;
     fn fetch_detail(&self, identity: ProcessIdentity) -> Result<ProcessDetail, String>;
-    fn send_signal(&self, identity: ProcessIdentity, signal: ProcessSignal) -> Result<SignalOutcome, String>;
+    fn send_signal(
+        &self,
+        identity: ProcessIdentity,
+        signal: ProcessSignal,
+    ) -> Result<SignalOutcome, String>;
     fn fetch_icons(&self, hashes: &[String]) -> Result<HashMap<String, Vec<u8>>, String>;
     /// Graceful, bounded close.
     fn close(&self);
@@ -110,7 +114,11 @@ pub trait RemoteConnector: Send + Sync {
         artifact: &HelperArtifact,
         cancel: &CancelToken,
     ) -> Result<RemoteInstallResult, RemoteHostError>;
-    fn prune_helpers(&self, alias: &str, keep_build_id: &str) -> Result<RemoteInstallResult, RemoteHostError>;
+    fn prune_helpers(
+        &self,
+        alias: &str,
+        keep_build_id: &str,
+    ) -> Result<RemoteInstallResult, RemoteHostError>;
     fn remove_helpers(&self, alias: &str) -> Result<RemoteInstallResult, RemoteHostError>;
     /// The verified bundled helper for `target`.
     fn bundled_helper(&self, target: RemoteHelperTarget) -> Option<HelperArtifact>;

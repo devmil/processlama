@@ -8,6 +8,9 @@ use crate::remote_ports::RemoteConnection;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
+/// Icon requests grouped by the connection that serves them.
+type ConnectionBatch = (Arc<dyn RemoteConnection>, Vec<(String, HashSet<String>)>);
+
 /// Unknown hashes are collected this long, so tabs and samples share a fetch.
 pub const ICON_BATCH_DELAY_MS: u64 = 100;
 /// Icons per `icons.fetch`.
@@ -49,7 +52,12 @@ impl IconService {
 }
 
 impl AppCore {
-    pub(crate) fn ensure_icons(&mut self, source_key: &str, hashes: Vec<String>, connection: Arc<dyn RemoteConnection>) {
+    pub(crate) fn ensure_icons(
+        &mut self,
+        source_key: &str,
+        hashes: Vec<String>,
+        connection: Arc<dyn RemoteConnection>,
+    ) {
         let now = self.now();
         let cache = Arc::clone(&self.ports.icon_cache);
         cache.touch(&hashes);
@@ -59,7 +67,10 @@ impl AppCore {
             .insert(source_key.to_owned(), hashes.iter().cloned().collect());
         let failed = icons.failed.get(source_key).cloned().unwrap_or_default();
         for hash in hashes {
-            if cache.path_for(&hash).is_some() || icons.in_flight.contains(&hash) || failed.contains(&hash) {
+            if cache.path_for(&hash).is_some()
+                || icons.in_flight.contains(&hash)
+                || failed.contains(&hash)
+            {
                 continue;
             }
             icons
@@ -84,7 +95,7 @@ impl AppCore {
         self.icons.batch_at = None;
         let pending = std::mem::take(&mut self.icons.pending);
         // One fetcher per connection, in chunks.
-        let mut by_connection: Vec<(Arc<dyn RemoteConnection>, Vec<(String, HashSet<String>)>)> = Vec::new();
+        let mut by_connection: Vec<ConnectionBatch> = Vec::new();
         for (hash, entry) in pending {
             match by_connection
                 .iter_mut()
@@ -127,13 +138,22 @@ impl AppCore {
         }
     }
 
-    pub(crate) fn on_icons_fetched(&mut self, source_keys: &str, hashes: &[String], stored: HashMap<String, Vec<u8>>) {
+    pub(crate) fn on_icons_fetched(
+        &mut self,
+        source_keys: &str,
+        hashes: &[String],
+        stored: HashMap<String, Vec<u8>>,
+    ) {
         for hash in hashes {
             self.icons.in_flight.remove(hash);
             if !stored.contains_key(hash) && !source_keys.is_empty() {
                 // Remembered for this connection; the row keeps its letter.
                 for key in source_keys.split('\n') {
-                    self.icons.failed.entry(key.to_owned()).or_default().insert(hash.clone());
+                    self.icons
+                        .failed
+                        .entry(key.to_owned())
+                        .or_default()
+                        .insert(hash.clone());
                 }
             }
         }

@@ -91,7 +91,9 @@ pub type ClosedHandler = Box<dyn FnOnce(Option<ChannelFailure>) + Send>;
 type Publication = Arc<dyn Fn(Value) + Send + Sync>;
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
-    mutex.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
+    mutex
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -180,7 +182,9 @@ impl Channel {
             match handshake_rx.recv_timeout((deadline - now).min(Duration::from_millis(100))) {
                 Ok(outcome) => break outcome,
                 Err(mpsc::RecvTimeoutError::Timeout) => {}
-                Err(mpsc::RecvTimeoutError::Disconnected) => break Handshake::Failed(ChannelFailure::Disconnected),
+                Err(mpsc::RecvTimeoutError::Disconnected) => {
+                    break Handshake::Failed(ChannelFailure::Disconnected);
+                }
             }
         };
         let channel = Self { inner };
@@ -203,7 +207,9 @@ impl Channel {
     }
 
     pub fn hello(&self) -> Hello {
-        lock(&self.inner.hello).clone().expect("an open channel has a hello")
+        lock(&self.inner.hello)
+            .clone()
+            .expect("an open channel has a hello")
     }
 
     pub fn is_open(&self) -> bool {
@@ -212,8 +218,17 @@ impl Channel {
 
     /// Blocking call with the interactive or bulk deadline.
     pub fn call(&self, method: &str, arguments: Value, bulk: bool) -> Result<Value, String> {
-        let deadline = if bulk { self.inner.config.bulk_deadline } else { self.inner.config.interactive_deadline };
-        self.request("call", json!({"method": method, "args": arguments}), deadline, None)
+        let deadline = if bulk {
+            self.inner.config.bulk_deadline
+        } else {
+            self.inner.config.interactive_deadline
+        };
+        self.request(
+            "call",
+            json!({"method": method, "args": arguments}),
+            deadline,
+            None,
+        )
     }
 
     /// Subscribes; publications arrive on the reader thread. Returns the
@@ -228,19 +243,31 @@ impl Channel {
         let deadline = self.inner.config.interactive_deadline;
         let payload = json!({"topic": topic, "args": arguments, "credit": credit});
         let mut id = 0;
-        self.request("subscribe", payload, deadline, Some((&mut id, on_publication)))?;
+        self.request(
+            "subscribe",
+            payload,
+            deadline,
+            Some((&mut id, on_publication)),
+        )?;
         Ok(id)
     }
 
     pub fn grant(&self, subscription: u64, amount: u32) {
         if amount > 0 && lock(&self.inner.subscriptions).contains_key(&subscription) {
-            let _ = self.inner.send("credit", json!({"target": subscription, "amount": amount}));
+            let _ = self
+                .inner
+                .send("credit", json!({"target": subscription, "amount": amount}));
         }
     }
 
     pub fn unsubscribe(&self, subscription: u64) {
-        if lock(&self.inner.subscriptions).remove(&subscription).is_some() {
-            let _ = self.inner.send("unsubscribe", json!({"target": subscription}));
+        if lock(&self.inner.subscriptions)
+            .remove(&subscription)
+            .is_some()
+        {
+            let _ = self
+                .inner
+                .send("unsubscribe", json!({"target": subscription}));
         }
     }
 
@@ -317,7 +344,8 @@ impl Channel {
         }
         self.inner.fail_pending();
         lock(&self.inner.subscriptions).clear();
-        if self.inner.send("shutdown", json!({})) && !self.inner.stdout_done.load(Ordering::Acquire) {
+        if self.inner.send("shutdown", json!({})) && !self.inner.stdout_done.load(Ordering::Acquire)
+        {
             let (flag, condvar) = &self.inner.goodbye;
             let deadline = Instant::now() + self.inner.config.shutdown_grace;
             let mut said = lock(flag);
@@ -347,7 +375,8 @@ impl Channel {
                         return;
                     }
                     let now = Instant::now();
-                    if now.duration_since(*lock(&inner.last_frame)) >= inner.config.liveness_timeout {
+                    if now.duration_since(*lock(&inner.last_frame)) >= inner.config.liveness_timeout
+                    {
                         inner.fail(ChannelFailure::HeartbeatLost);
                         return;
                     }
@@ -355,7 +384,8 @@ impl Channel {
                         inner.fail(ChannelFailure::ProtocolViolation);
                         return;
                     }
-                    let due = now.duration_since(*lock(&inner.last_ping)) >= inner.config.ping_interval;
+                    let due =
+                        now.duration_since(*lock(&inner.last_ping)) >= inner.config.ping_interval;
                     if due {
                         *lock(&inner.last_ping) = now;
                         if !inner.send("ping", json!({})) {
@@ -379,7 +409,10 @@ impl Inner {
     }
 
     fn write_envelope(&self, request_id: u64, kind: &str, payload: Value) -> bool {
-        let incarnation = lock(&self.hello).as_ref().map(|hello| hello.incarnation.clone()).unwrap_or_default();
+        let incarnation = lock(&self.hello)
+            .as_ref()
+            .map(|hello| hello.incarnation.clone())
+            .unwrap_or_default();
         let envelope = json!({
             "protocolMajor": self.config.protocol_major,
             "nonce": *lock(&self.nonce),
@@ -467,11 +500,30 @@ impl Inner {
     }
 }
 
-const ENVELOPE_KEYS: [&str; 6] = ["protocolMajor", "nonce", "incarnation", "requestId", "kind", "payload"];
-const HELLO_KEYS: [&str; 8] = ["kind", "magic", "protocolMajor", "protocolMinor", "buildId", "incarnation", "limits", "body"];
+const ENVELOPE_KEYS: [&str; 6] = [
+    "protocolMajor",
+    "nonce",
+    "incarnation",
+    "requestId",
+    "kind",
+    "payload",
+];
+const HELLO_KEYS: [&str; 8] = [
+    "kind",
+    "magic",
+    "protocolMajor",
+    "protocolMinor",
+    "buildId",
+    "incarnation",
+    "limits",
+    "body",
+];
 
 fn is_lower_hex(text: &str, length: usize) -> bool {
-    text.len() == length && text.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    text.len() == length
+        && text
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 
 /// Reads the launch script's text up to and including `<prefix> 1 start`.
@@ -489,8 +541,14 @@ fn bootstrap(inner: &Inner, stdout: &mut impl Read) -> Result<Vec<u8>, ChannelFa
                 if inner.exit_code(inner.config.exit_drain_grace) == Some(255) {
                     return Err(ChannelFailure::SshConnectionFailed);
                 }
-                let marker = StatusMarker::parse(last_non_empty_line(&text).as_deref(), inner.config.bootstrap_prefix);
-                return Err(marker.map_or(ChannelFailure::BootstrapFailed, ChannelFailure::BootstrapMarker));
+                let marker = StatusMarker::parse(
+                    last_non_empty_line(&text).as_deref(),
+                    inner.config.bootstrap_prefix,
+                );
+                return Err(marker.map_or(
+                    ChannelFailure::BootstrapFailed,
+                    ChannelFailure::BootstrapMarker,
+                ));
             }
             Ok(read) => read,
         };
@@ -511,7 +569,8 @@ fn bootstrap(inner: &Inner, stdout: &mut impl Read) -> Result<Vec<u8>, ChannelFa
 }
 
 fn parse_hello(inner: &Inner, bytes: &[u8]) -> Result<Hello, ChannelFailure> {
-    let value: Value = serde_json::from_slice(bytes).map_err(|_| ChannelFailure::BootstrapFailed)?;
+    let value: Value =
+        serde_json::from_slice(bytes).map_err(|_| ChannelFailure::BootstrapFailed)?;
     let map = value.as_object().ok_or(ChannelFailure::BootstrapFailed)?;
     if map.len() != HELLO_KEYS.len()
         || !HELLO_KEYS.iter().all(|key| map.contains_key(*key))
@@ -524,15 +583,26 @@ fn parse_hello(inner: &Inner, bytes: &[u8]) -> Result<Hello, ChannelFailure> {
     {
         return Err(ChannelFailure::ProtocolMismatch);
     }
-    let build_id = map.get("buildId").and_then(Value::as_str).ok_or(ChannelFailure::BootstrapFailed)?;
+    let build_id = map
+        .get("buildId")
+        .and_then(Value::as_str)
+        .ok_or(ChannelFailure::BootstrapFailed)?;
     let incarnation = map
         .get("incarnation")
         .and_then(Value::as_str)
         .filter(|value| is_lower_hex(value, 32))
         .ok_or(ChannelFailure::BootstrapFailed)?;
-    map.get("protocolMinor").and_then(Value::as_u64).ok_or(ChannelFailure::BootstrapFailed)?;
-    let limits = map.get("limits").and_then(Value::as_object).ok_or(ChannelFailure::BootstrapFailed)?;
-    let body = map.get("body").filter(|body| body.is_object()).ok_or(ChannelFailure::BootstrapFailed)?;
+    map.get("protocolMinor")
+        .and_then(Value::as_u64)
+        .ok_or(ChannelFailure::BootstrapFailed)?;
+    let limits = map
+        .get("limits")
+        .and_then(Value::as_object)
+        .ok_or(ChannelFailure::BootstrapFailed)?;
+    let body = map
+        .get("body")
+        .filter(|body| body.is_object())
+        .ok_or(ChannelFailure::BootstrapFailed)?;
     if build_id != inner.config.build_id {
         return Err(ChannelFailure::BuildMismatch);
     }
@@ -553,7 +623,11 @@ fn parse_hello(inner: &Inner, bytes: &[u8]) -> Result<Hello, ChannelFailure> {
     })
 }
 
-fn reader(inner: &Arc<Inner>, mut stdout: std::process::ChildStdout, handshake: &mpsc::SyncSender<Handshake>) {
+fn reader(
+    inner: &Arc<Inner>,
+    mut stdout: std::process::ChildStdout,
+    handshake: &mpsc::SyncSender<Handshake>,
+) {
     let rest = match bootstrap(inner, &mut stdout) {
         Ok(rest) => rest,
         Err(failure) => {
@@ -629,19 +703,29 @@ fn reader(inner: &Arc<Inner>, mut stdout: std::process::ChildStdout, handshake: 
     }
 }
 
-fn dispatch(inner: &Arc<Inner>, bytes: &[u8], last_sequence: &mut u64) -> Result<(), ChannelFailure> {
-    let value: Value = serde_json::from_slice(bytes).map_err(|_| ChannelFailure::ProtocolViolation)?;
+fn dispatch(
+    inner: &Arc<Inner>,
+    bytes: &[u8],
+    last_sequence: &mut u64,
+) -> Result<(), ChannelFailure> {
+    let value: Value =
+        serde_json::from_slice(bytes).map_err(|_| ChannelFailure::ProtocolViolation)?;
     let envelope = value.as_object().ok_or(ChannelFailure::ProtocolViolation)?;
-    let incarnation = lock(&inner.hello).as_ref().map(|hello| hello.incarnation.clone()).unwrap_or_default();
+    let incarnation = lock(&inner.hello)
+        .as_ref()
+        .map(|hello| hello.incarnation.clone())
+        .unwrap_or_default();
     let valid = envelope.len() == ENVELOPE_KEYS.len()
         && ENVELOPE_KEYS.iter().all(|key| envelope.contains_key(*key))
-        && envelope.get("protocolMajor").and_then(Value::as_u64) == Some(inner.config.protocol_major)
+        && envelope.get("protocolMajor").and_then(Value::as_u64)
+            == Some(inner.config.protocol_major)
         && envelope.get("nonce").and_then(Value::as_str) == Some(lock(&inner.nonce).as_str())
         && envelope.get("incarnation").and_then(Value::as_str) == Some(incarnation.as_str());
     let request_id = envelope.get("requestId").and_then(Value::as_u64);
     let kind = envelope.get("kind").and_then(Value::as_str);
     let payload = envelope.get("payload").and_then(Value::as_object);
-    let (true, Some(request_id), Some(kind), Some(payload)) = (valid, request_id, kind, payload) else {
+    let (true, Some(request_id), Some(kind), Some(payload)) = (valid, request_id, kind, payload)
+    else {
         return Err(ChannelFailure::ProtocolViolation);
     };
     if request_id > inner.next_request.load(Ordering::Acquire) {
@@ -687,7 +771,11 @@ fn dispatch(inner: &Arc<Inner>, bytes: &[u8], last_sequence: &mut u64) -> Result
     }
 }
 
-fn result(inner: &Inner, request_id: u64, payload: &Map<String, Value>) -> Result<(), ChannelFailure> {
+fn result(
+    inner: &Inner,
+    request_id: u64,
+    payload: &Map<String, Value>,
+) -> Result<(), ChannelFailure> {
     if request_id == 0 || payload.len() != 1 {
         return Err(ChannelFailure::ProtocolViolation);
     }

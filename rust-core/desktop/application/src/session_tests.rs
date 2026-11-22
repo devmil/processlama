@@ -60,7 +60,12 @@ fn snapshot(records: Vec<ProcessRecord>) -> Arc<ProcessSnapshot> {
 }
 
 fn names(session: &ProcessSession) -> Vec<String> {
-    session.tree().rows.iter().map(|row| row.record.name.clone()).collect()
+    session
+        .tree()
+        .rows
+        .iter()
+        .map(|row| row.record.name.clone())
+        .collect()
 }
 
 fn id(session: &ProcessSession, name: &str) -> ProcessIdentity {
@@ -145,7 +150,10 @@ fn tree_search_highlights_without_filtering_and_cycles() {
     session.on_sample(snapshot(records), 0);
     session.set_tree_search("edit", 1);
     // Rows stay; the shell branch opens to reveal its matching child.
-    assert_eq!(names(&session), vec!["init", "shell", "editor", "daemon", "editor-helper"]);
+    assert_eq!(
+        names(&session),
+        vec!["init", "shell", "editor", "daemon", "editor-helper"]
+    );
     assert_eq!(session.tree().tree_search_match_count, 2);
     let editor = id(&session, "editor");
     assert_eq!(session.tree().selected, Some(editor));
@@ -209,7 +217,13 @@ fn freeze_queues_structural_changes_and_keeps_metrics_flowing() {
     session.toggle_frozen(3);
     assert!(names(&session).contains(&"newcomer".to_owned()));
     assert_eq!(
-        session.tree().rows.iter().find(|r| r.record.name == "newcomer").unwrap().change_marker,
+        session
+            .tree()
+            .rows
+            .iter()
+            .find(|r| r.record.name == "newcomer")
+            .unwrap()
+            .change_marker,
         ChangeMarker::Spawned
     );
 }
@@ -223,13 +237,23 @@ fn spawned_and_terminated_rows_are_marked_for_one_publication() {
     next.push(record(30, 1, "fresh", 0.0));
     session.on_sample(snapshot(next.clone()), 10_000);
     let marker = |name: &str| {
-        session.tree().rows.iter().find(|r| r.record.name == name).map(|r| r.change_marker)
+        session
+            .tree()
+            .rows
+            .iter()
+            .find(|r| r.record.name == name)
+            .map(|r| r.change_marker)
     };
     assert_eq!(marker("daemon"), Some(ChangeMarker::Terminated));
     assert_eq!(marker("fresh"), Some(ChangeMarker::Spawned));
     session.on_sample(snapshot(next), 20_000);
     assert_eq!(
-        session.tree().rows.iter().find(|r| r.record.name == "daemon").map(|r| r.change_marker),
+        session
+            .tree()
+            .rows
+            .iter()
+            .find(|r| r.record.name == "daemon")
+            .map(|r| r.change_marker),
         None
     );
 }
@@ -271,9 +295,15 @@ fn an_outage_leaves_a_gap_in_the_histories() {
 fn sorting_flips_and_uses_column_defaults() {
     let (mut session, _) = session(HostOperatingSystem::Linux);
     session.on_sample(snapshot(basic()), 0);
-    assert_eq!(session.sort_by(SortColumn::Name, 1), (SortColumn::Name, SortDirection::Ascending));
+    assert_eq!(
+        session.sort_by(SortColumn::Name, 1),
+        (SortColumn::Name, SortDirection::Ascending)
+    );
     assert_eq!(names(&session), vec!["init", "daemon", "shell"]);
-    assert_eq!(session.sort_by(SortColumn::Name, 2), (SortColumn::Name, SortDirection::Descending));
+    assert_eq!(
+        session.sort_by(SortColumn::Name, 2),
+        (SortColumn::Name, SortDirection::Descending)
+    );
     assert_eq!(names(&session), vec!["init", "shell", "daemon"]);
 }
 

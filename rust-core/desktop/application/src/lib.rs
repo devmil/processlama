@@ -18,6 +18,9 @@ pub mod time;
 pub use crate::core::*;
 pub use events::*;
 pub use ports::*;
-pub use remote::{ConnectionState, InstallChoice, InstallPrompt, ProbeOutcome, ProfileDraft, RemoteCommand, RemoteEvent};
+pub use remote::{
+    ConnectionState, InstallChoice, InstallPrompt, ProbeOutcome, ProfileDraft, RemoteCommand,
+    RemoteEvent,
+};
 pub use remote_ports::*;
 pub use session::*;

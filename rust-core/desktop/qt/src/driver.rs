@@ -8,8 +8,8 @@ use processlama_application::{
     AppCore, CoreChanges, InspectorView, SourcePhase, ToastTone, TreeView, UiEvent, diagnostics,
 };
 use processlama_domain::{
-    DetailSection, HostOperatingSystem, NetworkRateSource, NetworkUnavailableReason, ProcessPorts, RemoteConnectionPhase,
-    SearchOptions, SearchQuery,
+    DetailSection, HostOperatingSystem, NetworkRateSource, NetworkUnavailableReason, ProcessPorts,
+    RemoteConnectionPhase, SearchOptions, SearchQuery,
 };
 use processlama_presentation::snapshot_label;
 use qtbridge::qobject;
@@ -60,7 +60,9 @@ impl Driver {
         model: Rc<RefCell<ProcessTreeModel>>,
         platform: Value,
     ) -> Self {
-        model.borrow_mut().set_icon_cache(Arc::clone(core.icon_cache()));
+        model
+            .borrow_mut()
+            .set_icon_cache(Arc::clone(core.icon_cache()));
         Self {
             core,
             inbox,
@@ -79,7 +81,10 @@ impl Driver {
             self.core.handle(event);
         }
         self.sync();
-        let deadline = self.core.next_deadline().map(|at| self.clock.instant_at(at));
+        let deadline = self
+            .core
+            .next_deadline()
+            .map(|at| self.clock.instant_at(at));
         self.timers.schedule(deadline);
     }
 
@@ -108,8 +113,12 @@ impl Driver {
         let icon_revision = self.core.icons_revision();
         if changes.tree || changes.settings || changes.tabs || changes.icons {
             let key = self.core.active_tab().key.clone();
-            let columns = processlama_domain::normalized_visible_columns(&self.core.settings().visible_columns);
-            self.model.borrow_mut().apply(&tree, &columns, &key, icon_revision);
+            let columns = processlama_domain::normalized_visible_columns(
+                &self.core.settings().visible_columns,
+            );
+            self.model
+                .borrow_mut()
+                .apply(&tree, &columns, &key, icon_revision);
         }
         let mut state = self.state.borrow_mut();
         if changes.settings {
@@ -130,7 +139,9 @@ impl Driver {
             let mut platform = self.platform.clone();
             platform["updateSupported"] = json!(self.core.update_supported());
             platform["networkSupported"] = json!(self.core.network_supported());
-            if state.platform != platform || state.network_available != self.core.network_available() {
+            if state.platform != platform
+                || state.network_available != self.core.network_available()
+            {
                 state.platform = platform;
                 state.network_available = self.core.network_available();
                 state.platform_changed();
@@ -147,7 +158,13 @@ impl Driver {
                 state.tabs_changed();
             }
         }
-        if changes.tree || changes.session_meta || changes.connections || changes.network || changes.tabs || changes.snapshots {
+        if changes.tree
+            || changes.session_meta
+            || changes.connections
+            || changes.network
+            || changes.tabs
+            || changes.snapshots
+        {
             let value = session_json(&self.core, &tree);
             if state.session != value {
                 state.session = value;
@@ -159,7 +176,12 @@ impl Driver {
                 state.pinned_changed();
             }
         }
-        if changes.inspector || changes.tabs || changes.network || changes.icons || changes.connections {
+        if changes.inspector
+            || changes.tabs
+            || changes.network
+            || changes.icons
+            || changes.connections
+        {
             let value = inspector_json(&self.core, self.core.active_session().inspector());
             if state.inspector != value {
                 state.inspector = value;
@@ -218,7 +240,12 @@ impl Driver {
                     installed_build,
                     version,
                     build,
-                } => state.update_available(installed_version, installed_build.to_string(), version, build.to_string()),
+                } => state.update_available(
+                    installed_version,
+                    installed_build.to_string(),
+                    version,
+                    build.to_string(),
+                ),
                 UiEvent::ConfirmHelperInstall(prompt) => state.confirm_helper_install(json!({
                     "profileId": prompt.profile_id,
                     "host": prompt.host,
@@ -243,8 +270,15 @@ impl Driver {
                     outcome,
                     platform,
                     compatibility,
-                } => state.probe_finished(request as i32, format!("{outcome:?}"), platform, compatibility),
-                UiEvent::CopyToClipboard { text, toast_key } => state.copy_to_clipboard(text, toast_key.to_owned()),
+                } => state.probe_finished(
+                    request as i32,
+                    format!("{outcome:?}"),
+                    platform,
+                    compatibility,
+                ),
+                UiEvent::CopyToClipboard { text, toast_key } => {
+                    state.copy_to_clipboard(text, toast_key.to_owned())
+                }
             }
         }
     }
@@ -422,7 +456,9 @@ fn pinned_json(core: &AppCore, tree: &TreeView) -> Vec<Value> {
 fn ports_json(ports: Option<&ProcessPorts>) -> Value {
     match ports {
         None => Value::Null,
-        Some(ports) => json!({"listening": ports.listening, "other": ports.other, "count": ports.count()}),
+        Some(ports) => {
+            json!({"listening": ports.listening, "other": ports.other, "count": ports.count()})
+        }
     }
 }
 
@@ -430,7 +466,13 @@ fn history(samples: &Arc<[f32]>) -> Value {
     Value::Array(
         samples
             .iter()
-            .map(|sample| if sample.is_finite() { json!(f64::from(*sample)) } else { Value::Null })
+            .map(|sample| {
+                if sample.is_finite() {
+                    json!(f64::from(*sample))
+                } else {
+                    Value::Null
+                }
+            })
             .collect(),
     )
 }

@@ -38,7 +38,10 @@ impl Inbox {
 
     pub fn take(&self) -> VecDeque<CoreEvent> {
         self.queued.store(false, Ordering::Release);
-        self.events.lock().map(|mut events| std::mem::take(&mut *events)).unwrap_or_default()
+        self.events
+            .lock()
+            .map(|mut events| std::mem::take(&mut *events))
+            .unwrap_or_default()
     }
 
     fn notify(&self) {
@@ -49,7 +52,11 @@ impl Inbox {
             .invoker
             .lock()
             .ok()
-            .and_then(|invoker| invoker.as_ref().map(|invoker| invoke_method!(invoker, "pump")))
+            .and_then(|invoker| {
+                invoker
+                    .as_ref()
+                    .map(|invoker| invoke_method!(invoker, "pump"))
+            })
             .unwrap_or(false);
         if !invoked {
             self.queued.store(false, Ordering::Release);
@@ -67,8 +74,11 @@ impl EventSink for Inbox {
 }
 
 /// A small fixed pool for finite blocking work.
+/// Work the pool runs on one of its threads.
+type Job = Box<dyn FnOnce() + Send>;
+
 pub struct WorkerPool {
-    jobs: Mutex<Option<Sender<Box<dyn FnOnce() + Send>>>>,
+    jobs: Mutex<Option<Sender<Job>>>,
 }
 
 impl WorkerPool {
@@ -124,7 +134,9 @@ pub struct SystemClock {
 
 impl SystemClock {
     pub fn new() -> Arc<Self> {
-        Arc::new(Self { start: Instant::now() })
+        Arc::new(Self {
+            start: Instant::now(),
+        })
     }
 
     pub fn instant_at(&self, monotonic_ms: u64) -> Instant {

@@ -6,7 +6,6 @@ publish.workspace = true
 description = "ProcessLama values: process identities and records, search, settings, remote host profiles and snapshot documents"
 
 [dependencies]
-serde = { workspace = true }
 serde_json = { workspace = true }
 
 [lints.rust]

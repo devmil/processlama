@@ -6,7 +6,11 @@ use std::ffi::CString;
 
 unsafe extern "C" {
     fn processlama_sparkle_available() -> bool;
-    fn processlama_sparkle_configure(feed_url: *const std::ffi::c_char, beta: bool, interval_seconds: i64);
+    fn processlama_sparkle_configure(
+        feed_url: *const std::ffi::c_char,
+        beta: bool,
+        interval_seconds: i64,
+    );
     fn processlama_sparkle_check();
     fn processlama_configure_windows(mouse_tracking: bool);
     fn processlama_system_reduce_motion() -> bool;

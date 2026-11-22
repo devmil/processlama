@@ -1,7 +1,7 @@
 //! Events the core handles on the GUI thread: worker results, timer ticks and
 //! commands from the window.
 
-use crate::ports::{SourceId, UpdateCheck, NetworkSetupFailure};
+use crate::ports::{NetworkSetupFailure, SourceId, UpdateCheck};
 use crate::remote::RemoteEvent;
 use processlama_domain::{
     AppearanceMode, BackgroundRefreshMode, ProcessDetail, ProcessIdentity, ProcessSignal,
@@ -16,9 +16,15 @@ pub type TabKey = String;
 #[derive(Debug)]
 pub enum CoreEvent {
     /// A source delivered a sample.
-    Sample { source: SourceId, snapshot: Arc<ProcessSnapshot> },
+    Sample {
+        source: SourceId,
+        snapshot: Arc<ProcessSnapshot>,
+    },
     /// A source failed to sample; the session shows the error.
-    SampleFailed { source: SourceId, error: String },
+    SampleFailed {
+        source: SourceId,
+        error: String,
+    },
     Detail {
         source: SourceId,
         identity: ProcessIdentity,
@@ -38,11 +44,20 @@ pub enum CoreEvent {
         path: String,
         result: Result<(String, SnapshotDocument), String>,
     },
-    SnapshotExported { target: String, result: Result<(), String> },
+    SnapshotExported {
+        target: String,
+        result: Result<(), String>,
+    },
     SnapshotRenamed(Result<(), String>),
-    SnapshotDeleted { path: String, result: Result<(), String> },
+    SnapshotDeleted {
+        path: String,
+        result: Result<(), String>,
+    },
     SettingsSaved(Result<(), String>),
-    RemoteHostsSaved { section: &'static str, result: Result<(), String> },
+    RemoteHostsSaved {
+        section: &'static str,
+        result: Result<(), String>,
+    },
     UpdateChecked(Result<UpdateCheck, String>),
     NetworkAvailability(bool),
     NetworkInstalled(Result<(), NetworkSetupFailure>),

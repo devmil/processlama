@@ -3,7 +3,7 @@
 
 mod mapping;
 
-pub use mapping::{map_detail, map_snapshot, LocalSnapshotMapper};
+pub use mapping::{LocalSnapshotMapper, map_detail, map_snapshot};
 
 use processlama_application::{
     Cadence, CoreEvent, EventSink, LocalSignals, LocalTelemetry, SessionSource, SourceId,
@@ -103,7 +103,9 @@ impl LocalSource {
 
 impl SessionSource for LocalSource {
     fn set_cadence(&self, cadence: Cadence, polling_interval_ms: u32) {
-        let _ = self.requests.send(Request::Cadence(cadence, polling_interval_ms));
+        let _ = self
+            .requests
+            .send(Request::Cadence(cadence, polling_interval_ms));
     }
 
     fn sample_now(&self, polling_interval_ms: u32) {
@@ -115,7 +117,12 @@ impl SessionSource for LocalSource {
     }
 }
 
-fn sampler(id: SourceId, requests: &Receiver<Request>, sink: &dyn EventSink, detail_sink: Arc<dyn EventSink>) {
+fn sampler(
+    id: SourceId,
+    requests: &Receiver<Request>,
+    sink: &dyn EventSink,
+    detail_sink: Arc<dyn EventSink>,
+) {
     let mut cadence = Cadence::Paused;
     // The native polling interval: its rates span it.
     let mut polling_ms: u32 = 1000;
@@ -166,9 +173,9 @@ fn sampler(id: SourceId, requests: &Receiver<Request>, sink: &dyn EventSink, det
                 }
                 if next != cadence {
                     cadence = next;
-                    next_sample = cadence
-                        .interval_ms()
-                        .map(|ms| Instant::now() + Duration::from_millis(u64::from(ms.clamp(250, 10_000))));
+                    next_sample = cadence.interval_ms().map(|ms| {
+                        Instant::now() + Duration::from_millis(u64::from(ms.clamp(250, 10_000)))
+                    });
                 }
             }
             Ok(Request::SampleNow(polling)) => {
@@ -182,9 +189,9 @@ fn sampler(id: SourceId, requests: &Receiver<Request>, sink: &dyn EventSink, det
             }
             Err(RecvTimeoutError::Timeout) => {
                 sample = true;
-                next_sample = cadence
-                    .interval_ms()
-                    .map(|ms| Instant::now() + Duration::from_millis(u64::from(ms.clamp(250, 10_000))));
+                next_sample = cadence.interval_ms().map(|ms| {
+                    Instant::now() + Duration::from_millis(u64::from(ms.clamp(250, 10_000)))
+                });
             }
             Err(RecvTimeoutError::Disconnected) => return,
         }
@@ -201,7 +208,8 @@ fn sampler(id: SourceId, requests: &Receiver<Request>, sink: &dyn EventSink, det
                         if next != cadence {
                             cadence = next;
                             next_sample = cadence.interval_ms().map(|ms| {
-                                Instant::now() + Duration::from_millis(u64::from(ms.clamp(250, 10_000)))
+                                Instant::now()
+                                    + Duration::from_millis(u64::from(ms.clamp(250, 10_000)))
                             });
                         }
                     }
@@ -217,11 +225,11 @@ fn sampler(id: SourceId, requests: &Receiver<Request>, sink: &dyn EventSink, det
             };
             match result {
                 Ok(sample) => match mapper.map(sample) {
-                    Ok(snapshot) => sink.post(CoreEvent::Sample {
+                    Some(snapshot) => sink.post(CoreEvent::Sample {
                         source: id,
                         snapshot: Arc::new(snapshot),
                     }),
-                    Err(()) => {
+                    None => {
                         // A missing topology: ask for the full structure next time.
                         next_sample = Some(Instant::now());
                     }

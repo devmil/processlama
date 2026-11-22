@@ -33,14 +33,9 @@ fn random_streams_never_panic() {
             bytes[2] = 0;
         }
         let mut input = Cursor::new(bytes);
-        loop {
-            match frame::read_frame(&mut input, 1024, &clock) {
-                Ok(payload) => {
-                    assert!(!payload.is_empty() && payload.len() <= 1024);
-                    let _ = serde_json::from_slice::<serde_json::Value>(&payload);
-                }
-                Err(_) => break,
-            }
+        while let Ok(payload) = frame::read_frame(&mut input, 1024, &clock) {
+            assert!(!payload.is_empty() && payload.len() <= 1024);
+            let _ = serde_json::from_slice::<serde_json::Value>(&payload);
         }
     }
 }

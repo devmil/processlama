@@ -23,7 +23,7 @@ PY
   python3 - "$directory/sparkle-public.der" <<'PY' || return 1
 import base64, pathlib, plistlib, sys
 actual = base64.b64encode(pathlib.Path(sys.argv[1]).read_bytes()[-32:]).decode()
-expected = plistlib.loads(pathlib.Path('macos/Runner/Info.plist').read_bytes())['SUPublicEDKey']
+expected = plistlib.loads(pathlib.Path('packaging/macos/Info.plist.in').read_bytes())['SUPublicEDKey']
 if actual != expected:
     raise SystemExit("release-secrets: Sparkle key does not match the app's public key")
 PY

@@ -84,31 +84,6 @@ mim_bump_version() {
   echo "==> Version bumped to $MIM_MARKETING_VERSION ($MIM_BUILD_NUMBER)" >&2
 }
 
-mim_apply_version_to_pubspec() {
-  local root pubspec
-  root="$(mim_repo_root)"
-  pubspec="$root/pubspec.yaml"
-  mim_read_version
-  mim_validate_semver "$MIM_MARKETING_VERSION"
-  mim_validate_build_number "$MIM_BUILD_NUMBER"
-  python3 - "$pubspec" "$MIM_MARKETING_VERSION" "$MIM_BUILD_NUMBER" <<'PY'
-import re
-import sys
-from pathlib import Path
-
-path = Path(sys.argv[1])
-version = sys.argv[2]
-build = sys.argv[3]
-text = path.read_text(encoding="utf-8")
-pattern = re.compile(r"^version:\s+.+$", re.M)
-if not pattern.search(text):
-    raise SystemExit(f"version: no version field found in {path}")
-next_text = pattern.sub(f"version: {version}+{build}", text, count=1)
-path.write_text(next_text, encoding="utf-8")
-PY
-  echo "==> pubspec.yaml set to $MIM_MARKETING_VERSION+$MIM_BUILD_NUMBER" >&2
-}
-
 mim_dmg_filename() {
   mim_read_version
   echo "ProcessLama-${MIM_MARKETING_VERSION}-${MIM_BUILD_NUMBER}.dmg"

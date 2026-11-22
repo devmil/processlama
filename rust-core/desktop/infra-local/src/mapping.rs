@@ -24,27 +24,34 @@ impl LocalSnapshotMapper {
 
     /// Err when the engine named a version this mapper never received; the
     /// next sample then asks for the full structure.
-    pub fn map(&mut self, sample: TelemetrySample) -> Result<ProcessSnapshot, ()> {
+    /// The snapshot, or None when a metric-only sample arrives for a topology
+    /// this mapper never received.
+    pub fn map(&mut self, sample: TelemetrySample) -> Option<ProcessSnapshot> {
         let topology = match (sample.topology_version, sample.topology) {
             (None, _) => None,
             (Some(version), Some(links)) => {
-                let order: Vec<ProcessIdentity> = links.iter().map(|link| identity(link.identity)).collect();
+                let order: Vec<ProcessIdentity> =
+                    links.iter().map(|link| identity(link.identity)).collect();
                 let parents: HashMap<ProcessIdentity, Option<ProcessIdentity>> = links
                     .iter()
                     .map(|link| (identity(link.identity), link.parent.map(identity)))
                     .collect();
-                Some(Arc::new(ProcessTopology::new(Some(version), parents, &order)))
+                Some(Arc::new(ProcessTopology::new(
+                    Some(version),
+                    parents,
+                    &order,
+                )))
             }
             (Some(version), None) => match &self.topology {
                 Some(known) if known.version == Some(version) => Some(Arc::clone(known)),
                 _ => {
                     self.topology = None;
-                    return Err(());
+                    return None;
                 }
             },
         };
         self.topology.clone_from(&topology);
-        Ok(map_snapshot(sample.snapshot, topology))
+        Some(map_snapshot(sample.snapshot, topology))
     }
 }
 
@@ -52,11 +59,18 @@ fn identity(identity: processtree::ProcessIdentity) -> ProcessIdentity {
     ProcessIdentity::new(identity.pid, identity.start_time_unix_ms)
 }
 
-pub fn map_snapshot(snapshot: processtree::ProcessSnapshot, topology: Option<Arc<ProcessTopology>>) -> ProcessSnapshot {
+pub fn map_snapshot(
+    snapshot: processtree::ProcessSnapshot,
+    topology: Option<Arc<ProcessTopology>>,
+) -> ProcessSnapshot {
     ProcessSnapshot {
         generated_at_unix_ms: snapshot.captured_at_unix_ms,
         platform: snapshot.platform,
-        processes: snapshot.processes.into_iter().map(|record| Arc::new(map_record(record))).collect(),
+        processes: snapshot
+            .processes
+            .into_iter()
+            .map(|record| Arc::new(map_record(record)))
+            .collect(),
         error: None,
         topology,
     }
@@ -113,7 +127,10 @@ fn map_record(record: processtree::ProcessRecord) -> ProcessRecord {
     }
 }
 
-fn section<T, U>(section: processtree::introspection::DetailSection<T>, map: impl FnOnce(T) -> U) -> DetailSection<U> {
+fn section<T, U>(
+    section: processtree::introspection::DetailSection<T>,
+    map: impl FnOnce(T) -> U,
+) -> DetailSection<U> {
     use processtree::introspection::DetailSection as Native;
     match section {
         Native::Available(value) => DetailSection::Available(map(value)),

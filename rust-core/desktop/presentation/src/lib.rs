@@ -24,7 +24,10 @@ pub fn format_bytes(bytes: u64) -> String {
 
 /// `<bytes>/s`.
 pub fn format_rate(bytes_per_second: f64) -> String {
-    format!("{}/s", format_bytes(bytes_per_second.max(0.0).round() as u64))
+    format!(
+        "{}/s",
+        format_bytes(bytes_per_second.max(0.0).round() as u64)
+    )
 }
 
 /// `0.0%` at zero, one decimal under 10, none above.
@@ -117,7 +120,12 @@ pub const COLUMNS: [ColumnDefinition; 20] = [
     column("storageRead", SortColumn::StorageRead, 104.0, true),
     column("storageWrite", SortColumn::StorageWrite, 104.0, true),
     column("treeStorageRead", SortColumn::TreeStorageRead, 132.0, true),
-    column("treeStorageWrite", SortColumn::TreeStorageWrite, 132.0, true),
+    column(
+        "treeStorageWrite",
+        SortColumn::TreeStorageWrite,
+        132.0,
+        true,
+    ),
     column("startTime", SortColumn::StartTime, 96.0, false),
     column("status", SortColumn::Status, 98.0, false),
     column("uid", SortColumn::Uid, 76.0, true),
@@ -129,7 +137,11 @@ pub fn column_definition(id: &str) -> Option<&'static ColumnDefinition> {
 }
 
 fn storage(available: bool, value: f64) -> String {
-    if available { format_rate(value) } else { "-".into() }
+    if available {
+        format_rate(value)
+    } else {
+        "-".into()
+    }
 }
 
 fn ports_cell(record: &ProcessRecord) -> String {
@@ -153,8 +165,14 @@ pub fn cell_text(row: &TreeRow, column: &str) -> String {
         "networkOut" => format_rate(record.network_out_bytes_per_second),
         "treeNetworkIn" => format_rate(row.tree_network_in),
         "treeNetworkOut" => format_rate(row.tree_network_out),
-        "storageRead" => storage(record.storage_io_available, record.storage_read_bytes_per_second),
-        "storageWrite" => storage(record.storage_io_available, record.storage_write_bytes_per_second),
+        "storageRead" => storage(
+            record.storage_io_available,
+            record.storage_read_bytes_per_second,
+        ),
+        "storageWrite" => storage(
+            record.storage_io_available,
+            record.storage_write_bytes_per_second,
+        ),
         "treeStorageRead" => storage(row.tree_storage_available, row.tree_storage_read),
         "treeStorageWrite" => storage(row.tree_storage_available, row.tree_storage_write),
         "startTime" => time::format_clock(record.start_time_unix_ms),
@@ -177,7 +195,7 @@ mod tests {
         assert_eq!(format_bytes(5 * 1024 * 1024 * 1024), "5.0 GB");
         assert_eq!(format_rate(2048.4), "2.0 KB/s");
         assert_eq!(format_percent(0.0), "0.0%");
-        assert_eq!(format_percent(3.14), "3.1%");
+        assert_eq!(format_percent(3.12), "3.1%");
         assert_eq!(format_percent(42.6), "43%");
         assert_eq!(format_remote_bytes(512 * 1024), "512 KB");
         assert_eq!(format_remote_bytes(1536 * 1024), "1.5 MB");

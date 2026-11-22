@@ -8,14 +8,17 @@ pub mod ssh;
 
 use channel::{Channel, ChannelConfig, ChannelFailure};
 use processlama_application::{
-    CancelToken, ClosedCallback, HelperArtifact, RemoteConnection, RemoteConnector, RemoteHostError,
-    TelemetryResult, TelemetrySubscription,
+    CancelToken, ClosedCallback, HelperArtifact, RemoteConnection, RemoteConnector,
+    RemoteHostError, TelemetryResult, TelemetrySubscription,
 };
 use processlama_domain::{
-    ProcessDetail, ProcessIdentity, ProcessSignal, RemoteFailureCode, RemoteHelperHello, RemoteHelperTarget,
-    RemoteInstallResult, SignalOutcome,
+    ProcessDetail, ProcessIdentity, ProcessSignal, RemoteFailureCode, RemoteHelperHello,
+    RemoteHelperTarget, RemoteInstallResult, SignalOutcome,
 };
-use processlama_wire::contract::{HELPER_BYTES, HELPER_EXECUTABLE, INSTALL_DEADLINE_MS, INSTALL_PREFIX, PROBE_DEADLINE_MS, TELEMETRY_CREDIT};
+use processlama_wire::contract::{
+    HELPER_BYTES, HELPER_EXECUTABLE, INSTALL_DEADLINE_MS, INSTALL_PREFIX, PROBE_DEADLINE_MS,
+    TELEMETRY_CREDIT,
+};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::collections::{HashMap, HashSet, VecDeque};
@@ -32,7 +35,9 @@ const SCRIPT_OUTPUT_BYTES: usize = 4096;
 pub fn failure_code(failure: &ChannelFailure) -> RemoteHostError {
     use RemoteFailureCode as C;
     let code = match failure {
-        ChannelFailure::SshConnectionFailed | ChannelFailure::Disconnected => C::SshConnectionFailed,
+        ChannelFailure::SshConnectionFailed | ChannelFailure::Disconnected => {
+            C::SshConnectionFailed
+        }
         ChannelFailure::BootstrapMarker(marker) => {
             let words = &marker.words;
             if marker.version == 1 && words.len() == 2 && words[0] == "missing" {
@@ -54,9 +59,9 @@ pub fn failure_code(failure: &ChannelFailure) -> RemoteHostError {
         }
         ChannelFailure::BootstrapFailed | ChannelFailure::HelloTimeout => C::HelperStartFailed,
         ChannelFailure::BuildMismatch => C::HelperOutdated,
-        ChannelFailure::ProtocolMismatch | ChannelFailure::ProtocolViolation | ChannelFailure::Fatal => {
-            C::ProtocolMismatch
-        }
+        ChannelFailure::ProtocolMismatch
+        | ChannelFailure::ProtocolViolation
+        | ChannelFailure::Fatal => C::ProtocolMismatch,
         ChannelFailure::FrameTooLarge => C::FrameTooLarge,
         ChannelFailure::HeartbeatLost => C::HeartbeatLost,
         ChannelFailure::Canceled => C::Canceled,
@@ -82,7 +87,9 @@ impl SshConnector {
         // Test harnesses pass an isolated SSH configuration; release builds
         // never read it.
         let config_file = if cfg!(debug_assertions) {
-            std::env::var("PROCESSLAMA_SSH_CONFIG").ok().filter(|path| path.starts_with('/'))
+            std::env::var("PROCESSLAMA_SSH_CONFIG")
+                .ok()
+                .filter(|path| path.starts_with('/'))
         } else {
             None
         };
@@ -108,9 +115,14 @@ impl SshConnector {
 
     fn start(&self, alias: &str, script: &str) -> Result<std::process::Child, RemoteHostError> {
         let executable = self.executable()?;
-        let arguments = ssh::arguments(alias, &ssh::posix_shell_command(script), self.config_file.as_deref())
-            .ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
-        ssh::spawn(&executable, &arguments).map_err(|_| RemoteHostError::new(RemoteFailureCode::SshMissing))
+        let arguments = ssh::arguments(
+            alias,
+            &ssh::posix_shell_command(script),
+            self.config_file.as_deref(),
+        )
+        .ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
+        ssh::spawn(&executable, &arguments)
+            .map_err(|_| RemoteHostError::new(RemoteFailureCode::SshMissing))
     }
 
     /// Runs a fixed script and reads its `PROCESSLAMA-INSTALL 1 <result>` line.
@@ -123,7 +135,10 @@ impl SshConnector {
         cancel: Option<&CancelToken>,
     ) -> Result<RemoteInstallResult, RemoteHostError> {
         let mut child = self.start(alias, script)?;
-        let mut stdout = child.stdout.take().ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
+        let mut stdout = child
+            .stdout
+            .take()
+            .ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
         let reader = std::thread::spawn(move || {
             let mut output: VecDeque<u8> = VecDeque::new();
             let mut buffer = [0_u8; 4096];
@@ -155,7 +170,9 @@ impl SshConnector {
             }
             match child.try_wait() {
                 Ok(Some(status)) => break status,
-                Ok(None) if started.elapsed() < deadline => std::thread::sleep(Duration::from_millis(50)),
+                Ok(None) if started.elapsed() < deadline => {
+                    std::thread::sleep(Duration::from_millis(50))
+                }
                 _ => {
                     ssh::terminate(&mut child, Duration::from_secs(2));
                     return Err(RemoteHostError::new(RemoteFailureCode::InstallFailed));
@@ -163,10 +180,15 @@ impl SshConnector {
             }
         };
         let output = reader.join().unwrap_or_default();
-        let marker = scripts::StatusMarker::parse(scripts::last_non_empty_line(&output).as_deref(), INSTALL_PREFIX);
+        let marker = scripts::StatusMarker::parse(
+            scripts::last_non_empty_line(&output).as_deref(),
+            INSTALL_PREFIX,
+        );
         match marker {
-            Some(marker) if marker.version == 1 && marker.words.len() == 1 => RemoteInstallResult::parse(&marker.words[0])
-                .ok_or(RemoteHostError::new(RemoteFailureCode::InstallFailed)),
+            Some(marker) if marker.version == 1 && marker.words.len() == 1 => {
+                RemoteInstallResult::parse(&marker.words[0])
+                    .ok_or(RemoteHostError::new(RemoteFailureCode::InstallFailed))
+            }
             _ => Err(RemoteHostError::new(if status.code() == Some(255) {
                 RemoteFailureCode::SshConnectionFailed
             } else {
@@ -184,7 +206,8 @@ impl RemoteConnector for SshConnector {
         on_closed: ClosedCallback,
     ) -> Result<Arc<dyn RemoteConnection>, RemoteHostError> {
         let config = ChannelConfig::processlama();
-        let script = scripts::bootstrap(&config.build_id).ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
+        let script = scripts::bootstrap(&config.build_id)
+            .ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
         let child = self.start(alias, &script)?;
         let channel = Channel::connect(
             child,
@@ -195,7 +218,10 @@ impl RemoteConnector for SshConnector {
         .map_err(|failure| failure_code(&failure))?;
         let hello = channel.hello();
         match codec::hello(&hello.body, &hello.build_id) {
-            Ok(parsed) => Ok(Arc::new(SshConnection { channel, hello: parsed })),
+            Ok(parsed) => Ok(Arc::new(SshConnection {
+                channel,
+                hello: parsed,
+            })),
             Err(_) => {
                 channel.close();
                 Err(RemoteHostError::new(RemoteFailureCode::ProtocolMismatch))
@@ -213,18 +239,41 @@ impl RemoteConnector for SshConnector {
             .ok_or(RemoteHostError::new(RemoteFailureCode::HelperDamaged))?;
         let script = scripts::install(&artifact.build_id, &artifact.sha256, artifact.size)
             .ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
-        self.run_script(alias, &script, Some(bytes), Duration::from_millis(INSTALL_DEADLINE_MS), Some(cancel))
+        self.run_script(
+            alias,
+            &script,
+            Some(bytes),
+            Duration::from_millis(INSTALL_DEADLINE_MS),
+            Some(cancel),
+        )
     }
 
-    fn prune_helpers(&self, alias: &str, keep_build_id: &str) -> Result<RemoteInstallResult, RemoteHostError> {
-        let script = scripts::prune(keep_build_id).ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
-        self.run_script(alias, &script, None, Duration::from_millis(PROBE_DEADLINE_MS), None)
+    fn prune_helpers(
+        &self,
+        alias: &str,
+        keep_build_id: &str,
+    ) -> Result<RemoteInstallResult, RemoteHostError> {
+        let script = scripts::prune(keep_build_id)
+            .ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
+        self.run_script(
+            alias,
+            &script,
+            None,
+            Duration::from_millis(PROBE_DEADLINE_MS),
+            None,
+        )
     }
 
     fn remove_helpers(&self, alias: &str) -> Result<RemoteInstallResult, RemoteHostError> {
-        let script =
-            scripts::uninstall(processlama_wire::BUILD_ID).ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
-        self.run_script(alias, &script, None, Duration::from_millis(PROBE_DEADLINE_MS), None)
+        let script = scripts::uninstall(processlama_wire::BUILD_ID)
+            .ok_or(RemoteHostError::new(RemoteFailureCode::Internal))?;
+        self.run_script(
+            alias,
+            &script,
+            None,
+            Duration::from_millis(PROBE_DEADLINE_MS),
+            None,
+        )
     }
 
     fn bundled_helper(&self, target: RemoteHelperTarget) -> Option<HelperArtifact> {
@@ -241,7 +290,10 @@ impl RemoteConnector for SshConnector {
 /// `PROCESSLAMA_REMOTE_HELPER_DIR` and the checkout's `build/` folders.
 fn helper_roots() -> Vec<PathBuf> {
     let mut roots = Vec::new();
-    if let Some(directory) = std::env::current_exe().ok().and_then(|exe| exe.parent().map(Path::to_path_buf)) {
+    if let Some(directory) = std::env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(Path::to_path_buf))
+    {
         if cfg!(target_os = "macos") {
             roots.push(directory.join("../Resources/remote-helper"));
         } else if cfg!(windows) {
@@ -252,7 +304,9 @@ fn helper_roots() -> Vec<PathBuf> {
         }
     }
     if cfg!(debug_assertions) {
-        if let Some(directory) = std::env::var_os("PROCESSLAMA_REMOTE_HELPER_DIR").filter(|dir| !dir.is_empty()) {
+        if let Some(directory) =
+            std::env::var_os("PROCESSLAMA_REMOTE_HELPER_DIR").filter(|dir| !dir.is_empty())
+        {
             roots.push(PathBuf::from(directory));
         }
         if let Ok(current) = std::env::current_dir() {
@@ -263,10 +317,22 @@ fn helper_roots() -> Vec<PathBuf> {
     roots
 }
 
-const DESCRIPTOR_KEYS: [&str; 8] = ["schema", "target", "buildId", "compatibility", "size", "sha256", "glibcFloor", "minimumSystem"];
+const DESCRIPTOR_KEYS: [&str; 8] = [
+    "schema",
+    "target",
+    "buildId",
+    "compatibility",
+    "size",
+    "sha256",
+    "glibcFloor",
+    "minimumSystem",
+];
 
 fn sha256_hex(bytes: &[u8]) -> String {
-    Sha256::digest(bytes).iter().map(|byte| format!("{byte:02x}")).collect()
+    Sha256::digest(bytes)
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
 }
 
 fn read_verified(path: &Path, size: u64, digest: &str) -> Option<Vec<u8>> {
@@ -277,8 +343,10 @@ fn read_verified(path: &Path, size: u64, digest: &str) -> Option<Vec<u8>> {
 /// A verified helper in `directory`, or None.
 fn artifact_in(directory: &Path, target: RemoteHelperTarget) -> Option<HelperArtifact> {
     let binary = directory.join(HELPER_EXECUTABLE);
-    let descriptor: Value =
-        serde_json::from_slice(&std::fs::read(directory.join(format!("{HELPER_EXECUTABLE}.json"))).ok()?).ok()?;
+    let descriptor: Value = serde_json::from_slice(
+        &std::fs::read(directory.join(format!("{HELPER_EXECUTABLE}.json"))).ok()?,
+    )
+    .ok()?;
     let map = descriptor.as_object()?;
     if map.len() != DESCRIPTOR_KEYS.len()
         || !DESCRIPTOR_KEYS.iter().all(|key| map.contains_key(*key))
@@ -288,8 +356,14 @@ fn artifact_in(directory: &Path, target: RemoteHelperTarget) -> Option<HelperArt
     {
         return None;
     }
-    let size = map.get("size").and_then(Value::as_u64).filter(|&size| size > 0 && size <= HELPER_BYTES as u64)?;
-    let digest = map.get("sha256").and_then(Value::as_str).filter(|digest| scripts::is_valid_sha256(digest))?;
+    let size = map
+        .get("size")
+        .and_then(Value::as_u64)
+        .filter(|&size| size > 0 && size <= HELPER_BYTES as u64)?;
+    let digest = map
+        .get("sha256")
+        .and_then(Value::as_str)
+        .filter(|digest| scripts::is_valid_sha256(digest))?;
     // Validate now so a damaged bundle is reported before any install.
     read_verified(&binary, size, digest)?;
     Some(HelperArtifact {
@@ -327,7 +401,10 @@ impl RemoteConnection for SshConnection {
             codec::telemetry_arguments(cadence_ms, polling_ms),
             TELEMETRY_CREDIT as u64,
             Arc::new(move |data| {
-                let result = decoder.lock().unwrap_or_else(std::sync::PoisonError::into_inner).decode(&data);
+                let result = decoder
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .decode(&data);
                 on_sample(result.map_err(|_| ()));
             }),
         )?;
@@ -346,7 +423,11 @@ impl RemoteConnection for SshConnection {
         codec::decode_detail(&value).map_err(|_| "invalidRequest".to_owned())
     }
 
-    fn send_signal(&self, identity: ProcessIdentity, signal: ProcessSignal) -> Result<SignalOutcome, String> {
+    fn send_signal(
+        &self,
+        identity: ProcessIdentity,
+        signal: ProcessSignal,
+    ) -> Result<SignalOutcome, String> {
         let value = self.channel.call(
             processlama_wire::contract::Method::ProcessSignal.as_str(),
             codec::signal_arguments(identity, signal),

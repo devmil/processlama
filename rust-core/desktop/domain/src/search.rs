@@ -229,11 +229,14 @@ impl SearchQuery {
             ]),
             SearchAspect::Name => self.matcher.matches(record.display_name()),
             SearchAspect::Pid => self.matcher.matches(&pid),
-            SearchAspect::User => self.matcher.matches_any([record.user.as_str(), uid.as_str()]),
-            SearchAspect::Command => self.matcher.matches(&record.command_line),
-            SearchAspect::Path => self
+            SearchAspect::User => self
                 .matcher
-                .matches_any([record.executable_path.as_str(), record.app_bundle_path.as_str()]),
+                .matches_any([record.user.as_str(), uid.as_str()]),
+            SearchAspect::Command => self.matcher.matches(&record.command_line),
+            SearchAspect::Path => self.matcher.matches_any([
+                record.executable_path.as_str(),
+                record.app_bundle_path.as_str(),
+            ]),
             SearchAspect::Port => false,
         }
     }

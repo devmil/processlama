@@ -165,7 +165,9 @@ impl RemoteHelperTarget {
     }
 
     pub fn parse(value: &str) -> Option<Self> {
-        Self::ALL.into_iter().find(|target| target.wire_name() == value)
+        Self::ALL
+            .into_iter()
+            .find(|target| target.wire_name() == value)
     }
 
     pub const fn os(self) -> &'static str {
@@ -576,7 +578,12 @@ impl RemoteHostsState {
         map.insert("version".into(), json!(1));
         map.insert(
             "profiles".into(),
-            Value::Array(self.profiles.iter().map(RemoteHostProfile::to_json).collect()),
+            Value::Array(
+                self.profiles
+                    .iter()
+                    .map(RemoteHostProfile::to_json)
+                    .collect(),
+            ),
         );
         map.insert("openTabs".into(), json!(self.open_tabs));
         map.insert("activeTab".into(), json!(self.active_tab));
@@ -617,7 +624,10 @@ impl RemoteHostsState {
         Self {
             profiles,
             open_tabs,
-            active_tab: map.get("activeTab").and_then(Value::as_str).map(str::to_owned),
+            active_tab: map
+                .get("activeTab")
+                .and_then(Value::as_str)
+                .map(str::to_owned),
             icon_cache_bytes: map
                 .get("iconCacheBytes")
                 .and_then(Value::as_u64)
@@ -671,8 +681,14 @@ mod tests {
         assert_eq!(profile.display_name, "A");
         assert!(profile.auto_reconnect);
         assert_eq!(profile.open_on_startup, Some(true));
-        assert_eq!(profile.background_refresh, Some(BackgroundRefreshMode::Live));
-        assert_eq!(profile.unknown_fields.get("extra"), Some(&Value::Bool(true)));
+        assert_eq!(
+            profile.background_refresh,
+            Some(BackgroundRefreshMode::Live)
+        );
+        assert_eq!(
+            profile.unknown_fields.get("extra"),
+            Some(&Value::Bool(true))
+        );
         assert_eq!(state.open_tabs, vec!["a"]);
         assert_eq!(state.icon_cache_bytes, DEFAULT_REMOTE_ICON_CACHE_BYTES);
         let again = RemoteHostsState::from_json(&state.to_json());

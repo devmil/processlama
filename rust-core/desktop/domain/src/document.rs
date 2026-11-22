@@ -41,7 +41,10 @@ pub struct SnapshotEntry {
 }
 
 fn is_sha256(value: &str) -> bool {
-    value.len() == 64 && value.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    value.len() == 64
+        && value
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 
 impl SnapshotDocument {
@@ -49,7 +52,12 @@ impl SnapshotDocument {
         let empty = Map::new();
         let map = value.as_object().unwrap_or(&empty);
         let host = map.get("host").and_then(Value::as_object).map(|host| {
-            let text = |key: &str| host.get(key).and_then(Value::as_str).unwrap_or("").to_owned();
+            let text = |key: &str| {
+                host.get(key)
+                    .and_then(Value::as_str)
+                    .unwrap_or("")
+                    .to_owned()
+            };
             SnapshotHost {
                 display_name: text("display_name"),
                 alias: text("alias"),
@@ -69,7 +77,10 @@ impl SnapshotDocument {
             })
             .unwrap_or_default();
         Self {
-            schema_version: map.get("schema_version").and_then(Value::as_u64).unwrap_or(1),
+            schema_version: map
+                .get("schema_version")
+                .and_then(Value::as_u64)
+                .unwrap_or(1),
             exported_at_unix_ms: map
                 .get("exported_at_unix_ms")
                 .and_then(Value::as_u64)
@@ -79,7 +90,10 @@ impl SnapshotDocument {
                 .and_then(Value::as_str)
                 .unwrap_or("ProcessLama")
                 .to_owned(),
-            display_name: map.get("display_name").and_then(Value::as_str).map(str::to_owned),
+            display_name: map
+                .get("display_name")
+                .and_then(Value::as_str)
+                .map(str::to_owned),
             host,
             icons,
             snapshot: snapshot_from_json(map.get("snapshot").unwrap_or(&Value::Null), now_ms),
@@ -89,7 +103,10 @@ impl SnapshotDocument {
     pub fn to_json(&self) -> Value {
         let mut map = Map::new();
         map.insert("schema_version".into(), json!(self.schema_version));
-        map.insert("exported_at_unix_ms".into(), json!(self.exported_at_unix_ms));
+        map.insert(
+            "exported_at_unix_ms".into(),
+            json!(self.exported_at_unix_ms),
+        );
         map.insert("source".into(), json!(self.source));
         if let Some(name) = &self.display_name {
             map.insert("display_name".into(), json!(name));
@@ -115,11 +132,20 @@ impl SnapshotDocument {
 
 pub fn snapshot_to_json(snapshot: &ProcessSnapshot) -> Value {
     let mut map = Map::new();
-    map.insert("generated_at_unix_ms".into(), json!(snapshot.generated_at_unix_ms));
+    map.insert(
+        "generated_at_unix_ms".into(),
+        json!(snapshot.generated_at_unix_ms),
+    );
     map.insert("platform".into(), json!(snapshot.platform));
     map.insert(
         "processes".into(),
-        Value::Array(snapshot.processes.iter().map(|record| record_to_json(record)).collect()),
+        Value::Array(
+            snapshot
+                .processes
+                .iter()
+                .map(|record| record_to_json(record))
+                .collect(),
+        ),
     );
     if let Some(error) = &snapshot.error {
         map.insert("error".into(), json!(error));
@@ -136,7 +162,10 @@ pub fn snapshot_from_json(value: &Value, now_ms: u64) -> ProcessSnapshot {
         return snapshot;
     }
     ProcessSnapshot {
-        generated_at_unix_ms: map.get("generated_at_unix_ms").and_then(Value::as_u64).unwrap_or(0),
+        generated_at_unix_ms: map
+            .get("generated_at_unix_ms")
+            .and_then(Value::as_u64)
+            .unwrap_or(0),
         platform: map
             .get("platform")
             .and_then(Value::as_str)
@@ -145,7 +174,13 @@ pub fn snapshot_from_json(value: &Value, now_ms: u64) -> ProcessSnapshot {
         processes: map
             .get("processes")
             .and_then(Value::as_array)
-            .map(|items| items.iter().filter_map(record_from_json).map(Arc::new).collect())
+            .map(|items| {
+                items
+                    .iter()
+                    .filter_map(record_from_json)
+                    .map(Arc::new)
+                    .collect()
+            })
             .unwrap_or_default(),
         error: None,
         topology: None,
@@ -153,7 +188,9 @@ pub fn snapshot_from_json(value: &Value, now_ms: u64) -> ProcessSnapshot {
 }
 
 fn ports_json(ports: &Option<Arc<[u16]>>) -> Value {
-    ports.as_ref().map_or(Value::Null, |ports| json!(ports.as_ref()))
+    ports
+        .as_ref()
+        .map_or(Value::Null, |ports| json!(ports.as_ref()))
 }
 
 pub fn record_to_json(record: &ProcessRecord) -> Value {
@@ -177,23 +214,62 @@ pub fn record_to_json(record: &ProcessRecord) -> Value {
     put("priority", json!(record.priority));
     put("cpu_usage", json!(record.cpu_usage));
     put("gpu_usage", json!(record.gpu_usage));
-    put("network_in_bytes_per_second", json!(record.network_in_bytes_per_second));
-    put("network_out_bytes_per_second", json!(record.network_out_bytes_per_second));
-    put("total_network_in_bytes", json!(record.total_network_in_bytes));
-    put("total_network_out_bytes", json!(record.total_network_out_bytes));
-    put("storage_read_bytes_per_second", json!(record.storage_read_bytes_per_second));
-    put("storage_write_bytes_per_second", json!(record.storage_write_bytes_per_second));
-    put("total_storage_read_bytes", json!(record.total_storage_read_bytes));
-    put("total_storage_write_bytes", json!(record.total_storage_write_bytes));
+    put(
+        "network_in_bytes_per_second",
+        json!(record.network_in_bytes_per_second),
+    );
+    put(
+        "network_out_bytes_per_second",
+        json!(record.network_out_bytes_per_second),
+    );
+    put(
+        "total_network_in_bytes",
+        json!(record.total_network_in_bytes),
+    );
+    put(
+        "total_network_out_bytes",
+        json!(record.total_network_out_bytes),
+    );
+    put(
+        "storage_read_bytes_per_second",
+        json!(record.storage_read_bytes_per_second),
+    );
+    put(
+        "storage_write_bytes_per_second",
+        json!(record.storage_write_bytes_per_second),
+    );
+    put(
+        "total_storage_read_bytes",
+        json!(record.total_storage_read_bytes),
+    );
+    put(
+        "total_storage_write_bytes",
+        json!(record.total_storage_write_bytes),
+    );
     put("storage_io_available", json!(record.storage_io_available));
     put("tree_cpu_usage", json!(record.tree_cpu_usage));
     put("tree_gpu_usage", json!(record.tree_gpu_usage));
     put("tree_rss_bytes", json!(record.tree_rss_bytes));
-    put("tree_network_in_bytes_per_second", json!(record.tree_network_in_bytes_per_second));
-    put("tree_network_out_bytes_per_second", json!(record.tree_network_out_bytes_per_second));
-    put("tree_storage_read_bytes_per_second", json!(record.tree_storage_read_bytes_per_second));
-    put("tree_storage_write_bytes_per_second", json!(record.tree_storage_write_bytes_per_second));
-    put("tree_storage_io_available", json!(record.tree_storage_io_available));
+    put(
+        "tree_network_in_bytes_per_second",
+        json!(record.tree_network_in_bytes_per_second),
+    );
+    put(
+        "tree_network_out_bytes_per_second",
+        json!(record.tree_network_out_bytes_per_second),
+    );
+    put(
+        "tree_storage_read_bytes_per_second",
+        json!(record.tree_storage_read_bytes_per_second),
+    );
+    put(
+        "tree_storage_write_bytes_per_second",
+        json!(record.tree_storage_write_bytes_per_second),
+    );
+    put(
+        "tree_storage_io_available",
+        json!(record.tree_storage_io_available),
+    );
     put("descendant_count", json!(record.descendant_count));
     put("start_time_unix_ms", json!(record.start_time_unix_ms));
     put("name", json!(record.name));
@@ -229,7 +305,12 @@ pub fn record_from_json(value: &Value) -> Option<ProcessRecord> {
     let int = |key: &str| map.get(key).and_then(Value::as_f64).unwrap_or(0.0);
     let unsigned = |key: &str| map.get(key).and_then(Value::as_f64).unwrap_or(0.0).max(0.0) as u64;
     let boolean = |key: &str| map.get(key).and_then(Value::as_bool).unwrap_or(false);
-    let text = |key: &str| map.get(key).and_then(Value::as_str).unwrap_or("").to_owned();
+    let text = |key: &str| {
+        map.get(key)
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .to_owned()
+    };
     let tree_cpu = map
         .get("tree_cpu_usage")
         .or_else(|| map.get("tree_cpu_percent"))
@@ -324,7 +405,9 @@ fn sanitize_file_name(name: Option<&str>) -> String {
     let replaced: String = trimmed
         .chars()
         .map(|c| {
-            if matches!(c, '<' | '>' | ':' | '"' | '/' | '\\' | '|' | '?' | '*') || (c as u32) < 0x20 {
+            if matches!(c, '<' | '>' | ':' | '"' | '/' | '\\' | '|' | '?' | '*')
+                || (c as u32) < 0x20
+            {
                 '-'
             } else {
                 c
@@ -405,7 +488,10 @@ mod tests {
             platform: String::new(),
             name: name.map(str::to_owned),
         };
-        assert_eq!(export_file_name(&entry(None)), "snapshot-5.processlama-snapshot.json");
+        assert_eq!(
+            export_file_name(&entry(None)),
+            "snapshot-5.processlama-snapshot.json"
+        );
         assert_eq!(
             export_file_name(&entry(Some(" a/b  c.json "))),
             "a-b c.processlama-snapshot.json"

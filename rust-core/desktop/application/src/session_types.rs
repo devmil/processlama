@@ -1,8 +1,8 @@
 //! Values a process session publishes and consumes.
 
 use processlama_domain::{
-    ProcessDetail, ProcessIdentity, ProcessPortOwner, ProcessPorts, ProcessRecord,
-    ProcessSnapshot, RemoteFailureCode, SearchOptions, SortColumn, SortDirection,
+    ProcessDetail, ProcessIdentity, ProcessPortOwner, ProcessPorts, ProcessRecord, ProcessSnapshot,
+    RemoteFailureCode, SearchOptions, SortColumn, SortDirection,
 };
 use std::collections::{BTreeMap, HashSet};
 use std::sync::Arc;

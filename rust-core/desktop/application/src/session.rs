@@ -8,6 +8,9 @@
 
 use crate::history::HistorySet;
 use crate::order_lock::TreeOrderLock;
+
+/// A process's local ports and, when known, its listening ports.
+type PortSource = (Arc<[u16]>, Option<Arc<[u16]>>);
 pub use crate::session_types::*;
 use processlama_domain::{
     AppSettings, DetailSection, HostCapabilities, HostOperatingSystem, ProcessDetail,
@@ -178,7 +181,9 @@ impl ProcessSession {
             focused: None,
             focus_stack: Vec::new(),
             tree_search_query: String::new(),
-            tree_search_columns: visible_search_columns(&processlama_domain::default_visible_columns()),
+            tree_search_columns: visible_search_columns(
+                &processlama_domain::default_visible_columns(),
+            ),
             select_first_tree_search_match_on_publish: false,
             sort_column: SortColumn::TreeCpu,
             sort_direction: SortDirection::Descending,
@@ -417,8 +422,11 @@ impl ProcessSession {
                 .iter()
                 .map(|record| (record.identity(), record))
                 .collect();
-            let next_ids: HashSet<ProcessIdentity> =
-                next.processes.iter().map(|record| record.identity()).collect();
+            let next_ids: HashSet<ProcessIdentity> = next
+                .processes
+                .iter()
+                .map(|record| record.identity())
+                .collect();
             for identity in &next_ids {
                 if !previous.contains_key(identity) {
                     markers.insert(*identity, ChangeMarker::Spawned);
@@ -454,7 +462,8 @@ impl ProcessSession {
         self.queued_snapshot = None;
         self.frozen = false;
         self.order_lock.reset_interaction(now);
-        self.source.set_cadence(Cadence::Paused, self.polling_interval_ms);
+        self.source
+            .set_cadence(Cadence::Paused, self.polling_interval_ms);
         self.changes.loaded_snapshot = true;
         // A loaded snapshot replaces the tree outright: nothing spawned or exited.
         self.active_snapshot = Arc::new(ProcessSnapshot::empty(None));
@@ -507,7 +516,11 @@ impl ProcessSession {
 
     /// Filters the tree to the processes using `port`.
     pub fn show_port(&mut self, port: u16, now: u64) {
-        self.apply_filter(port.to_string(), self.search_options.with_aspect(SearchAspect::Port), now);
+        self.apply_filter(
+            port.to_string(),
+            self.search_options.with_aspect(SearchAspect::Port),
+            now,
+        );
     }
 
     fn apply_filter(&mut self, text: String, options: SearchOptions, now: u64) {
@@ -755,7 +768,12 @@ impl ProcessSession {
 
     // Inspector detail
 
-    pub fn on_detail(&mut self, identity: ProcessIdentity, generation: u64, detail: Option<ProcessDetail>) {
+    pub fn on_detail(
+        &mut self,
+        identity: ProcessIdentity,
+        generation: u64,
+        detail: Option<ProcessDetail>,
+    ) {
         let Some(detail) = detail else {
             return;
         };
@@ -841,7 +859,11 @@ impl ProcessSession {
 
     fn selected_visible_row(&self) -> Option<TreeRow> {
         let selected = self.selected?;
-        self.tree.rows.iter().find(|row| row.identity == selected).cloned()
+        self.tree
+            .rows
+            .iter()
+            .find(|row| row.identity == selected)
+            .cloned()
     }
 
     fn subtree_identities(&self, root: ProcessIdentity) -> HashSet<ProcessIdentity> {
@@ -868,7 +890,10 @@ impl ProcessSession {
             .collect();
         let native = self.active_snapshot.topology.clone();
         let use_native = native.as_ref().is_some_and(|topology| {
-            !self.change_markers.values().any(|marker| *marker == ChangeMarker::Terminated)
+            !self
+                .change_markers
+                .values()
+                .any(|marker| *marker == ChangeMarker::Terminated)
                 && topology.parent_by_identity.len() == records.len()
         });
         let topology_changed;
@@ -918,7 +943,8 @@ impl ProcessSession {
     }
 
     fn compute_tree_metrics(&self) -> HashMap<ProcessIdentity, TreeMetrics> {
-        let mut memo: HashMap<ProcessIdentity, TreeMetrics> = HashMap::with_capacity(self.records.len());
+        let mut memo: HashMap<ProcessIdentity, TreeMetrics> =
+            HashMap::with_capacity(self.records.len());
         // Post-order over every identity without recursion.
         for root in self.records.keys() {
             if memo.contains_key(root) {
@@ -949,7 +975,8 @@ impl ProcessSession {
                     }
                     continue;
                 }
-                let mut total = record.map_or_else(TreeMetrics::default, |record| TreeMetrics::own(record));
+                let mut total =
+                    record.map_or_else(TreeMetrics::default, |record| TreeMetrics::own(record));
                 for child in children {
                     if let Some(metrics) = memo.get(child) {
                         total.add_child(metrics);
@@ -977,10 +1004,14 @@ impl ProcessSession {
             set.cpu.add(record.cpu_usage as f32);
             set.gpu.add(record.gpu_usage as f32);
             set.rss.add(record.rss_bytes as f32);
-            set.network_in.add(record.network_in_bytes_per_second as f32);
-            set.network_out.add(record.network_out_bytes_per_second as f32);
-            set.storage_read.add(record.storage_read_bytes_per_second as f32);
-            set.storage_write.add(record.storage_write_bytes_per_second as f32);
+            set.network_in
+                .add(record.network_in_bytes_per_second as f32);
+            set.network_out
+                .add(record.network_out_bytes_per_second as f32);
+            set.storage_read
+                .add(record.storage_read_bytes_per_second as f32);
+            set.storage_write
+                .add(record.storage_write_bytes_per_second as f32);
             set.tree_gpu.add(metrics.gpu as f32);
             set.tree_rss.add(metrics.rss as f32);
             set.tree_network_in.add(metrics.network_in as f32);
@@ -989,7 +1020,8 @@ impl ProcessSession {
             set.tree_storage_write.add(metrics.storage_write as f32);
         }
         let records = &self.records;
-        self.histories.retain(|identity, _| records.contains_key(identity));
+        self.histories
+            .retain(|identity, _| records.contains_key(identity));
         self.cpu_scale_max = f64::from(cpu_scale_max);
     }
 
@@ -1008,12 +1040,14 @@ impl ProcessSession {
     ) -> HashMap<Option<ProcessIdentity>, Vec<ProcessIdentity>> {
         let mut ordered = self.children_by_parent.clone();
         for children in ordered.values_mut() {
-            children.sort_by(|left, right| match (previous.get(left), previous.get(right)) {
-                (None, None) => self.compare_identities(*left, *right),
-                (None, Some(_)) => Ordering::Greater,
-                (Some(_), None) => Ordering::Less,
-                (Some(a), Some(b)) => a.cmp(b),
-            });
+            children.sort_by(
+                |left, right| match (previous.get(left), previous.get(right)) {
+                    (None, None) => self.compare_identities(*left, *right),
+                    (None, Some(_)) => Ordering::Greater,
+                    (Some(_), None) => Ordering::Less,
+                    (Some(a), Some(b)) => a.cmp(b),
+                },
+            );
         }
         ordered
     }
@@ -1028,15 +1062,31 @@ impl ProcessSession {
         let base = match self.sort_column {
             SortColumn::Tree => compare_by_pid(left, right),
             SortColumn::Pid => l.pid.cmp(&r.pid),
-            SortColumn::Name => l.display_name().to_lowercase().cmp(&r.display_name().to_lowercase()),
+            SortColumn::Name => l
+                .display_name()
+                .to_lowercase()
+                .cmp(&r.display_name().to_lowercase()),
             SortColumn::Cpu => f(l.cpu_usage, r.cpu_usage),
-            SortColumn::TreeCpu => f(lm.map_or(l.cpu_usage, |m| m.cpu), rm.map_or(r.cpu_usage, |m| m.cpu)),
+            SortColumn::TreeCpu => f(
+                lm.map_or(l.cpu_usage, |m| m.cpu),
+                rm.map_or(r.cpu_usage, |m| m.cpu),
+            ),
             SortColumn::Gpu => f(l.gpu_usage, r.gpu_usage),
-            SortColumn::TreeGpu => f(lm.map_or(l.gpu_usage, |m| m.gpu), rm.map_or(r.gpu_usage, |m| m.gpu)),
+            SortColumn::TreeGpu => f(
+                lm.map_or(l.gpu_usage, |m| m.gpu),
+                rm.map_or(r.gpu_usage, |m| m.gpu),
+            ),
             SortColumn::Memory => l.rss_bytes.cmp(&r.rss_bytes),
-            SortColumn::TreeMemory => lm.map_or(l.rss_bytes, |m| m.rss).cmp(&rm.map_or(r.rss_bytes, |m| m.rss)),
-            SortColumn::NetworkIn => f(l.network_in_bytes_per_second, r.network_in_bytes_per_second),
-            SortColumn::NetworkOut => f(l.network_out_bytes_per_second, r.network_out_bytes_per_second),
+            SortColumn::TreeMemory => lm
+                .map_or(l.rss_bytes, |m| m.rss)
+                .cmp(&rm.map_or(r.rss_bytes, |m| m.rss)),
+            SortColumn::NetworkIn => {
+                f(l.network_in_bytes_per_second, r.network_in_bytes_per_second)
+            }
+            SortColumn::NetworkOut => f(
+                l.network_out_bytes_per_second,
+                r.network_out_bytes_per_second,
+            ),
             SortColumn::TreeNetworkIn => f(
                 lm.map_or(l.network_in_bytes_per_second, |m| m.network_in),
                 rm.map_or(r.network_in_bytes_per_second, |m| m.network_in),
@@ -1045,8 +1095,14 @@ impl ProcessSession {
                 lm.map_or(l.network_out_bytes_per_second, |m| m.network_out),
                 rm.map_or(r.network_out_bytes_per_second, |m| m.network_out),
             ),
-            SortColumn::StorageRead => f(l.storage_read_bytes_per_second, r.storage_read_bytes_per_second),
-            SortColumn::StorageWrite => f(l.storage_write_bytes_per_second, r.storage_write_bytes_per_second),
+            SortColumn::StorageRead => f(
+                l.storage_read_bytes_per_second,
+                r.storage_read_bytes_per_second,
+            ),
+            SortColumn::StorageWrite => f(
+                l.storage_write_bytes_per_second,
+                r.storage_write_bytes_per_second,
+            ),
             SortColumn::TreeStorageRead => f(
                 lm.map_or(l.storage_read_bytes_per_second, |m| m.storage_read),
                 rm.map_or(r.storage_read_bytes_per_second, |m| m.storage_read),
@@ -1071,7 +1127,10 @@ impl ProcessSession {
         }
     }
 
-    fn parent_links(&self, records: &[Arc<ProcessRecord>]) -> HashMap<ProcessIdentity, Option<ProcessIdentity>> {
+    fn parent_links(
+        &self,
+        records: &[Arc<ProcessRecord>],
+    ) -> HashMap<ProcessIdentity, Option<ProcessIdentity>> {
         let mut by_pid: HashMap<i32, ProcessIdentity> = HashMap::with_capacity(records.len());
         for record in records {
             let identity = record.identity();
@@ -1111,14 +1170,14 @@ impl ProcessSession {
         {
             return false;
         }
-        let current_parents = current
-            .topology
-            .as_ref()
-            .map_or_else(|| self.parent_links(&current.processes), |t| t.parent_by_identity.clone());
-        let next_parents = next
-            .topology
-            .as_ref()
-            .map_or_else(|| self.parent_links(&next.processes), |t| t.parent_by_identity.clone());
+        let current_parents = current.topology.as_ref().map_or_else(
+            || self.parent_links(&current.processes),
+            |t| t.parent_by_identity.clone(),
+        );
+        let next_parents = next.topology.as_ref().map_or_else(
+            || self.parent_links(&next.processes),
+            |t| t.parent_by_identity.clone(),
+        );
         if current_parents.len() != next_parents.len() {
             return true;
         }
@@ -1149,7 +1208,8 @@ impl ProcessSession {
             .collect();
         let topology = current.topology.clone().unwrap_or_else(|| {
             let parents = self.parent_links(&current.processes);
-            let order: Vec<ProcessIdentity> = current.processes.iter().map(|r| r.identity()).collect();
+            let order: Vec<ProcessIdentity> =
+                current.processes.iter().map(|r| r.identity()).collect();
             Arc::new(ProcessTopology::new(None, parents, &order))
         });
         ProcessSnapshot {
@@ -1172,11 +1232,17 @@ impl ProcessSession {
             .collect()
     }
 
-    fn publish_tree(&mut self, allow_interaction_order_lock: bool, record_metrics: bool, _now: u64) {
+    fn publish_tree(
+        &mut self,
+        allow_interaction_order_lock: bool,
+        record_metrics: bool,
+        _now: u64,
+    ) {
         let previous_order = self.previous_visible_order();
         let order_locked_by_interaction =
             allow_interaction_order_lock && self.order_lock.locked() && !previous_order.is_empty();
-        let order_frozen = allow_interaction_order_lock && self.frozen && !previous_order.is_empty();
+        let order_frozen =
+            allow_interaction_order_lock && self.frozen && !previous_order.is_empty();
         if self.records.len() != self.display_records.len() {
             self.rebuild_tree_caches(record_metrics);
         }
@@ -1194,8 +1260,14 @@ impl ProcessSession {
             self.select_first_tree_search_match_on_publish = false;
         }
         let match_count = matches.clone().count();
-        if self.selected.is_none_or(|selected| !rows.iter().any(|row| row.identity == selected)) {
-            self.selected = rows.iter().find(|row| !row.is_terminated()).map(|row| row.identity);
+        if self
+            .selected
+            .is_none_or(|selected| !rows.iter().any(|row| row.identity == selected))
+        {
+            self.selected = rows
+                .iter()
+                .find(|row| !row.is_terminated())
+                .map(|row| row.identity);
         }
         let selected_match_index = self
             .selected
@@ -1214,7 +1286,10 @@ impl ProcessSession {
             lock: TreeLockState {
                 is_frozen: self.frozen,
                 has_queued_structural_mutations: self.queued_snapshot.is_some(),
-                queued_process_count: self.queued_snapshot.as_ref().map_or(0, |s| s.processes.len()),
+                queued_process_count: self
+                    .queued_snapshot
+                    .as_ref()
+                    .map_or(0, |s| s.processes.len()),
                 is_order_locked_by_interaction: order_locked_by_interaction,
             },
             sort_column: self.sort_column,
@@ -1222,9 +1297,11 @@ impl ProcessSession {
             pinned: Arc::clone(&self.pinned),
             focused: self.focused,
             focus_stack_depth: self.focus_stack.len(),
-            focused_name: self
-                .focused
-                .and_then(|identity| self.records.get(&identity).map(|record| record.name.clone())),
+            focused_name: self.focused.and_then(|identity| {
+                self.records
+                    .get(&identity)
+                    .map(|record| record.name.clone())
+            }),
             cpu_scale_max: self.cpu_scale_max,
         };
         self.changes.tree = true;
@@ -1246,7 +1323,8 @@ impl ProcessSession {
         } else {
             &self.sorted_children_by_parent
         };
-        let roots: Vec<ProcessIdentity> = children_by_parent.get(&None).cloned().unwrap_or_default();
+        let roots: Vec<ProcessIdentity> =
+            children_by_parent.get(&None).cloned().unwrap_or_default();
         if let Some(focused) = self.focused
             && !self.records.contains_key(&focused)
         {
@@ -1261,9 +1339,20 @@ impl ProcessSession {
             self.expanded.extend(roots.iter().copied());
             if self.capabilities.operating_system == HostOperatingSystem::Linux {
                 for root in &roots {
-                    if self.records.get(root).is_some_and(|record| record.name == "systemd") {
-                        for child in children_by_parent.get(&Some(*root)).map_or(&[][..], Vec::as_slice) {
-                            if self.records.get(child).is_some_and(|record| record.name == "systemd") {
+                    if self
+                        .records
+                        .get(root)
+                        .is_some_and(|record| record.name == "systemd")
+                    {
+                        for child in children_by_parent
+                            .get(&Some(*root))
+                            .map_or(&[][..], Vec::as_slice)
+                        {
+                            if self
+                                .records
+                                .get(child)
+                                .is_some_and(|record| record.name == "systemd")
+                            {
                                 self.expanded.insert(*child);
                             }
                         }
@@ -1323,13 +1412,18 @@ impl ProcessSession {
         let search_columns = self.tree_search_columns;
         let mut rows = Vec::with_capacity(records.len().min(4096));
         // Preorder with an explicit stack: (identity, depth, ancestor matched).
-        let mut stack: Vec<(ProcessIdentity, u32, bool)> =
-            visible_roots.iter().rev().map(|root| (*root, 0, false)).collect();
+        let mut stack: Vec<(ProcessIdentity, u32, bool)> = visible_roots
+            .iter()
+            .rev()
+            .map(|root| (*root, 0, false))
+            .collect();
         while let Some((identity, depth, ancestor_matched)) = stack.pop() {
             let Some(record) = records.get(&identity) else {
                 continue;
             };
-            let children = children_by_parent.get(&Some(identity)).map_or(&[][..], Vec::as_slice);
+            let children = children_by_parent
+                .get(&Some(identity))
+                .map_or(&[][..], Vec::as_slice);
             let has_children = !children.is_empty();
             let expanded = self.expanded.contains(&identity);
             let matches = record_matches(record);
@@ -1339,20 +1433,32 @@ impl ProcessSession {
                 0
             };
             let descendant = has_filter
-                && descendant_matches(identity, children_by_parent, records, &mut filter_memo, &record_matches);
+                && descendant_matches(
+                    identity,
+                    children_by_parent,
+                    records,
+                    &mut filter_memo,
+                    &record_matches,
+                );
             let force_for_filter = has_filter && has_children;
             let force_for_search = has_search
                 && has_children
-                && descendant_matches(identity, children_by_parent, records, &mut search_memo, &record_matches_search);
+                && descendant_matches(
+                    identity,
+                    children_by_parent,
+                    records,
+                    &mut search_memo,
+                    &record_matches_search,
+                );
             let force_expanded = force_for_filter || force_for_search;
             if !(!has_filter || matches || descendant || ancestor_matched) {
                 continue;
             }
             let metrics = self.tree_metrics.get(&identity).copied();
-            let cpu_history = self
-                .histories
-                .get_mut(&identity)
-                .map_or_else(|| Arc::from(Vec::<f32>::new()), |set| set.tree_cpu.as_list());
+            let cpu_history = self.histories.get_mut(&identity).map_or_else(
+                || Arc::from(Vec::<f32>::new()),
+                |set| set.tree_cpu.as_list(),
+            );
             rows.push(TreeRow {
                 identity,
                 record: Arc::clone(record),
@@ -1362,16 +1468,25 @@ impl ProcessSession {
                 tree_cpu: metrics.map_or(record.cpu_usage, |m| m.cpu),
                 tree_gpu: metrics.map_or(record.gpu_usage, |m| m.gpu),
                 tree_rss: metrics.map_or(record.rss_bytes, |m| m.rss),
-                tree_network_in: metrics.map_or(record.network_in_bytes_per_second, |m| m.network_in),
-                tree_network_out: metrics.map_or(record.network_out_bytes_per_second, |m| m.network_out),
-                tree_storage_read: metrics.map_or(record.storage_read_bytes_per_second, |m| m.storage_read),
-                tree_storage_write: metrics.map_or(record.storage_write_bytes_per_second, |m| m.storage_write),
-                tree_storage_available: metrics.map_or(record.storage_io_available, |m| m.storage_available),
+                tree_network_in: metrics
+                    .map_or(record.network_in_bytes_per_second, |m| m.network_in),
+                tree_network_out: metrics
+                    .map_or(record.network_out_bytes_per_second, |m| m.network_out),
+                tree_storage_read: metrics
+                    .map_or(record.storage_read_bytes_per_second, |m| m.storage_read),
+                tree_storage_write: metrics
+                    .map_or(record.storage_write_bytes_per_second, |m| m.storage_write),
+                tree_storage_available: metrics
+                    .map_or(record.storage_io_available, |m| m.storage_available),
                 descendant_count: metrics.map_or(0, |m| m.descendant_count),
                 matches_filter: !has_filter || matches,
                 preserves_filter_branch: has_filter && !matches,
                 search_columns: matched_columns,
-                change_marker: self.change_markers.get(&identity).copied().unwrap_or_default(),
+                change_marker: self
+                    .change_markers
+                    .get(&identity)
+                    .copied()
+                    .unwrap_or_default(),
                 cpu_history,
             });
             if force_expanded || expanded {
@@ -1389,7 +1504,13 @@ impl ProcessSession {
             self.changes.inspector = true;
             return;
         };
-        let Some(row) = self.tree.rows.iter().find(|row| row.identity == selected).cloned() else {
+        let Some(row) = self
+            .tree
+            .rows
+            .iter()
+            .find(|row| row.identity == selected)
+            .cloned()
+        else {
             self.inspector = InspectorView::default();
             self.changes.inspector = true;
             return;
@@ -1399,22 +1520,25 @@ impl ProcessSession {
             .as_ref()
             .filter(|detail| detail.identity == selected)
             .cloned();
-        let histories = self.histories.get_mut(&selected).map(|set| SelectedHistories {
-            tree_cpu: set.tree_cpu.as_list(),
-            tree_gpu: set.tree_gpu.as_list(),
-            tree_rss: set.tree_rss.as_list(),
-            tree_network_in: set.tree_network_in.as_list(),
-            tree_network_out: set.tree_network_out.as_list(),
-            tree_storage_read: set.tree_storage_read.as_list(),
-            tree_storage_write: set.tree_storage_write.as_list(),
-            cpu: set.cpu.as_list(),
-            gpu: set.gpu.as_list(),
-            rss: set.rss.as_list(),
-            network_in: set.network_in.as_list(),
-            network_out: set.network_out.as_list(),
-            storage_read: set.storage_read.as_list(),
-            storage_write: set.storage_write.as_list(),
-        });
+        let histories = self
+            .histories
+            .get_mut(&selected)
+            .map(|set| SelectedHistories {
+                tree_cpu: set.tree_cpu.as_list(),
+                tree_gpu: set.tree_gpu.as_list(),
+                tree_rss: set.tree_rss.as_list(),
+                tree_network_in: set.tree_network_in.as_list(),
+                tree_network_out: set.tree_network_out.as_list(),
+                tree_storage_read: set.tree_storage_read.as_list(),
+                tree_storage_write: set.tree_storage_write.as_list(),
+                cpu: set.cpu.as_list(),
+                gpu: set.gpu.as_list(),
+                rss: set.rss.as_list(),
+                network_in: set.network_in.as_list(),
+                network_out: set.network_out.as_list(),
+                storage_read: set.storage_read.as_list(),
+                storage_write: set.storage_write.as_list(),
+            });
         self.inspector = InspectorView {
             process: Some(Arc::clone(&row.record)),
             identity: Some(selected),
@@ -1433,7 +1557,7 @@ impl ProcessSession {
     fn subtree_ports(&self, root: ProcessIdentity) -> Option<ProcessPorts> {
         let mut pending = vec![root];
         let mut visited = HashSet::new();
-        let mut sources: Vec<(Arc<[u16]>, Option<Arc<[u16]>>)> = Vec::new();
+        let mut sources: Vec<PortSource> = Vec::new();
         while let Some(identity) = pending.pop() {
             if !visited.insert(identity) {
                 continue;
@@ -1453,9 +1577,9 @@ impl ProcessSession {
         if sources.is_empty() {
             return None;
         }
-        Some(ProcessPorts::merge(
-            sources.iter().map(|(local, listening)| (local.as_ref(), listening.as_deref())),
-        ))
+        Some(ProcessPorts::merge(sources.iter().map(
+            |(local, listening)| (local.as_ref(), listening.as_deref()),
+        )))
     }
 
     fn listener_owners_of_peers(
@@ -1468,7 +1592,9 @@ impl ProcessSession {
         };
         let peer_ports: HashSet<u16> = sockets
             .iter()
-            .filter(|endpoint| endpoint.remote_port != 0 && is_loopback_address(&endpoint.remote_address))
+            .filter(|endpoint| {
+                endpoint.remote_port != 0 && is_loopback_address(&endpoint.remote_address)
+            })
             .map(|endpoint| endpoint.remote_port)
             .collect();
         if peer_ports.is_empty() {
@@ -1476,7 +1602,9 @@ impl ProcessSession {
         }
         let mut owners: BTreeMap<u16, Vec<ProcessPortOwner>> = BTreeMap::new();
         for (identity, record) in &self.records {
-            if *identity == selected || self.change_markers.get(identity) == Some(&ChangeMarker::Terminated) {
+            if *identity == selected
+                || self.change_markers.get(identity) == Some(&ChangeMarker::Terminated)
+            {
                 continue;
             }
             for port in record.listening_ports.as_deref().unwrap_or(&[]) {
@@ -1506,7 +1634,11 @@ fn compare_by_pid(left: ProcessIdentity, right: ProcessIdentity) -> Ordering {
 /// processes with only other local ports, then processes without ports.
 fn compare_ports(left: &ProcessRecord, right: &ProcessRecord) -> Ordering {
     fn key(record: &ProcessRecord) -> (u8, i64) {
-        if let Some(first) = record.listening_ports.as_deref().and_then(|ports| ports.first()) {
+        if let Some(first) = record
+            .listening_ports
+            .as_deref()
+            .and_then(|ports| ports.first())
+        {
             return (0, i64::from(*first));
         }
         match record.local_ports.as_deref() {

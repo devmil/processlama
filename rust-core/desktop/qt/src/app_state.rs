@@ -4,10 +4,12 @@
 //! into the inbox and never publish synchronously, so no QML binding re-enters
 //! a borrowed bridge object.
 
-use processlama_application::{Command, CoreEvent, EventSink, InstallChoice, ProfileDraft, RemoteCommand, diagnostics};
+use processlama_application::{
+    Command, CoreEvent, EventSink, InstallChoice, ProfileDraft, RemoteCommand, diagnostics,
+};
 use processlama_domain::{
-    AppearanceMode, BackgroundRefreshMode, ProcessIdentity, ProcessSignal, ReleaseChannel, RowDensity, SearchAspect,
-    SortColumn,
+    AppearanceMode, BackgroundRefreshMode, ProcessIdentity, ProcessSignal, ReleaseChannel,
+    RowDensity, SearchAspect, SortColumn,
 };
 use qtbridge::qobject;
 use serde_json::Value;
@@ -64,17 +66,45 @@ mod app_state {
         qproperty!("platform", Member = platform, Notify = platform_changed);
         qproperty!("tabs", Member = tabs, Notify = tabs_changed);
         qproperty!("activeTab", Member = active_tab, Notify = tabs_changed);
-        qproperty!("activeTabIndex", Member = active_tab_index, Notify = tabs_changed);
+        qproperty!(
+            "activeTabIndex",
+            Member = active_tab_index,
+            Notify = tabs_changed
+        );
         qproperty!("session", Member = session, Notify = session_changed);
         qproperty!("inspector", Member = inspector, Notify = inspector_changed);
         qproperty!("snapshots", Member = snapshots, Notify = snapshots_changed);
-        qproperty!("remoteHosts", Member = remote_hosts, Notify = remote_hosts_changed);
+        qproperty!(
+            "remoteHosts",
+            Member = remote_hosts,
+            Notify = remote_hosts_changed
+        );
         qproperty!("pinnedRows", Member = pinned_rows, Notify = pinned_changed);
-        qproperty!("savedFilters", Member = saved_filters, Notify = saved_filters_changed);
-        qproperty!("iconRevision", Member = icon_revision, Notify = icons_changed);
-        qproperty!("networkAvailable", Member = network_available, Notify = platform_changed);
-        qproperty!("diagnosticsDetailed", Member = diagnostics_detailed, Notify = diagnostics_changed);
-        qproperty!("startupSnapshot", Member = startup_snapshot, Notify = platform_changed);
+        qproperty!(
+            "savedFilters",
+            Member = saved_filters,
+            Notify = saved_filters_changed
+        );
+        qproperty!(
+            "iconRevision",
+            Member = icon_revision,
+            Notify = icons_changed
+        );
+        qproperty!(
+            "networkAvailable",
+            Member = network_available,
+            Notify = platform_changed
+        );
+        qproperty!(
+            "diagnosticsDetailed",
+            Member = diagnostics_detailed,
+            Notify = diagnostics_changed
+        );
+        qproperty!(
+            "startupSnapshot",
+            Member = startup_snapshot,
+            Notify = platform_changed
+        );
 
         #[qsignal]
         pub fn settings_changed(&mut self);
@@ -103,13 +133,25 @@ mod app_state {
         #[qsignal]
         pub fn toast(&mut self, key: String, args: Vec<String>, tone: String);
         #[qsignal]
-        pub fn update_available(&mut self, installed_version: String, installed_build: String, version: String, build: String);
+        pub fn update_available(
+            &mut self,
+            installed_version: String,
+            installed_build: String,
+            version: String,
+            build: String,
+        );
         #[qsignal]
         pub fn confirm_helper_install(&mut self, prompt: Value);
         #[qsignal]
         pub fn profile_saved(&mut self, request: i32, profile_id: String, error: String);
         #[qsignal]
-        pub fn probe_finished(&mut self, request: i32, outcome: String, platform: String, compatibility: String);
+        pub fn probe_finished(
+            &mut self,
+            request: i32,
+            outcome: String,
+            platform: String,
+            compatibility: String,
+        );
         #[qsignal]
         pub fn copy_to_clipboard(&mut self, text: String, toast_key: String);
 
@@ -215,7 +257,8 @@ mod app_state {
         }
         #[qslot]
         fn sort_by(&mut self, column: String) {
-            let sort = processlama_presentation::column_definition(&column).map(|definition| definition.sort);
+            let sort = processlama_presentation::column_definition(&column)
+                .map(|definition| definition.sort);
             if let Some(sort) = sort.or_else(|| SortColumn::parse(&column)) {
                 self.send(Command::SortBy(sort));
             }
@@ -458,7 +501,10 @@ mod app_state {
                 "installAlways" => InstallChoice::InstallAlways,
                 _ => InstallChoice::Cancel,
             };
-            self.send(Command::Remote(RemoteCommand::InstallChoice { profile_id: id, choice }));
+            self.send(Command::Remote(RemoteCommand::InstallChoice {
+                profile_id: id,
+                choice,
+            }));
         }
         #[qslot]
         fn remove_remote_helper(&mut self, id: String) {
@@ -466,7 +512,9 @@ mod app_state {
         }
         #[qslot]
         fn copy_network_install_command(&mut self, id: String) {
-            self.send(Command::Remote(RemoteCommand::CopyNetworkInstallCommand(id)));
+            self.send(Command::Remote(RemoteCommand::CopyNetworkInstallCommand(
+                id,
+            )));
         }
         #[qslot]
         fn set_default_background_refresh(&mut self, value: String) {
@@ -508,9 +556,21 @@ mod app_state {
         }
         #[qslot]
         fn diagnostics_snapshot(&self) -> String {
-            let platform = self.platform.get("os").and_then(Value::as_str).unwrap_or("unknown");
-            let version = self.platform.get("version").and_then(Value::as_str).unwrap_or("unknown");
-            let build = self.platform.get("build").and_then(Value::as_str).unwrap_or("");
+            let platform = self
+                .platform
+                .get("os")
+                .and_then(Value::as_str)
+                .unwrap_or("unknown");
+            let version = self
+                .platform
+                .get("version")
+                .and_then(Value::as_str)
+                .unwrap_or("unknown");
+            let build = self
+                .platform
+                .get("build")
+                .and_then(Value::as_str)
+                .unwrap_or("");
             diagnostics::snapshot("processlama", &format!("{version}+{build}"), platform)
         }
         /// Writes exported text to `url` (a `file:` URL or a path).

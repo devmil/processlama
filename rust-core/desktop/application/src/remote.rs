@@ -9,15 +9,19 @@ use crate::events::CoreEvent;
 use crate::ports::{EventSink, SourceId};
 use crate::reconnect::Reconnector;
 use crate::remote_ports::{
-    CancelToken, HelperArtifact, RemoteConnection, RemoteHostError, TelemetryResult, TelemetrySubscription,
+    CancelToken, HelperArtifact, RemoteConnection, RemoteHostError, TelemetryResult,
+    TelemetrySubscription,
 };
-use crate::session::{Cadence, ProcessSession, SessionSource, SourcePhase, SourceState, DEFAULT_BACKGROUND_REFRESH_MS};
+use crate::session::{
+    Cadence, DEFAULT_BACKGROUND_REFRESH_MS, ProcessSession, SessionSource, SourcePhase, SourceState,
+};
 use processlama_domain::{
-    BackgroundRefreshMode, HostCapabilities, ProcessIconRef, ProcessIdentity, ProcessSignal, ProcessSnapshot,
-    RemoteConnectionPhase, RemoteFailureCode, RemoteHelperHello, RemoteHelperTarget, RemoteHostFacts,
-    RemoteHostProfile, RemoteInstallResult, SignalOutcome, SnapshotDocument, SnapshotHost,
-    MAXIMUM_REMOTE_HOST_PROFILES, MAXIMUM_REMOTE_TABS, MAX_REMOTE_ICON_CACHE_BYTES, MIN_REMOTE_ICON_CACHE_BYTES,
-    REMOTE_HOST_DISPLAY_NAME_MAX_LENGTH, is_valid_alias, is_valid_display_name,
+    BackgroundRefreshMode, HostCapabilities, MAX_REMOTE_ICON_CACHE_BYTES,
+    MAXIMUM_REMOTE_HOST_PROFILES, MAXIMUM_REMOTE_TABS, MIN_REMOTE_ICON_CACHE_BYTES, ProcessIconRef,
+    ProcessIdentity, ProcessSignal, ProcessSnapshot, REMOTE_HOST_DISPLAY_NAME_MAX_LENGTH,
+    RemoteConnectionPhase, RemoteFailureCode, RemoteHelperHello, RemoteHelperTarget,
+    RemoteHostFacts, RemoteHostProfile, RemoteInstallResult, SignalOutcome, SnapshotDocument,
+    SnapshotHost, is_valid_alias, is_valid_display_name,
 };
 use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap};
@@ -100,13 +104,19 @@ pub enum RemoteCommand {
     },
     DuplicateProfile(String),
     RemoveProfile(String),
-    TestConnection { request: u64, alias: String },
+    TestConnection {
+        request: u64,
+        alias: String,
+    },
     /// Opens (or selects) the profile's tab and connects.
     OpenTab(String),
     /// Connects, asking to install the helper when the host needs it.
     Connect(String),
     Disconnect(String),
-    InstallChoice { profile_id: String, choice: InstallChoice },
+    InstallChoice {
+        profile_id: String,
+        choice: InstallChoice,
+    },
     /// Removes every helper from the host (after the user confirmed).
     RemoveHelper(String),
     CopyNetworkInstallCommand(String),
@@ -312,7 +322,11 @@ fn getrandom_fill(bytes: &mut [u8]) -> Result<(), ()> {
 /// The shell command that installs this build's network service package on a
 /// Linux host of `target`; None for other hosts. The user runs it; the app
 /// never runs sudo over SSH.
-pub fn network_service_install_command(version: &str, build: u64, target: RemoteHelperTarget) -> Option<String> {
+pub fn network_service_install_command(
+    version: &str,
+    build: u64,
+    target: RemoteHelperTarget,
+) -> Option<String> {
     let arch = match target {
         RemoteHelperTarget::LinuxX8664 => "x86_64",
         RemoteHelperTarget::LinuxArm64 => "aarch64",
@@ -342,12 +356,24 @@ pub(crate) fn base64_encode(bytes: &[u8]) -> String {
     const TABLE: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     let mut out = String::with_capacity(bytes.len().div_ceil(3) * 4);
     for chunk in bytes.chunks(3) {
-        let b = [chunk[0], *chunk.get(1).unwrap_or(&0), *chunk.get(2).unwrap_or(&0)];
+        let b = [
+            chunk[0],
+            *chunk.get(1).unwrap_or(&0),
+            *chunk.get(2).unwrap_or(&0),
+        ];
         let n = (u32::from(b[0]) << 16) | (u32::from(b[1]) << 8) | u32::from(b[2]);
         out.push(TABLE[(n >> 18) as usize & 63] as char);
         out.push(TABLE[(n >> 12) as usize & 63] as char);
-        out.push(if chunk.len() > 1 { TABLE[(n >> 6) as usize & 63] as char } else { '=' });
-        out.push(if chunk.len() > 2 { TABLE[n as usize & 63] as char } else { '=' });
+        out.push(if chunk.len() > 1 {
+            TABLE[(n >> 6) as usize & 63] as char
+        } else {
+            '='
+        });
+        out.push(if chunk.len() > 2 {
+            TABLE[n as usize & 63] as char
+        } else {
+            '='
+        });
     }
     out
 }
@@ -364,7 +390,7 @@ pub(crate) fn base64_decode(text: &str) -> Option<Vec<u8>> {
         })
     };
     let bytes = text.as_bytes();
-    if bytes.len() % 4 != 0 {
+    if !bytes.len().is_multiple_of(4) {
         return None;
     }
     let mut out = Vec::with_capacity(bytes.len() / 4 * 3);
@@ -415,7 +441,11 @@ impl AppCore {
         let mut open: Vec<String> = state
             .open_tabs
             .iter()
-            .filter(|id| state.profile(id).is_some_and(|profile| profile.open_on_startup != Some(false)))
+            .filter(|id| {
+                state
+                    .profile(id)
+                    .is_some_and(|profile| profile.open_on_startup != Some(false))
+            })
             .cloned()
             .collect();
         for profile in &state.profiles {
@@ -442,7 +472,7 @@ impl AppCore {
         if let Some(index) = self.tabs.iter().position(|tab| tab.key == key) {
             return Some(index);
         }
-        if self.profile(profile_id).is_none() || self.tabs.len() - 1 >= MAXIMUM_REMOTE_TABS {
+        if self.profile(profile_id).is_none() || self.tabs.len() > MAXIMUM_REMOTE_TABS {
             return None;
         }
         let source = self.allocate_source();
@@ -535,7 +565,10 @@ impl AppCore {
     fn acquire(&mut self, profile_id: &str) {
         let host = self.host_mut(profile_id);
         host.leases += 1;
-        if host.connection.is_none() && !host.attempting && host.state.phase != RemoteConnectionPhase::Reconnecting {
+        if host.connection.is_none()
+            && !host.attempting
+            && host.state.phase != RemoteConnectionPhase::Reconnecting
+        {
             self.connect(profile_id, false);
         }
     }
@@ -552,7 +585,11 @@ impl AppCore {
     /// missing helper and reports failures.
     fn connect(&mut self, profile_id: &str, workflow: bool) {
         let host = self.host_mut(profile_id);
-        if host.connection.as_ref().is_some_and(|connection| connection.is_open()) {
+        if host
+            .connection
+            .as_ref()
+            .is_some_and(|connection| connection.is_open())
+        {
             return;
         }
         if workflow {
@@ -566,7 +603,10 @@ impl AppCore {
     }
 
     fn start_attempt(&mut self, profile_id: &str, reconnecting: bool) {
-        let Some(alias) = self.profile(profile_id).map(|profile| profile.ssh_alias.clone()) else {
+        let Some(alias) = self
+            .profile(profile_id)
+            .map(|profile| profile.ssh_alias.clone())
+        else {
             let host = self.host_mut(profile_id);
             host.state = ConnectionState {
                 phase: RemoteConnectionPhase::Failed,
@@ -625,7 +665,11 @@ impl AppCore {
         generation: u64,
         result: Result<Arc<dyn RemoteConnection>, RemoteHostError>,
     ) {
-        let disposed_or_stale = self.remote.hosts.get(profile_id).is_none_or(|host| host.generation != generation);
+        let disposed_or_stale = self
+            .remote
+            .hosts
+            .get(profile_id)
+            .is_none_or(|host| host.generation != generation);
         if disposed_or_stale {
             if let Ok(connection) = result {
                 std::thread::spawn(move || connection.close());
@@ -639,7 +683,9 @@ impl AppCore {
     }
 
     fn on_connect_failed(&mut self, profile_id: &str, error: RemoteHostError) {
-        let auto_install = self.profile(profile_id).is_some_and(|profile| profile.auto_install_helper);
+        let auto_install = self
+            .profile(profile_id)
+            .is_some_and(|profile| profile.auto_install_helper);
         let host = self.host_mut(profile_id);
         let reconnecting = host.attempt_reconnecting;
         if error.code == RemoteFailureCode::HelperNotInstalled
@@ -694,7 +740,11 @@ impl AppCore {
         let prune = !host.pruned;
         host.pruned = true;
         self.update_facts(profile_id, facts.clone());
-        if prune && let Some(alias) = self.profile(profile_id).map(|profile| profile.ssh_alias.clone()) {
+        if prune
+            && let Some(alias) = self
+                .profile(profile_id)
+                .map(|profile| profile.ssh_alias.clone())
+        {
             let connector = Arc::clone(&self.ports.remote);
             let keep = facts.helper_build_id.clone();
             self.spawn(move || {
@@ -707,7 +757,12 @@ impl AppCore {
     }
 
     fn update_facts(&mut self, profile_id: &str, facts: RemoteHostFacts) {
-        let Some(profile) = self.remote_state.profiles.iter_mut().find(|profile| profile.id == profile_id) else {
+        let Some(profile) = self
+            .remote_state
+            .profiles
+            .iter_mut()
+            .find(|profile| profile.id == profile_id)
+        else {
             return;
         };
         if profile.last_known.as_ref() == Some(&facts) {
@@ -718,7 +773,9 @@ impl AppCore {
     }
 
     fn on_closed(&mut self, profile_id: &str, failure: Option<RemoteFailureCode>) {
-        let auto_reconnect = self.profile(profile_id).is_some_and(|profile| profile.auto_reconnect);
+        let auto_reconnect = self
+            .profile(profile_id)
+            .is_some_and(|profile| profile.auto_reconnect);
         let now = self.now();
         let Some(host) = self.remote.hosts.get_mut(profile_id) else {
             return;
@@ -763,7 +820,11 @@ impl AppCore {
             .remote
             .hosts
             .iter()
-            .filter(|(_, host)| host.reconnector.and_then(|r| r.next_at).is_some_and(|at| at <= now))
+            .filter(|(_, host)| {
+                host.reconnector
+                    .and_then(|r| r.next_at)
+                    .is_some_and(|at| at <= now)
+            })
             .map(|(id, _)| id.clone())
             .collect();
         for profile_id in due {
@@ -819,8 +880,16 @@ impl AppCore {
 
     // Helper installs
 
-    fn start_install(&mut self, profile_id: &str, target: RemoteHelperTarget, during_connect: bool) {
-        let Some(alias) = self.profile(profile_id).map(|profile| profile.ssh_alias.clone()) else {
+    fn start_install(
+        &mut self,
+        profile_id: &str,
+        target: RemoteHelperTarget,
+        during_connect: bool,
+    ) {
+        let Some(alias) = self
+            .profile(profile_id)
+            .map(|profile| profile.ssh_alias.clone())
+        else {
             return;
         };
         let Some(artifact) = self.ports.remote.bundled_helper(target) else {
@@ -861,7 +930,12 @@ impl AppCore {
         during_connect: bool,
         result: Result<RemoteInstallResult, RemoteHostError>,
     ) {
-        if self.remote.hosts.get(profile_id).is_none_or(|host| host.generation != generation) {
+        if self
+            .remote
+            .hosts
+            .get(profile_id)
+            .is_none_or(|host| host.generation != generation)
+        {
             return;
         }
         let host = self.host_mut(profile_id);
@@ -869,7 +943,9 @@ impl AppCore {
             Ok(RemoteInstallResult::Ok) => {
                 if during_connect {
                     host.state.phase = RemoteConnectionPhase::Handshaking;
-                    let alias = self.profile(profile_id).map(|profile| profile.ssh_alias.clone());
+                    let alias = self
+                        .profile(profile_id)
+                        .map(|profile| profile.ssh_alias.clone());
                     let cancel = self.host_mut(profile_id).cancel.clone().unwrap_or_default();
                     self.mark_connections();
                     if let Some(alias) = alias {
@@ -906,8 +982,14 @@ impl AppCore {
 
     fn report_install_failed(&mut self, profile_id: &str, failure: Option<RemoteFailureCode>) {
         let host = self.host_name(profile_id);
-        let reason = failure.map(|code| format!("@failure:{}", code.name())).unwrap_or_default();
-        self.toast("remoteHelperInstallFailed", vec![host, reason], ToastTone::Error);
+        let reason = failure
+            .map(|code| format!("@failure:{}", code.name()))
+            .unwrap_or_default();
+        self.toast(
+            "remoteHelperInstallFailed",
+            vec![host, reason],
+            ToastTone::Error,
+        );
     }
 
     /// A workflow connect finished: ask to install a missing helper, or
@@ -925,8 +1007,15 @@ impl AppCore {
             self.prompt_install(profile_id, target);
         } else if state.phase == RemoteConnectionPhase::Failed {
             let host = self.host_name(profile_id);
-            let reason = state.failure.map(|code| format!("@failure:{}", code.name())).unwrap_or_default();
-            self.toast("remoteHostConnectFailed", vec![host, reason], ToastTone::Error);
+            let reason = state
+                .failure
+                .map(|code| format!("@failure:{}", code.name()))
+                .unwrap_or_default();
+            self.toast(
+                "remoteHostConnectFailed",
+                vec![host, reason],
+                ToastTone::Error,
+            );
         }
     }
 
@@ -936,10 +1025,17 @@ impl AppCore {
         };
         let Some(artifact) = self.ports.remote.bundled_helper(target) else {
             let host = self.host_name(profile_id);
-            self.toast("remoteHelperInstallUnavailable", vec![host], ToastTone::Error);
+            self.toast(
+                "remoteHelperInstallUnavailable",
+                vec![host],
+                ToastTone::Error,
+            );
             return;
         };
-        let previous = profile.last_known.as_ref().map(|facts| facts.helper_build_id.clone());
+        let previous = profile
+            .last_known
+            .as_ref()
+            .map(|facts| facts.helper_build_id.clone());
         let prompt = InstallPrompt {
             profile_id: profile_id.to_owned(),
             host: profile.display_name.clone(),
@@ -964,7 +1060,11 @@ impl AppCore {
             InstallChoice::Cancel => {}
             InstallChoice::Install | InstallChoice::InstallAlways => {
                 if choice == InstallChoice::InstallAlways
-                    && let Some(profile) = self.remote_state.profiles.iter_mut().find(|p| p.id == profile_id)
+                    && let Some(profile) = self
+                        .remote_state
+                        .profiles
+                        .iter_mut()
+                        .find(|p| p.id == profile_id)
                 {
                     profile.auto_install_helper = true;
                     self.save_remote_hosts("profile");
@@ -1009,7 +1109,9 @@ impl AppCore {
             Err(error) => {
                 let outcome = match error.code {
                     RemoteFailureCode::HostKeyUntrusted => ProbeOutcome::HostKeyUntrusted,
-                    RemoteFailureCode::AuthenticationInteractive => ProbeOutcome::AuthenticationInteractive,
+                    RemoteFailureCode::AuthenticationInteractive => {
+                        ProbeOutcome::AuthenticationInteractive
+                    }
                     RemoteFailureCode::UnsupportedPlatform => ProbeOutcome::UnsupportedPlatform,
                     RemoteFailureCode::HelperNotInstalled => ProbeOutcome::HelperMissing,
                     RemoteFailureCode::HelperOutdated
@@ -1020,9 +1122,10 @@ impl AppCore {
                 };
                 (
                     outcome,
-                    error
-                        .host_target
-                        .map_or_else(|| "–".to_owned(), |target| target.platform_label().to_owned()),
+                    error.host_target.map_or_else(
+                        || "–".to_owned(),
+                        |target| target.platform_label().to_owned(),
+                    ),
                     "–".to_owned(),
                 )
             }
@@ -1078,7 +1181,12 @@ impl AppCore {
                 id
             }
             Some(id) => {
-                let Some(profile) = self.remote_state.profiles.iter_mut().find(|profile| profile.id == id) else {
+                let Some(profile) = self
+                    .remote_state
+                    .profiles
+                    .iter_mut()
+                    .find(|profile| profile.id == id)
+                else {
                     self.emit(UiEvent::ProfileSaved {
                         request,
                         profile_id: None,
@@ -1143,7 +1251,9 @@ impl AppCore {
         self.handle_command_close_tab(&key);
         self.disconnect(id);
         self.remote.hosts.remove(id);
-        self.remote_state.profiles.retain(|profile| profile.id != id);
+        self.remote_state
+            .profiles
+            .retain(|profile| profile.id != id);
         self.remote_state.open_tabs.retain(|tab| tab != id);
         if self.remote_state.active_tab.as_deref() == Some(key.as_str()) {
             self.remote_state.active_tab = Some("local".into());
@@ -1153,7 +1263,9 @@ impl AppCore {
     }
 
     fn handle_command_close_tab(&mut self, key: &str) {
-        self.handle(CoreEvent::Command(crate::events::Command::CloseTab(key.to_owned())));
+        self.handle(CoreEvent::Command(crate::events::Command::CloseTab(
+            key.to_owned(),
+        )));
     }
 
     pub(crate) fn set_default_background_refresh(&mut self, mode: BackgroundRefreshMode) {
@@ -1178,10 +1290,14 @@ impl AppCore {
 
     pub(crate) fn handle_remote_command(&mut self, command: RemoteCommand) {
         match command {
-            RemoteCommand::SaveProfile { request, id, draft } => self.save_profile(request, id, draft),
+            RemoteCommand::SaveProfile { request, id, draft } => {
+                self.save_profile(request, id, draft)
+            }
             RemoteCommand::DuplicateProfile(id) => self.duplicate_profile(&id),
             RemoteCommand::RemoveProfile(id) => self.remove_profile(&id),
-            RemoteCommand::TestConnection { request, alias } => self.test_connection(request, alias),
+            RemoteCommand::TestConnection { request, alias } => {
+                self.test_connection(request, alias)
+            }
             RemoteCommand::OpenTab(id) => match self.open_remote_tab(&id, true) {
                 Some(index) => {
                     self.activate(index, true);
@@ -1189,7 +1305,11 @@ impl AppCore {
                 }
                 None => {
                     if self.profile(&id).is_some() {
-                        self.toast("remoteTabLimit", vec![MAXIMUM_REMOTE_TABS.to_string()], ToastTone::Error);
+                        self.toast(
+                            "remoteTabLimit",
+                            vec![MAXIMUM_REMOTE_TABS.to_string()],
+                            ToastTone::Error,
+                        );
                     }
                 }
             },
@@ -1204,7 +1324,9 @@ impl AppCore {
                 }
             }
             RemoteCommand::Disconnect(id) => self.disconnect(&id),
-            RemoteCommand::InstallChoice { profile_id, choice } => self.on_install_choice(&profile_id, choice),
+            RemoteCommand::InstallChoice { profile_id, choice } => {
+                self.on_install_choice(&profile_id, choice)
+            }
             RemoteCommand::RemoveHelper(id) => {
                 let Some(alias) = self.profile(&id).map(|profile| profile.ssh_alias.clone()) else {
                     return;
@@ -1214,7 +1336,10 @@ impl AppCore {
                 let sink = self.sink();
                 self.spawn(move || {
                     let result = connector.remove_helpers(&alias);
-                    sink.post(CoreEvent::Remote(RemoteEvent::HelperRemoved { profile_id: id, result }));
+                    sink.post(CoreEvent::Remote(RemoteEvent::HelperRemoved {
+                        profile_id: id,
+                        result,
+                    }));
                 });
             }
             RemoteCommand::CopyNetworkInstallCommand(id) => {
@@ -1224,9 +1349,9 @@ impl AppCore {
                     .hello
                     .map(|hello| hello.facts.target);
                 let installed = self.ports.updates.installed();
-                if let Some(command) =
-                    target.and_then(|target| network_service_install_command(&installed.version, installed.build, target))
-                {
+                if let Some(command) = target.and_then(|target| {
+                    network_service_install_command(&installed.version, installed.build, target)
+                }) {
                     self.emit(UiEvent::CopyToClipboard {
                         text: command,
                         toast_key: "remoteCapabilityInstallCommandCopied",
@@ -1243,7 +1368,11 @@ impl AppCore {
                 generation,
                 result,
             } => self.on_connected(&profile_id, generation, result),
-            RemoteEvent::Closed { profile_id, failure, .. } => self.on_closed(&profile_id, failure),
+            RemoteEvent::Closed {
+                profile_id,
+                failure,
+                ..
+            } => self.on_closed(&profile_id, failure),
             RemoteEvent::Installed {
                 profile_id,
                 generation,
@@ -1255,12 +1384,22 @@ impl AppCore {
                 self.host_mut(&profile_id).pruned = false;
                 let host = self.host_name(&profile_id);
                 match result {
-                    Ok(RemoteInstallResult::Ok) => self.toast("remoteHelperRemoved", vec![host], ToastTone::Success),
+                    Ok(RemoteInstallResult::Ok) => {
+                        self.toast("remoteHelperRemoved", vec![host], ToastTone::Success)
+                    }
                     _ => self.toast("remoteHelperRemoveFailed", vec![host], ToastTone::Error),
                 }
             }
-            RemoteEvent::Subscribed { source, serial, result } => self.on_subscribed(source, serial, result),
-            RemoteEvent::Telemetry { source, serial, result } => self.on_telemetry(source, serial, result),
+            RemoteEvent::Subscribed {
+                source,
+                serial,
+                result,
+            } => self.on_subscribed(source, serial, result),
+            RemoteEvent::Telemetry {
+                source,
+                serial,
+                result,
+            } => self.on_telemetry(source, serial, result),
             RemoteEvent::IconsFetched {
                 source_key,
                 hashes,
@@ -1316,7 +1455,9 @@ impl AppCore {
                     SourcePhase::Live
                 }
             }
-            RemoteConnectionPhase::Failed | RemoteConnectionPhase::Reconnecting | RemoteConnectionPhase::Disconnected => {
+            RemoteConnectionPhase::Failed
+            | RemoteConnectionPhase::Reconnecting
+            | RemoteConnectionPhase::Disconnected => {
                 if last_sample.is_none() {
                     SourcePhase::Failed
                 } else {
@@ -1364,7 +1505,11 @@ impl AppCore {
             (shared.cadence, shared.polling_ms.max(1))
         };
         let cadence_ms = cadence.and_then(Cadence::interval_ms);
-        let polling = if polling <= 1 { self.settings.polling_interval_ms } else { polling };
+        let polling = if polling <= 1 {
+            self.settings.polling_interval_ms
+        } else {
+            polling
+        };
         let sink = self.sink();
         self.spawn(move || {
             let sample_sink = Arc::clone(&sink);
@@ -1372,14 +1517,27 @@ impl AppCore {
                 cadence_ms,
                 polling,
                 Box::new(move |result| {
-                    sample_sink.post(CoreEvent::Remote(RemoteEvent::Telemetry { source, serial, result }));
+                    sample_sink.post(CoreEvent::Remote(RemoteEvent::Telemetry {
+                        source,
+                        serial,
+                        result,
+                    }));
                 }),
             );
-            sink.post(CoreEvent::Remote(RemoteEvent::Subscribed { source, serial, result }));
+            sink.post(CoreEvent::Remote(RemoteEvent::Subscribed {
+                source,
+                serial,
+                result,
+            }));
         });
     }
 
-    fn on_subscribed(&mut self, source: SourceId, serial: u64, result: Result<Arc<dyn TelemetrySubscription>, String>) {
+    fn on_subscribed(
+        &mut self,
+        source: SourceId,
+        serial: u64,
+        result: Result<Arc<dyn TelemetrySubscription>, String>,
+    ) {
         let Some(tab) = self.remote.tabs.get_mut(&source) else {
             if let Ok(subscription) = result {
                 subscription.cancel();
@@ -1444,7 +1602,10 @@ impl AppCore {
         };
         let first = tab.last_sample_at.is_none();
         tab.last_sample_at = Some(wall);
-        let topology = snapshot.topology.as_ref().map(|topology| Arc::as_ptr(topology) as usize);
+        let topology = snapshot
+            .topology
+            .as_ref()
+            .map(|topology| Arc::as_ptr(topology) as usize);
         let fetch = if tab.icon_topology != topology {
             tab.icon_topology = topology;
             tab.shared.borrow().connection.clone()
@@ -1496,7 +1657,11 @@ impl AppCore {
         identity: ProcessIdentity,
         signal: ProcessSignal,
     ) {
-        let connection = self.remote.hosts.get(profile_id).and_then(|host| host.connection.clone());
+        let connection = self
+            .remote
+            .hosts
+            .get(profile_id)
+            .and_then(|host| host.connection.clone());
         let sink = self.sink();
         let Some(connection) = connection else {
             sink.post(CoreEvent::SignalSent {
@@ -1509,7 +1674,9 @@ impl AppCore {
         };
         self.spawn(move || {
             // A failed call may or may not have sent it; never resend.
-            let outcome = connection.send_signal(identity, signal).unwrap_or(SignalOutcome::Unknown);
+            let outcome = connection
+                .send_signal(identity, signal)
+                .unwrap_or(SignalOutcome::Unknown);
             sink.post(CoreEvent::SignalSent {
                 source,
                 identity,
@@ -1519,7 +1686,11 @@ impl AppCore {
         });
     }
 
-    pub(crate) fn remote_snapshot_context(&self, profile_id: &str, snapshot: &ProcessSnapshot) -> RemoteSnapshotContext {
+    pub(crate) fn remote_snapshot_context(
+        &self,
+        profile_id: &str,
+        snapshot: &ProcessSnapshot,
+    ) -> RemoteSnapshotContext {
         let profile = self.profile(profile_id);
         let facts = self
             .remote
@@ -1544,8 +1715,14 @@ impl AppCore {
             host: SnapshotHost {
                 display_name: profile.map(|p| p.display_name.clone()).unwrap_or_default(),
                 alias: profile.map(|p| p.ssh_alias.clone()).unwrap_or_default(),
-                operating_system: facts.as_ref().map(|f| f.target.os().to_owned()).unwrap_or_default(),
-                architecture: facts.as_ref().map(|f| f.target.arch().to_owned()).unwrap_or_default(),
+                operating_system: facts
+                    .as_ref()
+                    .map(|f| f.target.os().to_owned())
+                    .unwrap_or_default(),
+                architecture: facts
+                    .as_ref()
+                    .map(|f| f.target.arch().to_owned())
+                    .unwrap_or_default(),
             },
             icons,
         }
@@ -1603,10 +1780,16 @@ mod tests {
 
     #[test]
     fn network_install_commands_only_for_linux() {
-        assert!(network_service_install_command("1.0.0", 5, RemoteHelperTarget::MacosArm64).is_none());
-        let command = network_service_install_command("1.0.0", 5, RemoteHelperTarget::LinuxArm64).unwrap();
+        assert!(
+            network_service_install_command("1.0.0", 5, RemoteHelperTarget::MacosArm64).is_none()
+        );
+        let command =
+            network_service_install_command("1.0.0", 5, RemoteHelperTarget::LinuxArm64).unwrap();
         assert!(command.contains("processlama-network-service-1.0.0-5-linux-aarch64.tar.gz"));
-        assert!(command.ends_with("sudo ./processlama-network-service-1.0.0-5-linux-aarch64/install.sh"));
+        assert!(
+            command
+                .ends_with("sudo ./processlama-network-service-1.0.0-5-linux-aarch64/install.sh")
+        );
     }
 
     #[test]

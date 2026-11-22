@@ -41,7 +41,10 @@ fn talks_to_the_real_helper() {
         eprintln!("skipped: no processlama-remote-helper build");
         return;
     };
-    let script = format!("printf 'motd\\nPROCESSLAMA-BOOTSTRAP 1 start\\n'; exec '{}' --stdio", helper.display());
+    let script = format!(
+        "printf 'motd\\nPROCESSLAMA-BOOTSTRAP 1 start\\n'; exec '{}' --stdio",
+        helper.display()
+    );
     let (closed_tx, closed_rx) = mpsc::channel();
     let channel = Channel::connect(
         launch(&script),
@@ -70,11 +73,17 @@ fn talks_to_the_real_helper() {
             }),
         )
         .expect("subscribe");
-    let first = samples_rx.recv_timeout(Duration::from_secs(10)).expect("first sample").expect("decodes");
+    let first = samples_rx
+        .recv_timeout(Duration::from_secs(10))
+        .expect("first sample")
+        .expect("decodes");
     assert!(!first.processes.is_empty());
     assert!(first.topology.is_some());
     channel.grant(id, 1);
-    let second = samples_rx.recv_timeout(Duration::from_secs(10)).expect("second sample").expect("decodes");
+    let second = samples_rx
+        .recv_timeout(Duration::from_secs(10))
+        .expect("second sample")
+        .expect("decodes");
     assert!(!second.processes.is_empty());
 
     // A call: the detail of this test process.
@@ -93,12 +102,19 @@ fn talks_to_the_real_helper() {
     codec::decode_detail(&detail).expect("detail decodes");
 
     // An unknown method answers with a typed error.
-    let error = channel.call("no.such.method", serde_json::json!({}), false).unwrap_err();
+    let error = channel
+        .call("no.such.method", serde_json::json!({}), false)
+        .unwrap_err();
     assert!(!error.is_empty());
 
     channel.unsubscribe(id);
     channel.close();
-    assert_eq!(closed_rx.recv_timeout(Duration::from_secs(5)).expect("closed"), None);
+    assert_eq!(
+        closed_rx
+            .recv_timeout(Duration::from_secs(5))
+            .expect("closed"),
+        None
+    );
     assert!(!channel.is_open());
 }
 
@@ -120,7 +136,10 @@ fn reports_bootstrap_markers() {
     };
     assert_eq!(marker.words, ["missing", "linux/x86_64"]);
     let error = processlama_infra_remote::failure_code(&failure);
-    assert_eq!(error.code, processlama_domain::RemoteFailureCode::HelperNotInstalled);
+    assert_eq!(
+        error.code,
+        processlama_domain::RemoteFailureCode::HelperNotInstalled
+    );
     assert!(error.host_target.is_some());
 }
 
@@ -147,11 +166,19 @@ fn rejects_a_hello_of_another_build() {
     };
     let mut config = ChannelConfig::processlama();
     config.build_id = "f".repeat(40);
-    let script = format!("printf 'PROCESSLAMA-BOOTSTRAP 1 start\\n'; exec '{}' --stdio", helper.display());
+    let script = format!(
+        "printf 'PROCESSLAMA-BOOTSTRAP 1 start\\n'; exec '{}' --stdio",
+        helper.display()
+    );
     let (tx, _rx) = mpsc::channel();
-    let failure = Channel::connect(launch(&script), config, &CancelToken::default(), Box::new(move |f| {
-        let _ = tx.send(f);
-    }))
+    let failure = Channel::connect(
+        launch(&script),
+        config,
+        &CancelToken::default(),
+        Box::new(move |f| {
+            let _ = tx.send(f);
+        }),
+    )
     .err()
     .expect("mismatch");
     assert_eq!(failure, ChannelFailure::BuildMismatch);

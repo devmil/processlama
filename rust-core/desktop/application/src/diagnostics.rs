@@ -55,7 +55,9 @@ fn valid_code(code: &str) -> bool {
 }
 
 fn iso_now() -> String {
-    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default();
     let secs = now.as_secs() as i64;
     let millis = now.subsec_millis();
     let days = secs.div_euclid(86_400);
@@ -85,7 +87,9 @@ pub fn record(code: &str, level: Level, fields: &[(&str, f64)], detailed: bool) 
     let Ok(mut history) = HISTORY.lock() else {
         return;
     };
-    let detailed_on = history.detailed_until.is_some_and(|until| Instant::now() < until);
+    let detailed_on = history
+        .detailed_until
+        .is_some_and(|until| Instant::now() < until);
     if (detailed || level < Level::Info) && !detailed_on {
         return;
     }
@@ -119,9 +123,11 @@ pub fn warning(code: &str) {
 }
 
 pub fn is_detailed() -> bool {
-    HISTORY
-        .lock()
-        .is_ok_and(|history| history.detailed_until.is_some_and(|until| Instant::now() < until))
+    HISTORY.lock().is_ok_and(|history| {
+        history
+            .detailed_until
+            .is_some_and(|until| Instant::now() < until)
+    })
 }
 
 pub fn detailed_remaining() -> Option<Duration> {
@@ -161,13 +167,24 @@ pub fn redact(value: &str) -> String {
             } else if word.contains('@') && word.contains('.') && !word.starts_with('@') {
                 "<email>".to_owned()
             } else if (word.starts_with('/') && word[1..].contains('/'))
-                || (word.len() > 2 && word.as_bytes()[1] == b':' && matches!(word.as_bytes()[2], b'\\' | b'/'))
+                || (word.len() > 2
+                    && word.as_bytes()[1] == b':'
+                    && matches!(word.as_bytes()[2], b'\\' | b'/'))
             {
                 "<path>".to_owned()
-            } else if ["password", "passphrase", "token", "secret", "cookie", "authorization", "key"]
-                .iter()
-                .any(|secret| lower.starts_with(&format!("{secret}=")) || lower.starts_with(&format!("{secret}:")))
-            {
+            } else if [
+                "password",
+                "passphrase",
+                "token",
+                "secret",
+                "cookie",
+                "authorization",
+                "key",
+            ]
+            .iter()
+            .any(|secret| {
+                lower.starts_with(&format!("{secret}=")) || lower.starts_with(&format!("{secret}:"))
+            }) {
                 "<secret>".to_owned()
             } else {
                 word.to_owned()
@@ -210,13 +227,21 @@ mod tests {
         info("startup");
         record("bad code!", Level::Info, &[], false);
         record("detail", Level::Info, &[], true);
-        record("sample", Level::Info, &[("count", 3.0), ("nan", f64::NAN)], false);
+        record(
+            "sample",
+            Level::Info,
+            &[("count", 3.0), ("nan", f64::NAN)],
+            false,
+        );
         let text = snapshot("processlama", "1.0", "linux");
         assert!(text.contains("INFO startup"));
         assert!(text.contains("sample count=3"));
         assert!(!text.contains("nan="));
         assert!(!text.contains("bad code"));
         assert!(!text.contains("detail"));
-        assert_eq!(redact("see /home/x/y token=abc https://a.b"), "see <path> <secret> <uri>");
+        assert_eq!(
+            redact("see /home/x/y token=abc https://a.b"),
+            "see <path> <secret> <uri>"
+        );
     }
 }

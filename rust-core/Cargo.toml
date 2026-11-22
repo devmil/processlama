@@ -51,7 +51,6 @@ processlama-infra-storage = { path = "desktop/infra-storage" }
 processlama-infra-platform = { path = "desktop/infra-platform" }
 processlama-qt = { path = "desktop/qt" }
 qtbridge = "=0.2.0"
-serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10"
 base64 = "0.22"

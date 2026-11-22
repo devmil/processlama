@@ -69,7 +69,11 @@ impl ReleaseChannel {
         }
     }
     pub fn parse(value: &str) -> Self {
-        if value == "beta" { Self::Beta } else { Self::Stable }
+        if value == "beta" {
+            Self::Beta
+        } else {
+            Self::Stable
+        }
     }
 }
 
@@ -243,7 +247,10 @@ pub fn normalized_visible_columns(columns: &[String]) -> Vec<String> {
 }
 
 pub fn default_visible_columns() -> Vec<String> {
-    AVAILABLE_COLUMNS.iter().map(|id| (*id).to_owned()).collect()
+    AVAILABLE_COLUMNS
+        .iter()
+        .map(|id| (*id).to_owned())
+        .collect()
 }
 
 pub const DEFAULT_POLLING_INTERVAL_MS: u32 = 1000;
@@ -331,7 +338,11 @@ impl AppSettings {
                 .collect();
         }
         if let Some(v) = map.get("visible_columns").and_then(Value::as_array) {
-            let columns: Vec<String> = v.iter().filter_map(Value::as_str).map(str::to_owned).collect();
+            let columns: Vec<String> = v
+                .iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect();
             if !is_legacy_compact_column_set(&columns) {
                 settings.visible_columns = columns;
             }
@@ -406,8 +417,10 @@ mod tests {
 
     #[test]
     fn json_round_trips() {
-        let mut settings = AppSettings::default();
-        settings.polling_interval_ms = 2000;
+        let mut settings = AppSettings {
+            polling_interval_ms: 2000,
+            ..AppSettings::default()
+        };
         settings.column_widths.insert("pid".into(), 99.0);
         settings.saved_filters = vec!["all:foo".into()];
         settings.release_channel = ReleaseChannel::Beta;

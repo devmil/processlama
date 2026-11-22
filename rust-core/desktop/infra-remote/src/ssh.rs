@@ -10,24 +10,42 @@ const VERSION_PROBE_TIMEOUT: Duration = Duration::from_secs(5);
 /// Options every connection uses; the alias's `~/.ssh/config` supplies the rest.
 pub const FIXED_ARGUMENTS: &[&str] = &[
     "-T",
-    "-o", "RequestTTY=no",
-    "-o", "StdinNull=no",
-    "-o", "BatchMode=yes",
-    "-o", "StrictHostKeyChecking=yes",
-    "-o", "ForwardAgent=no",
-    "-o", "ForwardX11=no",
-    "-o", "ClearAllForwardings=yes",
-    "-o", "GSSAPIDelegateCredentials=no",
-    "-o", "ControlMaster=no",
-    "-o", "ControlPath=none",
-    "-o", "ForkAfterAuthentication=no",
-    "-o", "RemoteCommand=none",
-    "-o", "SessionType=default",
-    "-o", "PermitLocalCommand=no",
-    "-o", "ConnectTimeout=10",
-    "-o", "ConnectionAttempts=1",
-    "-o", "ServerAliveInterval=15",
-    "-o", "ServerAliveCountMax=3",
+    "-o",
+    "RequestTTY=no",
+    "-o",
+    "StdinNull=no",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "ForwardAgent=no",
+    "-o",
+    "ForwardX11=no",
+    "-o",
+    "ClearAllForwardings=yes",
+    "-o",
+    "GSSAPIDelegateCredentials=no",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "ForkAfterAuthentication=no",
+    "-o",
+    "RemoteCommand=none",
+    "-o",
+    "SessionType=default",
+    "-o",
+    "PermitLocalCommand=no",
+    "-o",
+    "ConnectTimeout=10",
+    "-o",
+    "ConnectionAttempts=1",
+    "-o",
+    "ServerAliveInterval=15",
+    "-o",
+    "ServerAliveCountMax=3",
 ];
 
 /// The account's login shell may be zsh or fish; scripts are POSIX sh.
@@ -36,7 +54,11 @@ pub fn posix_shell_command(script: &str) -> String {
 }
 
 /// The full argument list, or None for an alias that is not a plain host alias.
-pub fn arguments(alias: &str, remote_command: &str, config_file: Option<&str>) -> Option<Vec<String>> {
+pub fn arguments(
+    alias: &str,
+    remote_command: &str,
+    config_file: Option<&str>,
+) -> Option<Vec<String>> {
     if !processlama_domain::is_valid_alias(alias) {
         return None;
     }
@@ -45,7 +67,11 @@ pub fn arguments(alias: &str, remote_command: &str, config_file: Option<&str>) -
         arguments.push("-F".to_owned());
         arguments.push(config.to_owned());
     }
-    arguments.extend(FIXED_ARGUMENTS.iter().map(|argument| (*argument).to_owned()));
+    arguments.extend(
+        FIXED_ARGUMENTS
+            .iter()
+            .map(|argument| (*argument).to_owned()),
+    );
     arguments.push("--".to_owned());
     arguments.push(alias.to_owned());
     arguments.push(remote_command.to_owned());
@@ -55,10 +81,20 @@ pub fn arguments(alias: &str, remote_command: &str, config_file: Option<&str>) -
 /// `OpenSSH_9.6p1` or `OpenSSH_for_Windows_8.9`.
 pub fn parse_version(text: &str) -> Option<(u32, u32)> {
     let start = text.find("OpenSSH_")? + "OpenSSH_".len();
-    let rest = text[start..].strip_prefix("for_Windows_").unwrap_or(&text[start..]);
+    let rest = text[start..]
+        .strip_prefix("for_Windows_")
+        .unwrap_or(&text[start..]);
     let mut parts = rest.splitn(2, '.');
-    let major: String = parts.next()?.chars().take_while(char::is_ascii_digit).collect();
-    let minor: String = parts.next()?.chars().take_while(char::is_ascii_digit).collect();
+    let major: String = parts
+        .next()?
+        .chars()
+        .take_while(char::is_ascii_digit)
+        .collect();
+    let minor: String = parts
+        .next()?
+        .chars()
+        .take_while(char::is_ascii_digit)
+        .collect();
     if major.is_empty() || minor.is_empty() || major.len() > 4 || minor.len() > 4 {
         return None;
     }
@@ -75,7 +111,12 @@ pub fn resolve_executable() -> Option<PathBuf> {
     let mut candidates: Vec<PathBuf> = Vec::new();
     if cfg!(windows) {
         if let Some(root) = std::env::var_os("SystemRoot") {
-            candidates.push(Path::new(&root).join("System32").join("OpenSSH").join("ssh.exe"));
+            candidates.push(
+                Path::new(&root)
+                    .join("System32")
+                    .join("OpenSSH")
+                    .join("ssh.exe"),
+            );
         }
         if let Some(path) = std::env::var_os("PATH") {
             for entry in std::env::split_paths(&path) {
@@ -120,7 +161,12 @@ pub fn read_version(executable: &Path) -> Option<String> {
     }
     let mut text = String::new();
     use std::io::Read;
-    child.stderr.take()?.take(4096).read_to_string(&mut text).ok()?;
+    child
+        .stderr
+        .take()?
+        .take(4096)
+        .read_to_string(&mut text)
+        .ok()?;
     Some(text)
 }
 
@@ -179,8 +225,14 @@ mod tests {
 
     #[test]
     fn parses_openssh_versions() {
-        assert_eq!(parse_version("OpenSSH_9.6p1 Ubuntu-3ubuntu13, OpenSSL 3.0.13"), Some((9, 6)));
-        assert_eq!(parse_version("OpenSSH_for_Windows_8.9p1, LibreSSL 3.4.3"), Some((8, 9)));
+        assert_eq!(
+            parse_version("OpenSSH_9.6p1 Ubuntu-3ubuntu13, OpenSSL 3.0.13"),
+            Some((9, 6))
+        );
+        assert_eq!(
+            parse_version("OpenSSH_for_Windows_8.9p1, LibreSSL 3.4.3"),
+            Some((8, 9))
+        );
         assert!(is_supported("OpenSSH_8.9p1"));
         assert!(!is_supported("OpenSSH_8.8p1"));
         assert!(!is_supported("Dropbear v2022.83"));
@@ -188,13 +240,19 @@ mod tests {
 
     #[test]
     fn quotes_scripts_for_sh() {
-        assert_eq!(posix_shell_command("printf 'a'"), "exec /bin/sh -c 'printf '\\''a'\\'''");
+        assert_eq!(
+            posix_shell_command("printf 'a'"),
+            "exec /bin/sh -c 'printf '\\''a'\\'''"
+        );
     }
 
     #[test]
     fn rejects_unsafe_aliases() {
         assert!(arguments("-oProxyCommand=x", "true", None).is_none());
         let arguments = arguments("build-box", "true", None).unwrap();
-        assert_eq!(&arguments[arguments.len() - 3..], ["--", "build-box", "true"]);
+        assert_eq!(
+            &arguments[arguments.len() - 3..],
+            ["--", "build-box", "true"]
+        );
     }
 }

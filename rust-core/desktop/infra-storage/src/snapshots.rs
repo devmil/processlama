@@ -42,7 +42,9 @@ impl FileSnapshotStore {
 
     fn next_file(&self) -> PathBuf {
         loop {
-            let path = self.directory.join(format!("snapshot-{}{SNAPSHOT_EXTENSION}", now_ms()));
+            let path = self
+                .directory
+                .join(format!("snapshot-{}{SNAPSHOT_EXTENSION}", now_ms()));
             if !path.exists() {
                 return path;
             }
@@ -93,7 +95,9 @@ impl SnapshotStore for FileSnapshotStore {
     }
 
     fn export(&self, entry: &SnapshotEntry, target: &str) -> Result<(), String> {
-        std::fs::copy(&entry.path, target).map(|_| ()).map_err(|e| e.to_string())
+        std::fs::copy(&entry.path, target)
+            .map(|_| ())
+            .map_err(|e| e.to_string())
     }
 
     fn rename(&self, entry: &SnapshotEntry, name: &str) -> Result<(), String> {
@@ -144,7 +148,9 @@ mod tests {
         store.rename(&entries[0], " Mine ").unwrap();
         assert_eq!(store.list().unwrap()[0].name.as_deref(), Some("Mine"));
         let external = dir.path().join("outside.json");
-        store.export(&entries[0], external.to_str().unwrap()).unwrap();
+        store
+            .export(&entries[0], external.to_str().unwrap())
+            .unwrap();
         let imported = store.import(external.to_str().unwrap()).unwrap();
         assert_ne!(imported, path);
         assert_eq!(store.list().unwrap().len(), 2);

@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>de.devmil.processlama</id>
   <name>ProcessLama</name>
-  <summary>A Flutter and Rust process explorer</summary>
+  <summary>A Rust and Qt process explorer</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <developer id="de.devmil">
