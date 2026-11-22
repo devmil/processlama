@@ -60,6 +60,8 @@ pub mod ffi {
         fn base_sibling(&self, row: i32, column: i32, idx: &QModelIndex) -> QModelIndex;
         # [rust_name = base_data_changed]
         fn dataChanged(self: Pin<&mut Self>, top_left: &QModelIndex, bottom_right: &QModelIndex);
+        # [rust_name = base_data_changed_roles]
+        fn dataChangedRoles(self: Pin<&mut Self>, top_left: &QModelIndex, bottom_right: &QModelIndex, roles: &[i32]);
         # [rust_name = base_begin_insert_columns]
         fn beginInsertColumns(self: Pin<&mut Self>, parent: &QModelIndex, first: i32, last: i32);
         # [rust_name = base_end_insert_columns]

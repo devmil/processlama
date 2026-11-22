@@ -115,6 +115,17 @@ pub trait QAbstractItemModelBase : QAbstractItemModel {
         let proxy = self.try_get_rust_proxy_ptr().expect("No proxy");
         unsafe { &mut *proxy }.base_data_changed(&mut *self, top_left, bottom_right)
     }
+    /// ProcessLama patch: `dataChanged` naming the roles that changed, so
+    /// views update only the bindings that read them.
+    fn data_changed_roles(
+        &mut self,
+        top_left: &QModelIndex,
+        bottom_right: &QModelIndex,
+        roles: &[i32],
+    ) {
+        let proxy = self.try_get_rust_proxy_ptr().expect("No proxy");
+        unsafe { &mut *proxy }.base_data_changed_roles(&mut *self, top_left, bottom_right, roles)
+    }
     fn begin_insert_columns(
         &mut self,
         parent: &QModelIndex,
@@ -278,6 +289,9 @@ impl QAbstractItemModelProxyRust {
     }
     pub fn base_data_changed(&mut self, mut_ref: &mut dyn QAbstractItemModelAdapter, top_left: &QModelIndex, bottom_right: &QModelIndex) {
         call_cpp_impl!(mut self, mut_ref, base_data_changed(top_left, bottom_right))
+    }
+    pub fn base_data_changed_roles(&mut self, mut_ref: &mut dyn QAbstractItemModelAdapter, top_left: &QModelIndex, bottom_right: &QModelIndex, roles: &[i32]) {
+        call_cpp_impl!(mut self, mut_ref, base_data_changed_roles(top_left, bottom_right, roles))
     }
     pub fn base_begin_insert_columns(&mut self, mut_ref: &mut dyn QAbstractItemModelAdapter, parent: &QModelIndex, first: i32, last: i32) {
         call_cpp_impl!(mut self, mut_ref, base_begin_insert_columns(parent, first, last))

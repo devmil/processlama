@@ -134,19 +134,23 @@ Rectangle {
                     color: Theme.colors.lineStrong
                 }
 
+                // One bar per slot, always 60: a model that grew with the
+                // history regenerated every bar on each new sample.
                 Repeater {
                     objectName: "bars"
-                    model: root.sampleCount
+                    model: root.slots
                     Item {
                         id: bar
                         required property int index
-                        readonly property bool latest: index === root.highlighted
+                        readonly property int sample: index - root.leading
+                        readonly property bool present: sample >= 0 && sample < root.sampleCount
+                        readonly property bool latest: present && sample === root.highlighted
                         // Bars fill their slots edge to edge on whole pixels, so
                         // no uneven gaps appear between them.
-                        readonly property real x0: Math.round((root.leading + index) * chart.slotWidth)
-                        readonly property real x1: Math.round((root.leading + index + 1) * chart.slotWidth)
-                        readonly property real upper: root.sampleAt(root.samples, index)
-                        readonly property real lower: root.diverging ? root.sampleAt(root.lowerSamples, index) : 0
+                        readonly property real x0: Math.round(index * chart.slotWidth)
+                        readonly property real x1: Math.round((index + 1) * chart.slotWidth)
+                        readonly property real upper: present ? root.sampleAt(root.samples, sample) : NaN
+                        readonly property real lower: present && root.diverging ? root.sampleAt(root.lowerSamples, sample) : NaN
                         readonly property real upperHeight: isFinite(upper) ? chart.span * Math.max(0, Math.min(1, upper / chart.effectiveMax)) : 0
                         readonly property real lowerHeight: isFinite(lower) ? chart.span * Math.max(0, Math.min(1, lower / chart.effectiveMax)) : 0
                         Rectangle {

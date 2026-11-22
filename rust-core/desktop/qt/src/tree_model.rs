@@ -41,6 +41,37 @@ pub(crate) fn icon_url(
     }
 }
 
+/// How a kept row changed between two publications.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Change {
+    /// Shape, marker, pin or search state: every role of every cell.
+    Row,
+    /// Values in the first through last visible column.
+    Cells(usize, usize),
+}
+
+/// The bounding box of changed cells: rows and columns, inclusive.
+#[derive(Debug, Default)]
+struct Bounds(Option<(usize, usize, usize, usize)>);
+
+impl Bounds {
+    fn add(&mut self, row: usize, first: usize, last: usize) {
+        self.0 = Some(match self.0 {
+            None => (row, row, first, last),
+            Some((top, bottom, left, right)) => (
+                top.min(row),
+                bottom.max(row),
+                left.min(first),
+                right.max(last),
+            ),
+        });
+    }
+
+    fn range(&self) -> Option<(usize, usize, usize, usize)> {
+        self.0
+    }
+}
+
 #[qobject(Base = QAbstractItemModel, ConvertToCamelCase)]
 mod process_tree_model {
     use super::*;
@@ -69,6 +100,32 @@ mod process_tree_model {
     pub const PID_ROLE: i32 = 276;
     pub const EXECUTABLE_ROLE: i32 = 277;
     pub const NUMERIC_ROLE: i32 = 278;
+    /// The roles a poll changes for a row that keeps its process and shape.
+    pub const VALUE_ROLES: [i32; 8] = [
+        TEXT_ROLE,
+        USAGE_ROLE,
+        HEAT_ROLE,
+        HISTORY_ROLE,
+        DESCENDANTS_ROLE,
+        STATUS_ROLE,
+        NAME_ROLE,
+        ICON_ROLE,
+    ];
+    /// With a tree search, changed text can also move the highlighted match.
+    pub const SEARCH_VALUE_ROLES: [i32; 12] = [
+        TEXT_ROLE,
+        USAGE_ROLE,
+        HEAT_ROLE,
+        HISTORY_ROLE,
+        DESCENDANTS_ROLE,
+        STATUS_ROLE,
+        NAME_ROLE,
+        ICON_ROLE,
+        CELL_MATCH_ROLE,
+        MATCH_START_ROLE,
+        MATCH_END_ROLE,
+        ROW_MATCH_ROLE,
+    ];
 
     pub struct ProcessTreeModel {
         rows: Arc<Vec<TreeRow>>,
@@ -276,14 +333,18 @@ mod process_tree_model {
             } else {
                 self.rows = Arc::clone(next);
             }
-            // Value changes in the kept rows and the suffix.
+            // Value changes in the kept rows and the suffix. A row that now
+            // shows another process, or changed shape, renews every role;
+            // otherwise only the value roles a poll changes.
             let column_count = self.columns.len();
-            let mut spans: Vec<(usize, usize, usize)> = Vec::new();
+            let mut full = Bounds::default();
+            let mut values = Bounds::default();
             let mut compare = |old: &TreeRow, new: &TreeRow, index: usize, this: &Self| {
-                // A different process at this position: every cell and role.
                 if old.identity != new.identity {
-                    spans.push((index, 0, column_count.saturating_sub(1)));
-                } else if let Some((first, last)) = this.changed_columns(
+                    full.add(index, 0, column_count.saturating_sub(1));
+                    return;
+                }
+                match this.changed_columns(
                     old,
                     new,
                     pinned_before,
@@ -291,7 +352,9 @@ mod process_tree_model {
                     icons_changed,
                     column_count,
                 ) {
-                    spans.push((index, first, last));
+                    Some(Change::Row) => full.add(index, 0, column_count.saturating_sub(1)),
+                    Some(Change::Cells(first, last)) => values.add(index, first, last),
+                    None => {}
                 }
             };
             for index in 0..kept_end {
@@ -302,22 +365,27 @@ mod process_tree_model {
                 let new_index = new_end + offset;
                 compare(old, &next[new_index], new_index, self);
             }
-            // One signal over the changed rows' bounding box: the view walks
-            // every loaded delegate per signal, while the delegates that
-            // exist are only the visible rows, which re-read cheaply.
-            if let (Some(top), Some(bottom)) = (
-                spans.iter().map(|span| span.0).min(),
-                spans.iter().map(|span| span.0).max(),
-            ) {
-                let first = spans.iter().map(|span| span.1).min().unwrap_or(0);
-                let last = spans.iter().map(|span| span.2).max().unwrap_or(0);
+            // One signal per kind over its bounding box: the view walks every
+            // loaded delegate per signal and every named role per delegate.
+            if let Some((top, bottom, first, last)) = full.range() {
                 let top_left = self.create_index(top as i32, first as i32, 0);
                 let bottom_right = self.create_index(bottom as i32, last as i32, 0);
                 self.data_changed(&top_left, &bottom_right);
             }
+            if let Some((top, bottom, first, last)) = values.range() {
+                let top_left = self.create_index(top as i32, first as i32, 0);
+                let bottom_right = self.create_index(bottom as i32, last as i32, 0);
+                let roles: &[i32] = if self.matcher.is_some() {
+                    &SEARCH_VALUE_ROLES
+                } else {
+                    &VALUE_ROLES
+                };
+                self.data_changed_roles(&top_left, &bottom_right, roles);
+            }
         }
 
-        /// The first and last visible column whose cell changed.
+        /// Whether the row changed shape, or the first and last visible
+        /// column whose value changed.
         fn changed_columns(
             &self,
             old: &TreeRow,
@@ -326,7 +394,7 @@ mod process_tree_model {
             search_changed: bool,
             icons_changed: bool,
             column_count: usize,
-        ) -> Option<(usize, usize)> {
+        ) -> Option<Change> {
             let row_level = old.depth != new.depth
                 || old.has_children != new.has_children
                 || old.is_expanded != new.is_expanded
@@ -335,7 +403,11 @@ mod process_tree_model {
                 || pinned_before.contains(&old.identity) != self.pinned.contains(&new.identity)
                 || (search_changed && (old.search_columns != 0 || new.search_columns != 0));
             if row_level {
-                return Some((0, column_count.saturating_sub(1)));
+                return Some(Change::Row);
+            }
+            // The CPU heat tints every cell of the row.
+            if (old.tree_cpu - new.tree_cpu).abs() > f64::EPSILON {
+                return Some(Change::Cells(0, column_count.saturating_sub(1)));
             }
             let mut first = None;
             let mut last = 0;
@@ -357,7 +429,7 @@ mod process_tree_model {
                     last = index;
                 }
             }
-            first.map(|first| (first, last))
+            first.map(|first| Change::Cells(first, last))
         }
 
         fn row(&self, index: &QModelIndex) -> Option<(&TreeRow, &'static ColumnDefinition)> {

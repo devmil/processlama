@@ -72,6 +72,14 @@ void QAbstractItemModelProxyCpp::dataChanged(const QModelIndex& topLeft, const Q
 {
     Base::dataChanged(topLeft, bottomRight);
 }
+void QAbstractItemModelProxyCpp::dataChangedRoles(const QModelIndex& topLeft, const QModelIndex& bottomRight, rust::Slice<const int32_t> roles)
+{
+    QList<int> list;
+    list.reserve(qsizetype(roles.size()));
+    for (const int32_t role : roles)
+        list.append(role);
+    Base::dataChanged(topLeft, bottomRight, list);
+}
 void QAbstractItemModelProxyCpp::beginInsertColumns(const QModelIndex& parent, int32_t first, int32_t last)
 {
     Base::beginInsertColumns(parent, first, last);

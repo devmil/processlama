@@ -44,6 +44,8 @@ public:
 
     // Access to base implementation of non virtual functions
     void dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    // ProcessLama patch: dataChanged with the roles that changed.
+    void dataChangedRoles(const QModelIndex& topLeft, const QModelIndex& bottomRight, rust::Slice<const int32_t> roles);
     void beginInsertColumns(const QModelIndex& parent, int32_t first, int32_t last);
     void endInsertColumns();
     void beginInsertRows(const QModelIndex& parent, int32_t first, int32_t last);

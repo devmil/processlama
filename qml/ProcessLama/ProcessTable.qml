@@ -88,8 +88,12 @@ FocusScope {
         return column >= 0 ? table.itemAtCell(Qt.point(column, row)) : null
     }
 
-    function rowAt(y) {
-        const row = Math.floor((y + table.contentY) / rowHeight)
+    // Pointer handlers declared in the TableView attach to its content item,
+    // so their `position` already scrolls with the rows. Map scene positions
+    // explicitly instead of adding contentY to either.
+    function rowAtScene(scenePosition) {
+        const local = table.contentItem.mapFromItem(null, scenePosition.x, scenePosition.y)
+        const row = Math.floor(local.y / rowHeight)
         return row >= 0 && row < table.rows ? row : -1
     }
 
@@ -453,7 +457,7 @@ FocusScope {
 
         HoverHandler {
             id: hover
-            onPointChanged: root.hoveredRow = hovered ? root.rowAt(point.position.y) : -1
+            onPointChanged: root.hoveredRow = hovered ? root.rowAtScene(point.scenePosition) : -1
             onHoveredChanged: {
                 root.app.setTreeHovering(hovered)
                 if (!hovered)
@@ -464,14 +468,14 @@ FocusScope {
             target: table
             function onContentYChanged() {
                 if (hover.hovered)
-                    root.hoveredRow = root.rowAt(hover.point.position.y)
+                    root.hoveredRow = root.rowAtScene(hover.point.scenePosition)
             }
         }
         // A primary press selects the row; a secondary click opens its menu.
         PointHandler {
             acceptedButtons: Qt.LeftButton
             onActiveChanged: if (active) {
-                const row = root.rowAt(point.position.y)
+                const row = root.rowAtScene(point.scenePosition)
                 if (row >= 0)
                     root.selectRow(row)
             }
@@ -479,9 +483,11 @@ FocusScope {
         TapHandler {
             acceptedButtons: Qt.RightButton
             onTapped: (point) => {
-                const row = root.rowAt(point.position.y)
-                if (row >= 0)
-                    root.openRowMenu(row, point.position.x, point.position.y)
+                const row = root.rowAtScene(point.scenePosition)
+                if (row >= 0) {
+                    const at = table.mapFromItem(null, point.scenePosition.x, point.scenePosition.y)
+                    root.openRowMenu(row, at.x, at.y)
+                }
             }
         }
 
