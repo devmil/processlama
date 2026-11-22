@@ -207,6 +207,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ## [Unreleased Beta]
 
+## [2.0.0-beta.1] - 2026-11-22
+
 ### Changed
 
 - Rebuilt the desktop application with Rust and Qt Quick (QML) instead of Flutter (Meridian 2.1.0), with the same features and look and lower idle CPU. Linux packages carry a private Qt runtime; Arch Linux and Omarchy get a package. Settings, snapshots and remote hosts carry over.
@@ -667,6 +669,6 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   sparklines.
 
 
-[Unreleased Stable]: https://github.com/devmil/processlama/compare/v1.0.0-beta.38-45...HEAD
-[Unreleased Beta]: https://github.com/devmil/processlama/compare/v1.0.0-beta.38-45...HEAD
-[1.0.0-beta.38]: https://github.com/devmil/processlama/releases/tag/v1.0.0-beta.38-45
+[Unreleased Stable]: https://github.com/devmil/processlama/compare/v2.0.0-beta.1-46...HEAD
+[Unreleased Beta]: https://github.com/devmil/processlama/compare/v2.0.0-beta.1-46...HEAD
+[2.0.0-beta.1]: https://github.com/devmil/processlama/releases/tag/v2.0.0-beta.1-46

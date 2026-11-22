@@ -148,6 +148,8 @@
 
 ## [Unreleased Beta]
 
+## [2.0.0-beta.1] - 2026-11-22
+
 ### Changed
 
 - ProcessLama now runs on Rust and Qt instead of Flutter: the same app with noticeably lower CPU use. Settings, snapshots and remote hosts carry over, and Arch Linux and Omarchy get a native package.
