@@ -142,7 +142,10 @@ stage_tree() {
   cp "$network_helper" "$stage/usr/libexec/processlama/processlama-network-helper"
   cp "$network_service" "$stage/usr/lib/systemd/system/processlama-network.service"
   python3 "$ROOT/scripts/package_licenses.py" "$stage/usr/share/licenses/processlama"
-  ln -s ../../opt/processlama/processlama "$stage/usr/bin/processlama"
+  # A wrapper, not a symlink: Qt looks for qt.conf (and with it the private
+  # plugins and QML modules) next to the path the executable was started by.
+  printf '#!/bin/sh\nexec /opt/processlama/processlama "$@"\n' >"$stage/usr/bin/processlama"
+  chmod 0755 "$stage/usr/bin/processlama"
   cp "$desktop" "$stage/usr/share/applications/de.devmil.processlama.desktop"
   cp "$metainfo" "$stage/usr/share/metainfo/de.devmil.processlama.metainfo.xml"
   cp "$icon" "$stage/usr/share/icons/hicolor/512x512/apps/de.devmil.processlama.png"
@@ -347,7 +350,9 @@ EOF
         "$appdir/usr/share/applications" "$appdir/usr/share/metainfo" \
         "$appdir/usr/share/icons/hicolor/512x512/apps"
       cp -a "$bundle/." "$appdir/usr/lib/processlama/"
-      ln -s ../lib/processlama/processlama "$appdir/usr/bin/processlama"
+      printf '#!/bin/sh\nexec "$(dirname "$(readlink -f "$0")")/../lib/processlama/processlama" "$@"\n' \
+        >"$appdir/usr/bin/processlama"
+      chmod 0755 "$appdir/usr/bin/processlama"
       cp "$desktop" "$appdir/de.devmil.processlama.desktop"
       cp "$desktop" "$appdir/usr/share/applications/de.devmil.processlama.desktop"
       cp "$metainfo" "$appdir/usr/share/metainfo/de.devmil.processlama.appdata.xml"
