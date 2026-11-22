@@ -13,12 +13,17 @@ The Rust side (`infra-platform/src/updates.rs`) builds the same bytes.
       --seed-env SPARKLE_PRIVATE_KEY_BASE64 [--openssl openssl]
   update_signature.py verify --artifact FILE --build N --arch x86_64 \\
       --signature BASE64 --public-key BASE64 [--openssl openssl]
+
+Without --openssl it uses the first OpenSSL that signs Ed25519: $OPENSSL,
+`openssl` on PATH, then Homebrew's openssl@3. macOS's own `openssl` is
+LibreSSL, which cannot.
 """
 
 import argparse
 import base64
 import hashlib
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -28,6 +33,28 @@ PREFIX = "ProcessLama AppImage update v1"
 # DER prefixes that wrap a raw 32-byte Ed25519 seed or public key.
 PRIVATE_DER = bytes.fromhex("302e020100300506032b657004220420")
 PUBLIC_DER = bytes.fromhex("302a300506032b6570032100")
+
+
+def supports_ed25519(openssl: str) -> bool:
+    try:
+        result = subprocess.run([openssl, "version"], capture_output=True, text=True, timeout=10)
+    except OSError:
+        return False
+    # Ed25519 raw signing (pkeyutl -rawin) arrived in OpenSSL 3.0.
+    parts = result.stdout.split()
+    return (result.returncode == 0 and len(parts) > 1 and parts[0] == "OpenSSL"
+            and parts[1].split(".")[0].isdigit() and int(parts[1].split(".")[0]) >= 3)
+
+
+def find_openssl() -> str | None:
+    candidates = [os.environ.get("OPENSSL"), shutil.which("openssl")]
+    brew = shutil.which("brew")
+    if brew:
+        prefix = subprocess.run([brew, "--prefix", "openssl@3"], capture_output=True, text=True)
+        if prefix.returncode == 0:
+            candidates.append(str(Path(prefix.stdout.strip()) / "bin" / "openssl"))
+    candidates += ["/opt/homebrew/opt/openssl@3/bin/openssl", "/usr/local/opt/openssl@3/bin/openssl"]
+    return next((c for c in candidates if c and supports_ed25519(c)), None)
 
 
 def message(build: int, arch: str, size: int, sha256: str) -> bytes:
@@ -94,7 +121,7 @@ def main() -> None:
         command.add_argument("--build", required=True, type=int)
         command.add_argument("--arch", required=True)
         if name != "message":
-            command.add_argument("--openssl", default="openssl")
+            command.add_argument("--openssl")
         if name == "sign":
             command.add_argument("--seed-env", required=True)
         if name == "verify":
@@ -102,6 +129,10 @@ def main() -> None:
             command.add_argument("--public-key", required=True)
     args = parser.parse_args()
     data = artifact_message(Path(args.artifact), args.build, args.arch)
+    if args.command != "message":
+        args.openssl = args.openssl or find_openssl()
+        if not args.openssl:
+            raise SystemExit("update_signature: no OpenSSL 3 found; set OPENSSL or pass --openssl")
     if args.command == "message":
         sys.stdout.buffer.write(data)
     elif args.command == "sign":
