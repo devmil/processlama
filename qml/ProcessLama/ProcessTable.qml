@@ -287,6 +287,7 @@ FocusScope {
         // Earlier cells stack above later ones, so a grip's overhang past the
         // divider wins over the next column's reorder drag.
         z: root.columnIds.length - index
+        Component.onDestruction: if (dragState.gripColumn === columnId) dragState.gripColumn = ""
 
         MeridianColumnHeader {
             anchors.fill: parent
@@ -301,8 +302,11 @@ FocusScope {
             onContextMenuRequested: (x, y) => columnMenu.popup(this, x, y)
         }
 
+        // Off while the pointer is on any resize grip: both handlers see the
+        // press, and the reorder drag would otherwise win the grab.
         DragHandler {
             id: reorder
+            enabled: dragState.gripColumn.length === 0
             target: null
             xAxis.enabled: true
             yAxis.enabled: false
@@ -354,7 +358,16 @@ FocusScope {
             anchors.rightMargin: -width / 2
             width: Theme.space.s6
             height: parent.height
-            HoverHandler { cursorShape: Qt.SplitHCursor }
+            HoverHandler {
+                id: gripHover
+                cursorShape: Qt.SplitHCursor
+                onHoveredChanged: {
+                    if (hovered)
+                        dragState.gripColumn = headerCell.columnId
+                    else if (!grip.active && dragState.gripColumn === headerCell.columnId)
+                        dragState.gripColumn = ""
+                }
+            }
             TapHandler { onDoubleTapped: { root.app.markTreeInteraction(); root.app.resetColumnWidth(headerCell.columnId) } }
             DragHandler {
                 id: grip
@@ -362,7 +375,12 @@ FocusScope {
                 target: null
                 yAxis.enabled: false
                 cursorShape: Qt.SplitHCursor
-                onActiveChanged: if (active) startWidth = headerCell.width
+                onActiveChanged: {
+                    if (active)
+                        startWidth = headerCell.width
+                    else if (dragState.gripColumn === headerCell.columnId && !gripHover.hovered)
+                        dragState.gripColumn = ""
+                }
                 onTranslationChanged: {
                     if (!active)
                         return
@@ -378,6 +396,8 @@ FocusScope {
         property bool active: false
         property string source: ""
         property string target: ""
+        // The column whose resize grip is under the pointer or dragging.
+        property string gripColumn: ""
         property real x: 0
         property real width: 0
     }
