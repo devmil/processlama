@@ -24,10 +24,9 @@ fn installs_streams_and_removes_on_a_real_host() {
     );
 
     let cancel = CancelToken::default();
-    let missing = connector
-        .connect(&alias, &cancel, Box::new(|_| {}))
-        .err()
-        .expect("no helper yet");
+    let Err(missing) = connector.connect(&alias, &cancel, Box::new(|_| {})) else {
+        panic!("no helper yet");
+    };
     assert_eq!(missing.code, RemoteFailureCode::HelperNotInstalled);
     let target = missing.host_target.expect("the host's platform");
 

@@ -121,16 +121,16 @@ fn talks_to_the_real_helper() {
 #[test]
 fn reports_bootstrap_markers() {
     let (tx, _rx) = mpsc::channel();
-    let failure = Channel::connect(
+    let Err(failure) = Channel::connect(
         launch("printf 'PROCESSLAMA-BOOTSTRAP 1 missing linux/x86_64\\n'"),
         ChannelConfig::processlama(),
         &CancelToken::default(),
         Box::new(move |failure| {
             let _ = tx.send(failure);
         }),
-    )
-    .err()
-    .expect("no helper");
+    ) else {
+        panic!("no helper");
+    };
     let ChannelFailure::BootstrapMarker(marker) = &failure else {
         panic!("expected a marker, got {failure:?}");
     };
@@ -146,16 +146,16 @@ fn reports_bootstrap_markers() {
 #[test]
 fn reports_ssh_connection_failures() {
     let (tx, _rx) = mpsc::channel();
-    let failure = Channel::connect(
+    let Err(failure) = Channel::connect(
         launch("exit 255"),
         ChannelConfig::processlama(),
         &CancelToken::default(),
         Box::new(move |failure| {
             let _ = tx.send(failure);
         }),
-    )
-    .err()
-    .expect("ssh failed");
+    ) else {
+        panic!("ssh failed");
+    };
     assert_eq!(failure, ChannelFailure::SshConnectionFailed);
 }
 
@@ -171,15 +171,15 @@ fn rejects_a_hello_of_another_build() {
         helper.display()
     );
     let (tx, _rx) = mpsc::channel();
-    let failure = Channel::connect(
+    let Err(failure) = Channel::connect(
         launch(&script),
         config,
         &CancelToken::default(),
         Box::new(move |f| {
             let _ = tx.send(f);
         }),
-    )
-    .err()
-    .expect("mismatch");
+    ) else {
+        panic!("mismatch");
+    };
     assert_eq!(failure, ChannelFailure::BuildMismatch);
 }
