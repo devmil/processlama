@@ -1,5 +1,5 @@
 {
-  "comment": "Accept/reject vectors for the product payloads of the remote helper protocol. rust-core/wire and test/remote/contract_vectors_test.dart both read this file.",
+  "comment": "Accept/reject vectors for the product payloads of the remote helper protocol. rust-core/wire and rust-core/desktop/infra-remote both read this file.",
   "vectors": [
     {
       "name": "linux hello",

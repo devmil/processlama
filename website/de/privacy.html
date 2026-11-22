@@ -15,9 +15,9 @@
     <link rel="manifest" href="../site.webmanifest?v=4a1da52cc7f8">
     <meta name="theme-color" content="#e8ecee" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b151a" media="(prefers-color-scheme: dark)">
-    <link rel="stylesheet" href="../styles.css?v=75e899b1241a">
+    <link rel="stylesheet" href="../styles.css?v=ee7443b4153f">
     <script>document.documentElement.classList.add("js");</script>
-    <script src="../site.js?v=a55f555e30dc" defer></script>
+    <script src="../site.js?v=7629b910bc3a" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Zum Inhalt springen</a>
@@ -90,7 +90,7 @@
         <h3>Berechtigungen</h3>
         <ul>
           <li><strong>macOS:</strong> ProcessLama fordert keine besonderen Berechtigungen an, etwa für Kamera, Mikrofon, Bildschirmaufnahme oder Bedienungshilfen. Die App liest, was macOS deinem Benutzerkonto zugänglich macht; wo macOS den Zugriff verweigert, zeigt der Inspektor das an. Für die Netzwerkwerte startet sie das Systemwerkzeug <code>nettop</code>.</li>
-          <li><strong>Linux:</strong> Für Netzwerkwerte pro Prozess ist der Systemdienst <code>processlama-network</code> nötig, der mit Administratorrechten (root) läuft. Die RPM- und DEB-Pakete installieren und starten ihn. In den portablen Builds bietet die App die Installation an und fragt über polkit nach deinem Administratorpasswort. Der Dienst zählt die Bytes, die jeder Prozess sendet und empfängt. Paketinhalte, Adressen oder Ports liest er nicht. Er schreibt diese Zähler nach <code>/run/processlama/network.json</code>; andere Benutzer desselben Computers können diese Datei lesen. Du kannst den Dienst mit <code>systemctl disable --now processlama-network.service</code> beenden.</li>
+          <li><strong>Linux:</strong> Für Netzwerkwerte pro Prozess ist der Systemdienst <code>processlama-network</code> nötig, der mit Administratorrechten (root) läuft. Die RPM-, DEB- und Arch-Pakete installieren und starten ihn. In den portablen Builds bietet die App die Installation an und fragt über polkit nach deinem Administratorpasswort. Der Dienst zählt die Bytes, die jeder Prozess sendet und empfängt. Paketinhalte, Adressen oder Ports liest er nicht. Er schreibt diese Zähler nach <code>/run/processlama/network.json</code>; andere Benutzer desselben Computers können diese Datei lesen. Du kannst den Dienst mit <code>systemctl disable --now processlama-network.service</code> beenden.</li>
           <li><strong>Windows:</strong> Die App läuft mit deinen normalen Benutzerrechten. Das Installationsprogramm fragt nach Administratorrechten, um in den Ordner „Programme“ zu installieren. Ein Dienst wird nicht installiert.</li>
         </ul>
         <p>Prozessaktionen wie das Beenden oder Anhalten eines Prozesses werden nur ausgeführt, wenn du sie auswählst; vor einem destruktiven Signal fragt ProcessLama nach.</p>

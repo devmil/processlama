@@ -28,13 +28,16 @@ class ArchitectureCheckTest(unittest.TestCase):
         directory = Path(tempfile.mkdtemp(prefix="processlama-arch-"))
         self.addCleanup(lambda: subprocess.run(["rm", "-rf", str(directory)]))
         base = {
-            "lib/rust/api.dart": "",
-            "lib/repositories/impl/bridge.dart": "import '../../rust/api.dart';\n",
-            "rust-core/core/Cargo.toml": "[dependencies]\nprocesslama_telemetry = {}\n",
-            "rust-core/core/src/lib.rs": "pub mod api;\n",
-            "rust-core/core/src/api.rs": "",
-            "rust-core/telemetry/Cargo.toml": "[dependencies]\nprocesstree = {}\n",
-            "rust-core/telemetry/src/lib.rs": "",
+            "rust-core/desktop/domain/Cargo.toml": "[dependencies]\nserde_json = {}\n",
+            "rust-core/desktop/domain/src/lib.rs": "",
+            "rust-core/desktop/application/Cargo.toml": "[dependencies]\nprocesslama-domain = {}\n",
+            "rust-core/desktop/application/src/lib.rs": "use processlama_domain::X;\n",
+            "rust-core/desktop/qt/Cargo.toml": "[dependencies]\nprocesslama-application = {}\nqtbridge = {}\n",
+            "rust-core/desktop/qt/src/lib.rs": "use processlama_application::Y;\nuse qtbridge::qobject;\n",
+            "rust-core/desktop/app/Cargo.toml": "[dependencies]\nprocesslama-qt = {}\nprocesslama-infra-local = {}\n",
+            "rust-core/desktop/app/src/main.rs": "use processlama_infra_local::Z;\n",
+            "rust-core/devmil-remote/src/lib.rs": "",
+            "qml/ProcessLama/Main.qml": "import QtQuick\nimport Meridian\nItem {}\n",
         }
         base.update(files)
         for name, content in base.items():
@@ -49,89 +52,63 @@ class ArchitectureCheckTest(unittest.TestCase):
         self.assertIn(fragment, result.stderr)
 
     def test_clean_fixture_passes(self):
-        self.assertEqual(run(self.fixture({})).returncode, 0)
-
-    def test_widget_importing_the_bridge_is_rejected(self):
-        self.assert_rejected(
-            {"lib/screens/view.dart": "import '../rust/api.dart';\n"},
-            "imports the Rust bridge",
-        )
-        self.assert_rejected(
-            {"lib/services/s.dart": "import 'package:processlama/rust/api.dart';\n"},
-            "imports the Rust bridge",
-        )
-
-    def test_widget_importing_devmil_remote_is_rejected(self):
-        self.assert_rejected(
-            {"lib/screens/view.dart": "import 'package:devmil_remote/devmil_remote.dart';\n"},
-            "imports devmil_remote",
-        )
-        self.assert_rejected(
-            {"lib/models/host.dart": "import 'package:devmil_remote/devmil_remote.dart';\n"},
-            "imports devmil_remote",
-        )
-        self.assert_rejected(
-            {"lib/repositories/remote.dart": "import 'package:devmil_remote/devmil_remote.dart';\n"},
-            "imports devmil_remote",
-        )
-
-    def test_services_and_repository_implementations_may_use_devmil_remote(self):
-        result = run(
-            self.fixture(
-                {
-                    "lib/services/impl/hosts.dart": "import 'package:devmil_remote/devmil_remote.dart';\n",
-                    "lib/repositories/impl/ssh.dart": "import 'package:devmil_remote/devmil_remote.dart';\n",
-                }
-            )
-        )
+        result = run(self.fixture({}))
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_shared_dart_package_importing_the_app_is_rejected(self):
+    def test_domain_depending_on_another_layer_is_rejected(self):
+        self.assert_rejected(
+            {"rust-core/desktop/domain/Cargo.toml": "[dependencies]\nprocesslama-application = {}\n"},
+            "domain must not depend on processlama_application",
+        )
+
+    def test_application_using_qt_is_rejected(self):
+        self.assert_rejected(
+            {"rust-core/desktop/application/src/lib.rs": "use qtbridge::qobject;\n"},
+            "application must not use qtbridge",
+        )
+
+    def test_qt_naming_an_adapter_is_rejected(self):
+        self.assert_rejected(
+            {"rust-core/desktop/qt/src/lib.rs": "use processlama_infra_remote::SshConnector;\n"},
+            "qt must not use processlama_infra_remote",
+        )
+
+    def test_adapters_using_each_other_is_rejected(self):
         self.assert_rejected(
             {
-                "packages/devmil_remote/lib/src/channel.dart":
-                    "import 'package:processlama/models/models.dart';\n"
+                "rust-core/desktop/infra-storage/Cargo.toml": "[dependencies]\nprocesslama-infra-local = {}\n",
+                "rust-core/desktop/infra-storage/src/lib.rs": "",
             },
-            "shared package imports",
+            "infra-storage must not depend on processlama_infra_local",
         )
 
-    def test_enum_index_mapping_is_rejected(self):
+    def test_dev_dependencies_are_allowed(self):
+        files = {
+            "rust-core/desktop/infra-storage/Cargo.toml": "[dependencies]\nprocesslama-domain = {}\n[dev-dependencies]\nprocesslama-infra-local = {}\n",
+            "rust-core/desktop/infra-storage/src/lib.rs": "",
+        }
+        self.assertEqual(run(self.fixture(files)).returncode, 0)
+
+    def test_unknown_layer_is_rejected(self):
         self.assert_rejected(
-            {"lib/repositories/impl/map.dart": "final s = Status.values[dto.status.index];\n"},
-            "values[...index]",
+            {"rust-core/desktop/misc/Cargo.toml": "[dependencies]\n", "rust-core/desktop/misc/src/lib.rs": ""},
+            "unknown desktop layer",
         )
 
-    def test_crates_depending_on_the_core_are_rejected(self):
+    def test_transport_importing_the_product_is_rejected(self):
         self.assert_rejected(
-            {"rust-core/remote-helper/Cargo.toml": "[dependencies]\nprocesslama_core = {}\n"},
-            "depends on processlama_core",
-        )
-        self.assert_rejected(
-            {"rust-core/telemetry/src/lib.rs": "use processlama_core::api;\n"},
-            "uses processlama_core",
+            {"rust-core/devmil-remote/src/lib.rs": "use processlama_wire::contract;\n"},
+            "devmil_remote must not import",
         )
 
-    def test_shared_crate_using_processlama_is_rejected(self):
+    def test_qml_loading_code_is_rejected(self):
         self.assert_rejected(
-            {
-                "rust-core/devmil-remote/Cargo.toml":
-                    "[dependencies]\nprocesslama-wire = {}\n",
-                "rust-core/devmil-remote/src/lib.rs": "",
-            },
-            "shared crate depends on processlama_wire",
+            {"qml/ProcessLama/X.qml": "import QtQuick\nItem { Component.onCompleted: Qt.createQmlObject('', this) }\n"},
+            "loads code at run time",
         )
         self.assert_rejected(
-            {
-                "rust-core/devmil-remote/Cargo.toml": "[dependencies]\n",
-                "rust-core/devmil-remote/src/lib.rs": "use processlama_telemetry::x;\n",
-            },
-            "shared crate uses processlama_telemetry",
-        )
-
-    def test_core_modules_importing_the_facade_are_rejected(self):
-        self.assert_rejected(
-            {"rust-core/core/src/network.rs": "use crate::api::ProcessSnapshotDto;\n"},
-            "imports the bridge facade",
+            {"qml/ProcessLama/Y.qml": "import Some.Plugin\nItem {}\n"},
+            "imports Some.Plugin",
         )
 
 

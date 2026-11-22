@@ -1,0 +1,12 @@
+[package]
+name = "processlama-domain"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+description = "ProcessLama values: process identities and records, search, settings, remote host profiles and snapshot documents"
+
+[dependencies]
+serde_json = { workspace = true }
+
+[lints.rust]
+unsafe_code = "forbid"

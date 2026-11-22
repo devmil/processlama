@@ -24,18 +24,29 @@ if ($major -gt 255 -or $minor -gt 255 -or $buildNumber -gt 65535) {
 }
 $msiVersion = "$major.$minor.$buildNumber"
 $packageVersion = "$marketingVersion-$buildNumber"
-$bundle = Join-Path $root "build\windows\x64\runner\Release"
+$bundle = Join-Path $root "build\windows\ProcessLama"
 $output = Join-Path $root "build\archive"
 $archive = Join-Path $output "ProcessLama-$packageVersion-windows-x86_64.zip"
 $installer = Join-Path $output "ProcessLama-$packageVersion-windows-x86_64.msi"
 
 if (-not $SkipBuild) {
     . (Join-Path $PSScriptRoot "initialize-msvc-environment.ps1")
-    flutter config --enable-windows-desktop
-    flutter pub get --enforce-lockfile
-    flutter build windows --release
+    $channel = if ($env:MIM_RELEASE_CHANNEL) { $env:MIM_RELEASE_CHANNEL } elseif ($marketingVersion -match '-(beta|rc)\.') { "beta" } else { "stable" }
+    $env:PROCESSLAMA_RELEASE_CHANNEL = $channel
+    cargo build --release --locked --manifest-path (Join-Path $root "rust-core\Cargo.toml") -p processlama
+    if ($LASTEXITCODE -ne 0) { throw "cargo build failed with exit code $LASTEXITCODE" }
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $bundle
+    New-Item -ItemType Directory -Force $bundle | Out-Null
+    Copy-Item (Join-Path $root "rust-core\target\release\processlama.exe") $bundle
+    # The Qt runtime, plugins and the QML modules the embedded QML imports.
+    windeployqt --release --qmldir (Join-Path $root "qml\ProcessLama") --qmlimport (Join-Path $root "qml") `
+        --no-translations --no-system-d3d-compiler `
+        (Join-Path $bundle "processlama.exe")
+    if ($LASTEXITCODE -ne 0) { throw "windeployqt failed with exit code $LASTEXITCODE" }
+    python (Join-Path $PSScriptRoot "package_licenses.py") $bundle
+    if ($LASTEXITCODE -ne 0) { throw "license packaging failed with exit code $LASTEXITCODE" }
 }
-foreach ($required in @("processlama.exe", "flutter_windows.dll", "data")) {
+foreach ($required in @("processlama.exe", "Qt6Core.dll", "Qt6Quick.dll", "qml")) {
     if (-not (Test-Path (Join-Path $bundle $required))) {
         throw "Windows release bundle is missing $required"
     }

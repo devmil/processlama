@@ -27,8 +27,6 @@ Do not infer installed artifact, native bridge load, or platform share-sheet
 acceptance from host unit tests. Existing automatic log files from earlier
 versions are not imported or exported by the new history.
 
-To qualify the actual host native library, build its Rust `cdylib`, set
-`DEVMIL_LOGGING_NATIVE_LIBRARY` to that artifact, and run
-`flutter test tool/native_diagnostic_hook_test.dart`. This checks the generated
-FRB availability hook and drain/configure calls end to end. It does not replace
-an installed application or platform share-sheet check.
+The history lives in the Rust core (`processlama_application::diagnostics`); the
+Preferences page previews, saves and clears it. The Qt build has no share sheet;
+Save is the export path on every platform.

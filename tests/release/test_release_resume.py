@@ -83,7 +83,7 @@ mim_resolve_existing_release_commit
             self.assertIn("no prepared release commit", result.stderr)
 
     def test_rejects_changed_preparation_metadata(self):
-        for name in ["pubspec.yaml", "CHANGELOG.md", "RELEASE_NOTES.md"]:
+        for name in ["CHANGELOG.md", "RELEASE_NOTES.md"]:
             with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
                 repository = self.prepare_untagged_release(directory)
                 with (repository / name).open("a") as stream:
@@ -150,7 +150,6 @@ mim_resolve_existing_release_commit
     @staticmethod
     def write_release_files(repository):
         (repository / "VERSION").write_text("1.0.0-beta.11\n13\n")
-        (repository / "pubspec.yaml").write_text("version: 1.0.0-beta.11+13\n")
         notes = "## [1.0.0-beta.11] - 2026-09-20\n\n- Fixed publishing.\n"
         (repository / "CHANGELOG.md").write_text(notes)
         (repository / "RELEASE_NOTES.md").write_text(notes)

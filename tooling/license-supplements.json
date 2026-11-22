@@ -1,28 +1,110 @@
 {
-  "dart-sys@4.1.5": [
+  "qt-build-utils@0.10.0": [
     {
-      "file": "upstream-dart-sys-LICENSE-MIT.md.txt",
-      "sha256": "a6b742d988bc83c6182193ca4e5abf2dbb67e929817fc94f5ed6e9f49b803f29",
-      "source": "https://github.com/dart-sys/dart-sys/blob/c9329430a5a8e3828cf59600babe7896326c7c44/LICENSE-MIT.md"
+      "file": "upstream-cxx-qt-MIT.txt",
+      "sha256": "b85dcd3e453d05982552c52b5fc9e0bdd6d23c6f8e844b984a88af32570b0cc0",
+      "source": "https://github.com/KDAB/cxx-qt/blob/282b88784320b26a1a4a69d0dcb5f7f23e6c5377/LICENSES/MIT.txt (SPDX-FileCopyrightText: Klarälvdalens Datakonsult AB, a KDAB Group company)"
     },
     {
-      "file": "upstream-dart-sys-LICENSE-APACHE-2.0.md.txt",
-      "sha256": "9c7a58ef39c896d7cc48e18c0a38eb570fc7cecb15a656101d399e367da800a2",
-      "source": "https://github.com/dart-sys/dart-sys/blob/c9329430a5a8e3828cf59600babe7896326c7c44/LICENSE-APACHE-2.0.md"
+      "file": "upstream-cxx-qt-Apache-2.0.txt",
+      "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff",
+      "source": "https://github.com/KDAB/cxx-qt/blob/282b88784320b26a1a4a69d0dcb5f7f23e6c5377/LICENSES/Apache-2.0.txt"
     }
   ],
-  "flutter_rust_bridge@2.12.0": [
+  "qt-version@0.1.5": [
     {
-      "file": "upstream-flutter_rust_bridge-LICENSE.txt",
-      "sha256": "d56622df159a9967bd6a16c726823a2cbe8546c1f18437617283c9da27000390",
-      "source": "https://github.com/fzyzcjy/flutter_rust_bridge/blob/62b9330ed2f900535e34d8443ff82dc54070579a/LICENSE"
+      "file": "upstream-cxx-qt-MIT.txt",
+      "sha256": "b85dcd3e453d05982552c52b5fc9e0bdd6d23c6f8e844b984a88af32570b0cc0",
+      "source": "https://github.com/KDAB/cxx-qt/blob/282b88784320b26a1a4a69d0dcb5f7f23e6c5377/LICENSES/MIT.txt (SPDX-FileCopyrightText: Klarälvdalens Datakonsult AB, a KDAB Group company)"
+    },
+    {
+      "file": "upstream-cxx-qt-Apache-2.0.txt",
+      "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff",
+      "source": "https://github.com/KDAB/cxx-qt/blob/282b88784320b26a1a4a69d0dcb5f7f23e6c5377/LICENSES/Apache-2.0.txt"
     }
   ],
-  "flutter_rust_bridge_macros@2.12.0": [
+  "qtbridge-build-utils@0.2.0": [
     {
-      "file": "upstream-flutter_rust_bridge-LICENSE.txt",
-      "sha256": "d56622df159a9967bd6a16c726823a2cbe8546c1f18437617283c9da27000390",
-      "source": "https://github.com/fzyzcjy/flutter_rust_bridge/blob/62b9330ed2f900535e34d8443ff82dc54070579a/LICENSE"
+      "file": "LGPL-3.0.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "source": "Elected license of the crate (LicenseRef-Qt-Commercial OR LGPL-3.0-only); https://www.gnu.org/licenses/lgpl-3.0.txt"
+    },
+    {
+      "file": "GPL-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "Incorporated by LGPL-3.0; https://www.gnu.org/licenses/gpl-3.0.txt"
+    }
+  ],
+  "qtbridge-gen-common@0.2.0": [
+    {
+      "file": "LGPL-3.0.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "source": "Elected license of the crate (LicenseRef-Qt-Commercial OR LGPL-3.0-only); https://www.gnu.org/licenses/lgpl-3.0.txt"
+    },
+    {
+      "file": "GPL-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "Incorporated by LGPL-3.0; https://www.gnu.org/licenses/gpl-3.0.txt"
+    }
+  ],
+  "qtbridge-gen@0.2.0": [
+    {
+      "file": "LGPL-3.0.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "source": "Elected license of the crate (LicenseRef-Qt-Commercial OR LGPL-3.0-only); https://www.gnu.org/licenses/lgpl-3.0.txt"
+    },
+    {
+      "file": "GPL-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "Incorporated by LGPL-3.0; https://www.gnu.org/licenses/gpl-3.0.txt"
+    }
+  ],
+  "qtbridge-interfaces@0.2.0": [
+    {
+      "file": "LGPL-3.0.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "source": "Elected license of the crate (LicenseRef-Qt-Commercial OR LGPL-3.0-only); https://www.gnu.org/licenses/lgpl-3.0.txt"
+    },
+    {
+      "file": "GPL-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "Incorporated by LGPL-3.0; https://www.gnu.org/licenses/gpl-3.0.txt"
+    }
+  ],
+  "qtbridge-runtime@0.2.0": [
+    {
+      "file": "LGPL-3.0.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "source": "Elected license of the crate (LicenseRef-Qt-Commercial OR LGPL-3.0-only); https://www.gnu.org/licenses/lgpl-3.0.txt"
+    },
+    {
+      "file": "GPL-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "Incorporated by LGPL-3.0; https://www.gnu.org/licenses/gpl-3.0.txt"
+    }
+  ],
+  "qtbridge-type-lib@0.2.0": [
+    {
+      "file": "LGPL-3.0.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "source": "Elected license of the crate (LicenseRef-Qt-Commercial OR LGPL-3.0-only); https://www.gnu.org/licenses/lgpl-3.0.txt"
+    },
+    {
+      "file": "GPL-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "Incorporated by LGPL-3.0; https://www.gnu.org/licenses/gpl-3.0.txt"
+    }
+  ],
+  "qtbridge@0.2.0": [
+    {
+      "file": "LGPL-3.0.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "source": "Elected license of the crate (LicenseRef-Qt-Commercial OR LGPL-3.0-only); https://www.gnu.org/licenses/lgpl-3.0.txt"
+    },
+    {
+      "file": "GPL-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "Incorporated by LGPL-3.0; https://www.gnu.org/licenses/gpl-3.0.txt"
     }
   ]
 }

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Build Linux AppImage, RPM, DEB, and portable tar bundles.
+# Build Linux packages of the Rust/QML application: AppImage, RPM, DEB, Arch
+# and a portable tar. Every format carries the same bundle: the executable, an
+# application-private Qt runtime (scripts/stage_linux_bundle.py), the network
+# telemetry service and the remote helpers.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -9,27 +12,33 @@ source "$ROOT/scripts/lib/version.sh"
 
 MIM_ARCHIVE_DIR="$ROOT/build/archive"
 MIM_FORMATS="appimage,rpm,deb,tar"
+SKIP_BUILD=0
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/package-linux.sh [--formats appimage,rpm,deb,tar]
+Usage: ./scripts/package-linux.sh [--formats appimage,rpm,deb,tar,arch] [--skip-build]
 
-Builds the Flutter/Rust Linux application and the selected x86_64/aarch64
-bundles in build/archive. The default builds all four distribution formats.
+Builds the Rust/QML application and the selected bundles in build/archive.
+The default builds AppImage, RPM, DEB and tar; add `arch` for an Arch Linux
+package (built with makepkg on an Arch host, otherwise in an Arch container).
 
-Required tools by format:
-  All:      patchelf
+Required tools:
+  All:      cargo, Qt 6 (qmake6 or QMAKE, rcc), patchelf (or PATCHELF), python3
   All:      clang, pkg-config, libelf development headers (network service)
   AppImage: appimagetool
   RPM:      rpmbuild
   DEB:      dpkg-deb
-  tar:      tar
+  Arch:     makepkg, or podman/docker
+
+Remote helpers come from PROCESSLAMA_REMOTE_HELPER_DIR (default
+build/remote-helper); PROCESSLAMA_REQUIRE_REMOTE_HELPER=1 requires all targets.
 EOF
 }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --formats) shift; MIM_FORMATS="${1:?--formats requires a comma-separated list}" ;;
+    --skip-build) SKIP_BUILD=1 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "package-linux.sh: unknown option $1" >&2; usage >&2; exit 64 ;;
   esac
@@ -53,55 +62,45 @@ case "$machine_arch" in
 esac
 
 IFS=',' read -r -a formats <<<"$MIM_FORMATS"
-command -v patchelf >/dev/null || { echo "package-linux.sh: patchelf is required" >&2; exit 1; }
+PATCHELF="${PATCHELF:-$(command -v patchelf || true)}"
+[[ -n "$PATCHELF" ]] || { echo "package-linux.sh: patchelf is required (or set PATCHELF)" >&2; exit 1; }
+export PATCHELF
 for format in "${formats[@]}"; do
   case "$format" in
     appimage) command -v appimagetool >/dev/null || { echo "package-linux.sh: appimagetool is required for AppImage" >&2; exit 1; } ;;
     rpm) command -v rpmbuild >/dev/null || { echo "package-linux.sh: rpmbuild is required for RPM" >&2; exit 1; } ;;
     deb) command -v dpkg-deb >/dev/null || { echo "package-linux.sh: dpkg-deb is required for DEB" >&2; exit 1; } ;;
-    tar) command -v tar >/dev/null || { echo "package-linux.sh: tar is required" >&2; exit 1; } ;;
+    tar) ;;
+    arch) command -v makepkg >/dev/null || command -v podman >/dev/null || command -v docker >/dev/null || {
+      echo "package-linux.sh: makepkg, podman or docker is required for Arch" >&2; exit 1; } ;;
     *) echo "package-linux.sh: unknown format '$format'" >&2; exit 64 ;;
   esac
 done
-command -v clang >/dev/null || { echo "package-linux.sh: clang is required for the eBPF network helper" >&2; exit 1; }
-command -v pkg-config >/dev/null || { echo "package-linux.sh: pkg-config is required for the eBPF network helper" >&2; exit 1; }
-pkg-config --exists libelf || {
-  echo "package-linux.sh: libelf development headers are required (Fedora: elfutils-libelf-devel)" >&2
-  exit 1
-}
 
-./scripts/build-rust.sh release
-cargo build --release --manifest-path linux/network-helper/Cargo.toml
-flutter pub get
-flutter build linux --release \
-  --build-name "$MIM_MARKETING_VERSION" \
-  --build-number "$MIM_BUILD_NUMBER" \
-  --dart-define "PROCESSLAMA_RELEASE_CHANNEL=$MIM_BUILD_RELEASE_CHANNEL"
-
-bundle="$(find "$ROOT/build/linux" -type d -path '*/release/bundle' -print -quit)"
-[[ -x "$bundle/processlama" ]] || {
-  echo "package-linux.sh: expected Flutter bundle at $bundle" >&2
-  exit 1
-}
-
-# Flutter plugins retain absolute RUNPATH entries for the imported engine in
-# flutter/ephemeral. Replace only those build-tree paths; preserve the
-# executable's valid $ORIGIN/lib RUNPATH.
-while IFS= read -r -d '' elf; do
-  current_rpath="$(patchelf --print-rpath "$elf" 2>/dev/null || true)"
-  if [[ "$current_rpath" == *"$ROOT"* ]]; then
-    patchelf --set-rpath '$ORIGIN' "$elf"
-  fi
-done < <(find "$bundle" -type f -print0)
+network_helper="$ROOT/linux/network-helper/target/release/processlama-network-helper"
+binary="$ROOT/rust-core/target/release/processlama"
+if [[ "$SKIP_BUILD" == 0 ]]; then
+  command -v clang >/dev/null || { echo "package-linux.sh: clang is required for the eBPF network helper" >&2; exit 1; }
+  pkg-config --exists libelf || {
+    echo "package-linux.sh: libelf development headers are required (Fedora: elfutils-libelf-devel)" >&2
+    exit 1
+  }
+  PROCESSLAMA_RELEASE_CHANNEL="$MIM_BUILD_RELEASE_CHANNEL" \
+    cargo build --release --locked --manifest-path rust-core/Cargo.toml -p processlama
+  cargo build --release --locked --manifest-path linux/network-helper/Cargo.toml
+fi
+[[ -x "$binary" && -x "$network_helper" ]] || { echo "package-linux.sh: build outputs missing" >&2; exit 1; }
 
 mkdir -p "$MIM_ARCHIVE_DIR"
 work="$(mktemp -d "$ROOT/build/processlama-linux-package.XXXXXX")"
 trap 'rm -rf "$work"' EXIT
+bundle="$work/bundle"
+python3 "$ROOT/scripts/stage_linux_bundle.py" --binary "$binary" --output "$bundle"
+
 desktop="$ROOT/linux/packaging/de.devmil.processlama.desktop"
 metainfo_template="$ROOT/linux/packaging/de.devmil.processlama.metainfo.xml"
 metainfo="$work/de.devmil.processlama.metainfo.xml"
 icon="$ROOT/linux/packaging/de.devmil.processlama.png"
-network_helper="$ROOT/linux/network-helper/target/release/processlama-network-helper"
 network_service="$ROOT/linux/packaging/processlama-network.service"
 network_installer="$ROOT/linux/packaging/install-network-service.sh"
 mkdir -p "$bundle/network"
@@ -111,7 +110,7 @@ cp "$network_installer" "$bundle/network/install-network-service.sh"
 chmod 0755 "$bundle/network/install-network-service.sh"
 python3 "$ROOT/scripts/package_licenses.py" "$bundle"
 python3 "$ROOT/scripts/package_licenses.py" "$bundle/network"
-# Remote helpers for every host target (docs/10_remote_hosts.md §8.2). Release CI sets
+# Remote helpers for every host target. Release CI sets
 # PROCESSLAMA_REQUIRE_REMOTE_HELPER=1 so a missing target fails the package.
 rm -rf "$bundle/lib/remote-helper"
 python3 "$ROOT/scripts/package_remote_helper.py" bundle \
@@ -129,6 +128,10 @@ awk -v version="$MIM_MARKETING_VERSION" -v date="$release_date" -v type="$releas
   { print }
 ' "$metainfo_template" >"$metainfo"
 
+# Host runtimes the private Qt needs; everything Qt-specific is bundled.
+deb_depends="libc6, libstdc++6, libgl1, libegl1, libfontconfig1, libfreetype6, libglib2.0-0, libdbus-1-3, libwayland-client0, libwayland-cursor0, libwayland-egl1, libxkbcommon0, libxkbcommon-x11-0, libx11-6, libx11-xcb1, libxcb1, libxcb-cursor0, libxcb-icccm4, libxcb-image0, libxcb-keysyms1, libxcb-randr0, libxcb-render-util0, libxcb-shape0, libxcb-xfixes0, libxcb-xkb1, libpng16-16, zlib1g, libzstd1, libpcre2-16-0, libharfbuzz0b, libelf1, systemd"
+arch_depends="'glibc' 'gcc-libs' 'libglvnd' 'fontconfig' 'freetype2' 'glib2' 'dbus' 'wayland' 'libxkbcommon' 'libxkbcommon-x11' 'libx11' 'libxcb' 'xcb-util-cursor' 'xcb-util-wm' 'xcb-util-image' 'xcb-util-keysyms' 'xcb-util-renderutil' 'libpng' 'zlib' 'zstd' 'pcre2' 'harfbuzz' 'libelf' 'openssh' 'systemd'"
+
 stage_tree() {
   local stage="$1"
   mkdir -p "$stage/opt/processlama" "$stage/usr/bin" \
@@ -139,7 +142,10 @@ stage_tree() {
   cp "$network_helper" "$stage/usr/libexec/processlama/processlama-network-helper"
   cp "$network_service" "$stage/usr/lib/systemd/system/processlama-network.service"
   python3 "$ROOT/scripts/package_licenses.py" "$stage/usr/share/licenses/processlama"
-  ln -s ../../opt/processlama/processlama "$stage/usr/bin/processlama"
+  # A wrapper, not a symlink: Qt looks for qt.conf (and with it the private
+  # plugins and QML modules) next to the path the executable was started by.
+  printf '#!/bin/sh\nexec /opt/processlama/processlama "$@"\n' >"$stage/usr/bin/processlama"
+  chmod 0755 "$stage/usr/bin/processlama"
   cp "$desktop" "$stage/usr/share/applications/de.devmil.processlama.desktop"
   cp "$metainfo" "$stage/usr/share/metainfo/de.devmil.processlama.metainfo.xml"
   cp "$icon" "$stage/usr/share/icons/hicolor/512x512/apps/de.devmil.processlama.png"
@@ -165,11 +171,12 @@ Version: ${MIM_MARKETING_VERSION}-${MIM_BUILD_NUMBER}
 Architecture: $deb_arch
 Maintainer: devmil <software@devmil.de>
 Installed-Size: $installed_size
-Depends: libgtk-3-0, libblkid1, liblzma5, libelf1, zlib1g, systemd
+Depends: $deb_depends
+Recommends: openssh-client
 Section: utils
 Priority: optional
 Homepage: https://devmil.de/processlama/
-Description: Flutter and Rust process explorer
+Description: Rust and Qt process explorer
  A dense desktop process explorer with live metrics and process inspection.
 EOF
       cat >"$deb_root/DEBIAN/postinst" <<'EOF'
@@ -208,14 +215,20 @@ EOF
       rpm_release="$MIM_BUILD_NUMBER"
       [[ "$MIM_MARKETING_VERSION" != "$rpm_version" ]] && rpm_release="0.${MIM_MARKETING_VERSION#*-}.${MIM_BUILD_NUMBER}"
       cat >"$rpm_root/SPECS/processlama.spec" <<EOF
+# The private Qt runtime lives under /opt/processlama; global build-ID links
+# would collide with other applications bundling the same Qt build.
+%global _build_id_links none
+%global __provides_exclude_from ^/opt/processlama/.*$
+%global __requires_exclude ^lib(Qt6|icu|double-conversion|md4c|b2).*$
 Name: processlama
 Version: $rpm_version
 Release: $rpm_release
-Summary: Flutter and Rust process explorer
-License: MIT AND GPL-2.0-only AND BSD-2-Clause
+Summary: Rust and Qt process explorer
+License: MIT AND GPL-2.0-only AND BSD-2-Clause AND LGPL-3.0-only
 URL: https://devmil.de/processlama/
 Source0: processlama-root.tar.gz
 Requires: systemd
+Recommends: openssh-clients
 
 %description
 A dense desktop process explorer with live metrics and process inspection.
@@ -259,7 +272,77 @@ fi
 EOF
       rpmbuild --define "_topdir $rpm_root" --target "$rpm_arch" -bb "$rpm_root/SPECS/processlama.spec"
       rpm_file="$(find "$rpm_root/RPMS" -type f -name '*.rpm' -print -quit)"
+      if rpm -qlp "$rpm_file" | grep -q '^/usr/lib/\.build-id'; then
+        echo "package-linux.sh: the RPM owns /usr/lib/.build-id paths" >&2
+        exit 1
+      fi
       cp "$rpm_file" "$MIM_ARCHIVE_DIR/$(mim_linux_artifact_filename rpm "$machine_arch")"
+      ;;
+    arch)
+      [[ "$machine_arch" == x86_64 ]] || { echo "package-linux.sh: Arch packages are x86_64 only" >&2; exit 1; }
+      arch_input="$work/arch"
+      mkdir -p "$arch_input/root"
+      stage_tree "$arch_input/root"
+      arch_version="${MIM_MARKETING_VERSION//-/_}"
+      cat >"$arch_input/PKGBUILD" <<EOF
+pkgname=processlama
+pkgver=$arch_version
+pkgrel=$MIM_BUILD_NUMBER
+pkgdesc="Process explorer with live metrics, process inspection and remote hosts"
+arch=('x86_64')
+url="https://devmil.de/processlama/"
+license=('MIT' 'GPL-2.0-only' 'BSD-2-Clause' 'LGPL-3.0-only')
+depends=($arch_depends)
+install=processlama.install
+options=('!debug' '!lto' '!purge' '!strip')
+source=('root.tar')
+sha256sums=('SKIP')
+
+package() {
+  cp -a "\$srcdir/root/." "\$pkgdir/"
+}
+EOF
+      cat >"$arch_input/processlama.install" <<'EOF'
+post_install() {
+  systemctl daemon-reload >/dev/null 2>&1 || true
+  systemctl enable --now processlama-network.service >/dev/null 2>&1 || true
+}
+
+post_upgrade() {
+  systemctl daemon-reload >/dev/null 2>&1 || true
+  systemctl try-restart processlama-network.service >/dev/null 2>&1 || true
+}
+
+pre_remove() {
+  systemctl disable --now processlama-network.service >/dev/null 2>&1 || true
+}
+
+post_remove() {
+  systemctl daemon-reload >/dev/null 2>&1 || true
+}
+EOF
+      source_date_epoch="${SOURCE_DATE_EPOCH:-$(git log -1 --format=%ct)}"
+      find "$arch_input" -exec touch --no-dereference --date="@$source_date_epoch" {} +
+      tar --sort=name --mtime="@$source_date_epoch" --owner=0 --group=0 --numeric-owner \
+        -cf "$arch_input/root.tar" -C "$arch_input" root
+      rm -rf -- "$arch_input/root"
+      if command -v makepkg >/dev/null && [[ -f /etc/arch-release ]]; then
+        (cd "$arch_input" && SOURCE_DATE_EPOCH="$source_date_epoch" PKGDEST="$arch_input" makepkg --nodeps --force --noconfirm)
+      else
+        engine="${PROCESSLAMA_CONTAINER_ENGINE:-$(command -v podman || command -v docker)}"
+        chmod -R a+rX,u+w "$arch_input"
+        chmod 0777 "$arch_input"
+        "$engine" run --rm --security-opt label=disable \
+          --mount "type=bind,src=$arch_input,dst=/build" \
+          --env "SOURCE_DATE_EPOCH=$source_date_epoch" \
+          "${PROCESSLAMA_ARCH_BUILD_IMAGE:-archlinux:base-devel}" bash -euo pipefail -c \
+          'useradd --create-home builder; cp -a /build /home/builder/pkg; chown -R builder:builder /home/builder/pkg
+           su builder -c "cd /home/builder/pkg && makepkg --nodeps --force --noconfirm"
+           install -m 0644 /home/builder/pkg/processlama-*-x86_64.pkg.tar.zst /build/'
+      fi
+      package="$(find "$arch_input" -maxdepth 1 -name 'processlama-*-x86_64.pkg.tar.zst' -print -quit)"
+      [[ -n "$package" ]] || { echo "package-linux.sh: makepkg produced no package" >&2; exit 1; }
+      cp "$package" "$MIM_ARCHIVE_DIR/$(mim_linux_artifact_basename "$machine_arch").pkg.tar.zst"
       ;;
     appimage)
       appdir="$work/ProcessLama.AppDir"
@@ -267,7 +350,9 @@ EOF
         "$appdir/usr/share/applications" "$appdir/usr/share/metainfo" \
         "$appdir/usr/share/icons/hicolor/512x512/apps"
       cp -a "$bundle/." "$appdir/usr/lib/processlama/"
-      ln -s ../lib/processlama/processlama "$appdir/usr/bin/processlama"
+      printf '#!/bin/sh\nexec "$(dirname "$(readlink -f "$0")")/../lib/processlama/processlama" "$@"\n' \
+        >"$appdir/usr/bin/processlama"
+      chmod 0755 "$appdir/usr/bin/processlama"
       cp "$desktop" "$appdir/de.devmil.processlama.desktop"
       cp "$desktop" "$appdir/usr/share/applications/de.devmil.processlama.desktop"
       cp "$metainfo" "$appdir/usr/share/metainfo/de.devmil.processlama.appdata.xml"

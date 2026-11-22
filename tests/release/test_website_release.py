@@ -38,7 +38,7 @@ class WebsiteReleaseTest(unittest.TestCase):
                 architectures="Apple Silicon", minimum_system="macOS 14.0",
                 notes_path="/download/notes.html",
                 download_url="https://github.example/releases/ProcessLama-2.0.0-20.dmg",
-                sparkle_signature="signed-value",
+                sparkle_signature="signed-value", update_signature="",
             ))
             result = json.loads(data.read_text())
 
@@ -46,6 +46,27 @@ class WebsiteReleaseTest(unittest.TestCase):
         stored = result["latest"]["artifacts"][0]
         self.assertEqual(stored["sparkleSignature"], "signed-value")
         self.assertTrue(stored["downloadPath"].startswith("https://github.example/"))
+
+    def test_publish_records_the_appimage_update_signature_only_for_appimages(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            data = root / "releases.json"
+            artifact = root / "ProcessLama-2.0.0-20-linux-x86_64.AppImage"
+            artifact.write_bytes(b"appimage")
+            data.write_text(json.dumps({"schemaVersion": 2, "latest": None, "history": [],
+                                        "beta": {"latest": None, "history": []}}))
+            arguments = dict(
+                data=str(data), version="2.0.0", build="20", channel="stable",
+                artifact=str(artifact), platform="linux", format="appimage",
+                architectures="x86_64", minimum_system="Linux", notes_path="/download/notes.html",
+                download_url="https://github.example/ProcessLama.AppImage",
+                sparkle_signature="", update_signature="signed-update",
+            )
+            website_release.publish(Namespace(**arguments))
+            stored = json.loads(data.read_text())["latest"]["artifacts"][0]
+            self.assertEqual(stored["updateSignature"], "signed-update")
+            with self.assertRaises(SystemExit):
+                website_release.publish(Namespace(**{**arguments, "format": "tar"}))
 
     def test_render_shows_all_platform_logos_and_windows_formats(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -57,6 +78,7 @@ class WebsiteReleaseTest(unittest.TestCase):
                 {"file": "ProcessLama.msi", "platform": "windows", "format": "msi"},
                 {"file": "ProcessLama.dmg", "platform": "macos", "format": "dmg"},
                 {"file": "ProcessLama.rpm", "platform": "linux", "format": "rpm"},
+                {"file": "ProcessLama.pkg.tar.zst", "platform": "linux", "format": "arch"},
             ]
             data.write_text(json.dumps({
                 "schemaVersion": 2,
@@ -68,12 +90,13 @@ class WebsiteReleaseTest(unittest.TestCase):
             website_release.render(Namespace(data=str(data), output=str(output)))
             document = output.read_text()
 
-        for mark in ("windows", "apple", "linux", "fedora"):
+        for mark in ("windows", "apple", "linux", "fedora", "arch"):
             self.assertIn(f'<span class="os-icon os-{mark}"></span>', document)
             self.assertIn(f".os-{mark} {{", STYLES)
             self.assertTrue((WEBSITE / "assets" / "platform" / f"{mark}.svg").is_file())
         self.assertIn("Download Windows installer", document)
         self.assertIn("sudo dnf install ./ProcessLama.rpm", document)
+        self.assertIn("sudo pacman -U ./ProcessLama.pkg.tar.zst", document)
 
     def test_reworked_assets_get_new_urls_on_both_pages(self):
         with tempfile.TemporaryDirectory() as directory:

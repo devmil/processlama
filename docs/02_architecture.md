@@ -1,128 +1,81 @@
 # Architecture
 
-ProcessLama combines layered Flutter services with Rust-first
-telemetry approach. Since remote hosts (docs/10_remote_hosts.md) the main
-window holds tabs: Local and one tab per remote host, each with its own
-explorer state.
+ProcessLama is a Rust application with a Qt Quick (QML) user interface. Rust owns all
+state and behaviour; QML renders projections of that state and sends commands back. The
+main window holds tabs: Local and one tab per remote host, each with its own explorer
+state.
 
 ```text
-lib/screens/
-  ProcessExplorerScreen, built per tab under ActiveProcessSessionScope
-    reads the tab's ProcessService (its ProcessSession)
-  workspace_tabs/: tab strip, remote host dialogs, banner, settings section
-    read WorkspaceTabsService and RemoteHostService
+qml/ProcessLama/        the window: toolbar, tabs, sidebar, process table, inspector,
+                        status bar and dialogs; reads Store.app and the tree model
+qml/Meridian/           the vendored Meridian QML library (scripts/sync-meridian.sh)
 
-lib/services/
-  WorkspaceTabsService     tabs, order, active tab, one ProcessSession each
-  ProcessSession           explorer state of one tab over one ProcessSource
-    LocalProcessSource     samples this computer through ProcessRepository
-    RemoteProcessSource    subscribes to a remote helper's telemetry
-  RemoteHostService        profiles, shared connections, leases, reconnect
-  RemoteHostWorkflows      install/remove flows through an interaction port
-  ProcessIconService       content-addressed remote icon cache
-  SettingsService          preferences and the remote hosts section
+rust-core/desktop/      the desktop application (Cargo workspace members)
+  domain/               records, identities, search, settings, remote host profiles,
+                        snapshot documents; no I/O
+  application/          AppCore: tabs, ProcessSession per tab, snapshots, settings,
+                        updates, network service, remote host workflows, icon service,
+                        diagnostics; the ports adapters implement
+  presentation/         display formats and column definitions shared by the bridge
+  infra-local/          local telemetry adapter over processlama_telemetry
+  infra-storage/        settings, snapshot store, remote icon cache, Flutter settings import
+  infra-platform/       update checks (Sparkle on macOS, in-place AppImage updates), Linux network service setup,
+                        macOS window chrome
+  infra-remote/         OpenSSH client, helper channel, scripts, telemetry decoding,
+                        bundled helpers
+  qt/                   qtbridge objects (AppState, ProcessTreeModel, Pump), the inbox,
+                        worker pool and timer thread
+  app/                  the composition root; embeds QML, fonts and art as a Qt resource
 
-lib/repositories/
-  ProcessRepository        generated Rust bridge (local telemetry)
-  RemoteConnectionRepository  ssh child processes and the helper channel
-  ...
-
-rust-core/ (Cargo workspace)
-  core/           flutter_rust_bridge facade (processlama_core)
-  telemetry/      process enumeration, metrics, inspection, icons
-  wire/           generated remote wire contract
-  devmil-remote/  generic framed transport for helpers
-  remote-helper/  processlama-remote-helper, run on remote hosts
+rust-core/telemetry/    process enumeration, metrics, inspection, icons (processtree)
+rust-core/wire/         the generated remote wire contract and helper build ID
+rust-core/devmil-remote/ the framed helper transport
+rust-core/remote-helper/ processlama-remote-helper, run on remote hosts
 ```
 
-## Flutter Layers
+`scripts/check_architecture.py` enforces the direction: `domain` depends on nothing,
+`application` only on `domain`, adapters only on `domain` and `application` (and the
+telemetry, wire and transport crates), `qt` never on an adapter; only `app` names
+everything.
 
-- `lib/app/` contains app bootstrap, theme, and desktop window setup.
-- `lib/di/` contains the Provider-backed registry copied from VOID Arc's
-  pattern.
-- `lib/screens/` contains widgets. Widgets never know how telemetry is
-  fetched and never touch the Rust bridge, ssh or `devmil_remote`.
-- `lib/services/` owns app state and business rules.
-- `lib/repositories/` owns IO, FFI, persistence, ssh and platform bridges.
-- `lib/models/` is shared Flutter domain state, including the generated
-  remote contract enums (`remote_contract.g.dart`).
-- `packages/devmil_remote/` is the shared Dart transport (ssh arguments,
-  framing, channel, reconnector, fakes); it has no ProcessLama imports.
+## Threads and the event loop
 
-`scripts/check_architecture.py` enforces these boundaries.
+The core runs synchronously on the GUI thread. Everything that blocks runs elsewhere and
+reports back as a `CoreEvent` posted to the `Inbox`:
 
-## Repository Pattern
+- a sampler thread per local source (cadence from the session), an inspector thread for
+  details, a worker pool for snapshots, settings, updates, SSH and icons;
+- a timer thread that posts `Tick` at the core's next deadline (debounced settings
+  saves, order-lock release, detail refresh, reconnects);
+- QML commands, which the AppState slots post as `CoreEvent::Command` rather than calling
+  into the core while a bridge object is borrowed.
 
-ProcessLama follows Mirroly's repository abstraction style:
+The inbox coalesces wake-ups into one queued `pump` call. `Driver::pump` drains the inbox
+into `AppCore::handle`, then `sync` projects only what changed (`CoreChanges`) onto the
+bridge objects, one borrow at a time.
 
-- every data source has an interface in `lib/repositories/`;
-- implementations live in `lib/repositories/impl/`;
-- services receive repositories through constructor injection;
-- each repository is owned by exactly one service;
-- other services call that owner service instead of bypassing it;
-- repository interfaces are exported from `lib/repositories/repositories.dart`.
+## Tabs and sessions
 
-Current owners:
+- `AppCore` keeps one `ProcessSession` per tab. Local is always first and cannot be
+  closed. Hidden sessions keep their selection, expansion, freeze and pins and sample at
+  the background cadence (5 s by default for remote tabs).
+- A `ProcessSession` consumes samples from one `SessionSource` and never polls. Sources
+  report their phase (connecting, live, stale, failed) and `HostCapabilities`; features
+  of a remote tab come from the helper's hello, never from the local platform.
+- Remote hosts share one connection per profile among the tabs that use it; telemetry is
+  credit-limited and re-subscribed after a reconnect. A dropped connection makes the tab
+  stale (last sample kept, history gap), never removes processes.
 
-| Repository | Owner Service | Responsibility |
-| ---------- | ------------- | -------------- |
-| `ProcessRepository` | `ProcessSessionFactory` (local sources and sessions) | Rust-backed process snapshots, details, signals |
-| `SnapshotRepository` | `ProcessSessionFactory` (sessions) | saved and exported snapshot documents |
-| `SettingsRepository`, `RemoteHostsSettingsRepository` | `SettingsService` | persisted preferences and the remote hosts section |
-| `LinuxNetworkSetupRepository` | `LinuxNetworkSetupService` | the local Linux network service |
-| `RemoteConnectionRepository` | `RemoteHostService` | ssh probe, install, prune, uninstall and helper channels |
-| `RemoteHelperArtifactRepository` | `RemoteHostService` | the helpers bundled with the app |
-| `RemoteIconCacheRepository` | `ProcessIconService` | remote icons on disk |
+## Rendering the tree
 
-`RepositoryOperationTracker` mirrors Mirroly's optimization helper and records
-repository access patterns without coupling widgets to persistence details.
+`ProcessTreeModel` is a flat `QAbstractItemModel` over the session's visible rows and
+visible columns. Each publication is reconciled by identity: the changed middle range is
+removed and inserted, and `dataChanged` covers only the cells whose text or state changed,
+so the `TableView` recycles delegates and repaints the minimum. Selection, hover, heat and
+search fills are drawn per cell from model roles; sparklines are `Shape` multilines with
+gaps where samples are missing.
 
-## Tabs and Sessions
+## Network streaming
 
-- `WorkspaceTabsService` keeps one `ProcessSession` per tab. The Local tab
-  is always first and cannot be closed. Hidden sessions keep their
-  selection, expansion, freeze and pins and sample at the background cadence
-  (5 s by default for remote tabs).
-- `ProcessServiceImpl` is a facade over the active session for code that is
-  not tab-aware; the explorer reads the session of its tab directly.
-- A `ProcessSession` consumes one `ProcessSource` and never polls a
-  repository itself. Sources report `ProcessSourceState` (connecting, live,
-  stale, failed) and `HostCapabilities`; features of a remote tab come from
-  the helper's `hello`, never from the local platform.
-- `RemoteHostService` shares one connection per profile among leases; a tab's
-  `RemoteProcessSource` holds a lease, subscribes to telemetry with credit
-  flow control and re-subscribes after a reconnect. A dropped connection
-  makes the tab stale (last sample kept, history gap), never removes
-  processes.
-
-## Rust Layers
-
-- `core` (`processlama_core`): the `flutter_rust_bridge` API in `api.rs`, DTO
-  translation, and Rust-owned child processes for ssh.
-- `telemetry` (`processlama_telemetry`): process enumeration and metrics
-  through processtree, inspection, signals, network rates, icon
-  normalization.
-- `wire` (`processlama_wire`): the remote contract generated from
-  `tooling/remote_wire/contract.json`, and the helper build ID.
-- `devmil-remote`: framing, server loop, publishers with credit, watchdog.
-- `remote-helper`: the helper binary; telemetry encoder, details, icons,
-  host facts.
-
-## State Flow (local tab)
-
-1. `LocalProcessSource` samples at the session's cadence through
-   `ProcessRepository.fetchSnapshot()`.
-2. `RustProcessRepository` calls generated `flutter_rust_bridge` bindings.
-3. Rust returns typed DTOs that the repository maps into domain models.
-4. The session applies the snapshot (freeze, order lock, histories) and
-   publishes `ValueListenable` state; the UI rebuilds.
-
-A remote tab follows the same path from step 4; its samples arrive as
-columnar telemetry frames decoded in `lib/repositories/impl/remote/wire/`.
-
-## Network Streaming
-
-Network telemetry belongs in Rust. The Rust side owns sampler subprocess
-lifecycle, parsing, process-start matching, throughput accumulation and
-reconnect policy; on Linux it reads the eBPF service's snapshot file.
-Remote helpers report the same rates in their telemetry.
+Network telemetry belongs in Rust. On Linux the core reads the eBPF service's snapshot
+file; macOS samples `nettop`; remote helpers report the same rates in their telemetry.

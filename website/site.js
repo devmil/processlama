@@ -848,7 +848,7 @@
     const liveStatus = status.textContent;
     const svg = (id) => `<svg class="icon" aria-hidden="true"><use href="#${id}"/></svg>`;
 
-    /* The app's formatters (process_explorer_screen.dart). */
+    /* The app's formatters (qml/ProcessLama/Format.qml). */
     const percent = (value) => withUnit(value <= 0 ? "0.0" : value.toFixed(value >= 10 ? 0 : 1), "%");
     const bytes = (value) => {
       if (value <= 0) return withUnit("0", "B");

@@ -25,23 +25,23 @@ class BrandMigrationTest(unittest.TestCase):
         self.assertIn(f'<link rel="canonical" href="{homepage}">', (ROOT / "website/index.html").read_text())
 
     def test_processlama_platform_and_storage_identity(self):
-        info = plistlib.loads((ROOT / "macos/Runner/Info.plist").read_bytes())
+        info = plistlib.loads((ROOT / "packaging/macos/Info.plist.in").read_bytes())
         self.assertEqual(info["CFBundleDisplayName"], "ProcessLama")
+        self.assertEqual(info["CFBundleIdentifier"], "de.devmil.processlama")
         self.assertEqual(info["SUFeedURL"], "https://devmil.de/processlama/download/appcast.xml")
-        self.assertIn("PRODUCT_BUNDLE_IDENTIFIER = de.devmil.processlama", (ROOT / "macos/Runner/Configs/AppInfo.xcconfig").read_text())
-        self.assertIn("PRODUCT_NAME = processlama", (ROOT / "macos/Runner/Configs/AppInfo.xcconfig").read_text())
-        for path in ["linux/CMakeLists.txt", "windows/CMakeLists.txt"]:
-            self.assertIn('set(BINARY_NAME "processlama")', (ROOT / path).read_text())
+        # One executable name on every platform: processlama(.exe).
+        cargo = (ROOT / "rust-core/desktop/app/Cargo.toml").read_text()
+        self.assertIn('[[bin]]\nname = "processlama"', cargo)
+        # The Wayland app id and desktop entry agree.
+        self.assertIn('"de.devmil.processlama"', (ROOT / "rust-core/desktop/app/src/main.rs").read_text())
+        self.assertIn("StartupWMClass=de.devmil.processlama", (ROOT / "linux/packaging/de.devmil.processlama.desktop").read_text())
         wix = ET.fromstring((ROOT / "packaging/windows/processlama.wxs").read_bytes())
         self.assertNotEqual("{D82A73FC-CB5E-4F95-AA5F-49BEFC5A3143}", wix.find("{http://wixtoolset.org/schemas/v4/wxs}Package").get("UpgradeCode"))
         for identity in ["INSTALLFOLDER", "ApplicationProgramsFolder"]:
             self.assertEqual("ProcessLama", wix.find(f".//*[@Id='{identity}']").get("Name"))
-        resource = (ROOT / "windows/runner/Runner.rc").read_text()
-        self.assertIn('VALUE "ProductName", "ProcessLama"', resource)
-        self.assertIn('VALUE "OriginalFilename", "processlama.exe"', resource)
-        snapshot = (ROOT / "lib/repositories/impl/file_snapshot_repository.dart").read_text()
-        self.assertIn(".processlama-snapshot.json", snapshot)
-        self.assertIn("source: 'ProcessLama'", snapshot)
+        document = (ROOT / "rust-core/desktop/domain/src/document.rs").read_text()
+        self.assertIn('".processlama-snapshot.json"', document)
+        self.assertIn('source: "ProcessLama"', document)
 
     def test_current_site_serves_real_feeds_and_resources(self):
         handler = functools.partial(QuietHandler, directory=str(ROOT))

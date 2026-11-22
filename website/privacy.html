@@ -15,9 +15,9 @@
     <link rel="manifest" href="site.webmanifest?v=4a1da52cc7f8">
     <meta name="theme-color" content="#e8ecee" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b151a" media="(prefers-color-scheme: dark)">
-    <link rel="stylesheet" href="styles.css?v=75e899b1241a">
+    <link rel="stylesheet" href="styles.css?v=ee7443b4153f">
     <script>document.documentElement.classList.add("js");</script>
-    <script src="site.js?v=a55f555e30dc" defer></script>
+    <script src="site.js?v=7629b910bc3a" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -90,7 +90,7 @@
         <h3>Permissions</h3>
         <ul>
           <li><strong>macOS:</strong> ProcessLama asks for no special permissions such as camera, microphone, screen recording or accessibility. It reads what macOS makes available to your user account; where macOS denies access, the inspector says so. For network figures it runs the system tool <code>nettop</code>.</li>
-          <li><strong>Linux:</strong> per-process network figures need the <code>processlama-network</code> system service, which runs with administrator (root) rights. The RPM and DEB packages install and start it. In the portable builds, the app offers to install it and asks for your administrator password through polkit. The service counts the bytes each process sends and receives. It does not read packet contents, addresses or ports. It writes these counters to <code>/run/processlama/network.json</code>, which other users on the same computer can read. You can stop it with <code>systemctl disable --now processlama-network.service</code>.</li>
+          <li><strong>Linux:</strong> per-process network figures need the <code>processlama-network</code> system service, which runs with administrator (root) rights. The RPM, DEB and Arch packages install and start it. In the portable builds, the app offers to install it and asks for your administrator password through polkit. The service counts the bytes each process sends and receives. It does not read packet contents, addresses or ports. It writes these counters to <code>/run/processlama/network.json</code>, which other users on the same computer can read. You can stop it with <code>systemctl disable --now processlama-network.service</code>.</li>
           <li><strong>Windows:</strong> the app runs with your normal user rights. The installer asks for administrator rights to install into Program Files. No service is installed.</li>
         </ul>
         <p>Process actions such as terminating or suspending a process only happen when you choose them; ProcessLama asks before it sends a destructive signal.</p>

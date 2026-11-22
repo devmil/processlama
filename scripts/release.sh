@@ -89,7 +89,6 @@ fi
 mim_read_version
 mim_validate_release_channel_version
 mim_validate_release_build_monotonicity
-mim_apply_version_to_pubspec
 if [[ "$MIM_CHANGELOG_CHECK" -eq 1 ]]; then
   mim_finalize_changelog_for_release
   mim_finalize_release_notes_for_release

@@ -16,8 +16,8 @@ the app's **Setup guide** buttons open that page.
 - A key-based login that works without a prompt: a key without passphrase,
   or a key loaded into your agent. ProcessLama runs ssh with
   `BatchMode=yes`, so it never asks for passwords.
-- The host key is already trusted: connect once with `ssh <alias>` in a
-  terminal and accept it. ProcessLama runs ssh with
+- The host key is already trusted: connect once with `ssh <destination>` in
+  a terminal and accept it. ProcessLama runs ssh with
   `StrictHostKeyChecking=yes`.
 
 **On the host**
@@ -29,10 +29,16 @@ the app's **Setup guide** buttons open that page.
 
 Windows hosts are not supported yet.
 
-## Your `~/.ssh/config`
+## SSH destinations
 
-ProcessLama stores only a host **alias**. User names, ports, keys and jump
-hosts belong in `~/.ssh/config`, where ssh and your other tools use them too.
+A host is an **SSH destination**: a host alias from `~/.ssh/config`, a
+hostname, or `user@host`, for example `deploy@build-box.example.net` or
+`admin@192.0.2.10`. `user@host` needs no config entry when your key or agent
+already signs in without a password. Ports, URIs (`ssh://`) and ssh options
+are not accepted in the destination; ports, keys and jump hosts belong in
+`~/.ssh/config`, where ssh and your other tools use them too.
+
+## Your `~/.ssh/config`
 
 A plain host:
 
@@ -65,17 +71,18 @@ Host db-internal
     ProxyJump bastion
 ```
 
-Check that `ssh <alias> true` returns without asking anything. Then use
-the alias in ProcessLama.
+Check that `ssh <destination> true` returns without asking anything. Then
+use the same destination in ProcessLama.
 
 ## Adding a host
 
 1. Click **+** at the end of the tab strip (or press Ctrl+T, ⌘T on macOS)
    and choose **Add remote host…**.
-2. Enter the SSH host alias. The display name defaults to the alias.
+2. Enter the SSH destination: a host alias, hostname or `user@host`. The
+   display name defaults to it.
 3. Click **Test connection**. It reports one of:
-   - *SSH unreachable*: ssh could not connect; run `ssh <alias>` in a
-     terminal to see why.
+   - *SSH unreachable*: ssh could not connect; run `ssh <destination>` in
+     a terminal to see why.
    - *Helper missing* or *Helper outdated*: fine; the helper is installed
      when you open the tab.
    - *Unsupported platform*: the host is not one of the systems above.
@@ -86,7 +93,7 @@ Options per host:
 
 - **Install helper automatically**: off by default. When off, ProcessLama
   shows the install dialog with the path, version, size and checksum
-  first. Changing the alias turns it off again.
+  first. Changing the destination turns it off again.
 - **Reconnect automatically**: on by default. After a dropped connection
   ProcessLama retries after 2, 5, 15 and 30 seconds and then every minute,
   for up to 10 minutes.
@@ -134,8 +141,8 @@ esac
 your processes*. Processes of other users also show restricted files,
 environment and I/O, as they do locally.
 
-**The host key is not trusted yet.** Connect once with `ssh <alias>` and
-accept the key.
+**The host key is not trusted yet.** Connect once with `ssh <destination>`
+and accept the key.
 
 ## Network rates on Linux hosts
 
@@ -185,12 +192,13 @@ the profile alone leaves the helper on the host.
 To remove it by hand:
 
 ```sh
-ssh <alias> 'rm -rf ~/.local/lib/processlama ~/.cache/processlama'
+ssh <destination> 'rm -rf ~/.local/lib/processlama ~/.cache/processlama'
 ```
 
 ## Privacy
 
-ProcessLama stores only the alias and what the helper last reported
-(system, architecture, helper version) for display. It stores no user
-names, ports, keys or passwords, and its logs contain no host names,
-aliases or command lines.
+ProcessLama stores only the SSH destination as you entered it (including a
+user name when you use `user@host`) and what the helper last reported
+(system, architecture, helper version) for display. It stores no ports,
+keys or passwords, and its logs contain no host names, destinations or
+command lines.

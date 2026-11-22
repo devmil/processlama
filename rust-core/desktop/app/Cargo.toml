@@ -1,0 +1,26 @@
+[package]
+name = "processlama"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+description = "ProcessLama, a process explorer for Linux, macOS and Windows"
+build = "build.rs"
+
+[[bin]]
+name = "processlama"
+path = "src/main.rs"
+
+[dependencies]
+processlama-domain = { workspace = true }
+processlama-application = { workspace = true }
+processlama-infra-local = { workspace = true }
+processlama-infra-remote = { workspace = true }
+processlama-infra-storage = { workspace = true }
+processlama-infra-platform = { workspace = true }
+processlama-qt = { workspace = true }
+qtbridge = { workspace = true, features = ["serde_json"] }
+serde_json = { workspace = true }
+sys-locale = "=0.3.2"
+
+[build-dependencies]
+cc = "1"

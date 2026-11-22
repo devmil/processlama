@@ -169,9 +169,10 @@ class PackageTest(unittest.TestCase):
         package_remote_helper.verify(source, "macos-x86_64")
 
     def test_every_package_script_bundles_the_helpers(self):
-        for script in ("package-linux.sh", "package-release.sh"):
+        for script in ("package-linux.sh", "package-macos.sh"):
             text = (ROOT / "scripts" / script).read_text()
-            self.assertIn("package_remote_helper.py\" bundle", text, script)
+            self.assertRegex(text, r'package_remote_helper\.py"? bundle', script)
+        self.assertIn("package-macos.sh", (ROOT / "scripts" / "package-release.sh").read_text())
         windows = (ROOT / "scripts" / "package-windows.ps1").read_text()
         self.assertIn("PROCESSLAMA_REQUIRE_REMOTE_HELPER", windows)
         self.assertIn('"linux-x86_64", "linux-arm64", "macos-arm64", "macos-x86_64"', windows)

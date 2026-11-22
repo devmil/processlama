@@ -66,49 +66,49 @@
         1024
       ]
     },
-    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_16.png": {
+    "packaging/macos/AppIcon.appiconset/app_icon_16.png": {
       "sha256": "a2257fa591c51fd572f996380730e12c5669e60015627a1a71511012312657cd",
       "dimensions": [
         16,
         16
       ]
     },
-    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png": {
+    "packaging/macos/AppIcon.appiconset/app_icon_32.png": {
       "sha256": "64290ed52d2a166f6f9f0d50d20c07cad48bc668acd10288374f3753924742dd",
       "dimensions": [
         32,
         32
       ]
     },
-    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_64.png": {
+    "packaging/macos/AppIcon.appiconset/app_icon_64.png": {
       "sha256": "5b30a61859ea8329757439014abc82b3d51555de943a8e189164c255b7a1ce2c",
       "dimensions": [
         64,
         64
       ]
     },
-    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_128.png": {
+    "packaging/macos/AppIcon.appiconset/app_icon_128.png": {
       "sha256": "ff7f42f8494ef32a7d34a57a651591330aaeab231cba378dd5cc0633fa2074f1",
       "dimensions": [
         128,
         128
       ]
     },
-    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png": {
+    "packaging/macos/AppIcon.appiconset/app_icon_256.png": {
       "sha256": "05045fbceaa4fb4813cc7a8114320b657ec969f4c1d95c65cf2053d5108d93d5",
       "dimensions": [
         256,
         256
       ]
     },
-    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png": {
+    "packaging/macos/AppIcon.appiconset/app_icon_512.png": {
       "sha256": "427e0b60346e0debcf62d6979efdea6f9be4e621fa29022f4b03c601e6f67653",
       "dimensions": [
         512,
         512
       ]
     },
-    "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png": {
+    "packaging/macos/AppIcon.appiconset/app_icon_1024.png": {
       "sha256": "710fcb56381fa1ab918adda53adabc10a1329a5e6ecb67781b54e70db7a810df",
       "dimensions": [
         1024,
@@ -167,7 +167,7 @@
     "website/favicon.ico": {
       "sha256": "40686994f20207826a3fa1a73aee066234fa9486b842fba25231a1dd61d636b9"
     },
-    "windows/runner/resources/app_icon.ico": {
+    "packaging/windows/app_icon.ico": {
       "sha256": "82ef7b163437e2d7f02c778b57aa19a31ad0def327bab0078ea30c3f4060acfd"
     },
     "resources/logo/iconapp_icon.icon/Assets/01-background.svg": {

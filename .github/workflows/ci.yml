@@ -9,35 +9,41 @@ on:
 
 env:
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+  QT_VERSION: "6.11.2"
 
 permissions:
   contents: read
 
 jobs:
-  analyze-and-test:
-    runs-on: macos-15
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: ./.github/actions/flutter
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-      - name: Install pinned workflow validator
-        run: python3 -m pip install --disable-pip-version-check -r tooling/requirements-ci.txt
+          python-version: "3.12"
 
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v4
+      - name: Install the workflow validator
+        run: python3 -m pip install -r tooling/requirements-ci.txt
+
+      - name: Install Linux build prerequisites
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends clang pkg-config libelf-dev \
+            libgl1-mesa-dev libegl1 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 \
+            libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 \
+            libxcb-xinerama0 libfontconfig1 libdbus-1-3
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
         with:
-          path: |
-            ~/.pub-cache
-            **/.dart_tool
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-
+          version: ${{ env.QT_VERSION }}
+          setup-python: false
+          cache: true
 
       - name: Cache Rust
         uses: actions/cache@v4
@@ -46,387 +52,45 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             rust-core/target
-          key: ${{ runner.os }}-rust-ws-${{ hashFiles('rust-core/Cargo.lock', 'linux/network-helper/Cargo.lock') }}
+          key: ${{ runner.os }}-rust-verify-${{ hashFiles('rust-core/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-rust-
+            ${{ runner.os }}-rust-verify-
 
       - name: Install Rust toolchain
         run: |
           set -euo pipefail
-          export PATH="$HOME/.cargo/bin:$PATH"
-          if ! command -v cargo >/dev/null 2>&1; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
-          else
-            rustup default stable
-          fi
-          rustup component add rustfmt
-          rustc --version
-          cargo --version
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-
-      # Fetch before Flutter's native-assets hook filters the Git/Cargo auth
-      # environment. Restored Cargo caches may not contain the pinned revision.
-      - name: Fetch locked Rust dependencies
-        shell: bash
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-        run: cargo fetch --locked --manifest-path rust-core/Cargo.toml
-
-      - name: Install Flutter dependencies
-        # The project analysis also covers packages/devmil_remote, which
-        # resolves its own dependencies.
-        run: |
-          flutter pub get
-          (cd packages/devmil_remote && dart pub get)
-
-      - name: Verify locked dependency notices
-        run: python3 scripts/generate-license-notices.py --check
-
-      - name: Verify brand derivatives and release tooling
-        run: |
-          python3 scripts/check_workflows.py
-          python3 scripts/generate-brand-assets.py --check
-          python3 -m unittest discover -s tests/release -v
-
-      - name: Verify native build hooks and helper packaging
-        run: |
-          python3 -m unittest discover -s tests/native_hooks -v
-          python3 -m unittest discover -s tests/package -v
-
-      - name: Verify architecture and the remote contract
-        run: |
-          python3 scripts/check_architecture.py
-          python3 -m unittest discover -s tests/architecture -v
-          python3 tooling/remote_wire/generate.py --check
-          python3 scripts/check_helper_compatibility.py --self-test
-          python3 scripts/check_helper_compatibility.py
-
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
-
-      - name: Analyze project source
-        run: flutter analyze --no-fatal-infos
-
-      - name: Run Flutter tests
-        run: flutter test
-
-      - name: Test shared remote transport package
-        working-directory: packages/devmil_remote
-        run: |
-          dart pub get
-          dart analyze --fatal-infos
-          dart test
-
-      - name: Run Rust tests
-        run: cargo test --manifest-path rust-core/Cargo.toml
-
-      - name: Remote helper protocol and pipe lanes
-        run: python3 scripts/verify_remote_hosts.py --protocol --helper
-
-
-  build-macos:
-    runs-on: macos-15
-    timeout-minutes: 30
-    needs: analyze-and-test
-    steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: ./.github/actions/flutter
-
-      - name: Cache Swift Package Manager downloads
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/Library/Caches/org.swift.swiftpm/repositories/Sparkle-*
-            ~/Library/Caches/org.swift.swiftpm/artifacts/https___github_com_sparkle_project_Sparkle_releases_download_*
-          key: ${{ runner.os }}-processlama-sparkle-v1-${{ hashFiles('macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.pub-cache
-            **/.dart_tool
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-
-
-      - name: Cache Rust
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            rust-core/target
-          key: ${{ runner.os }}-rust-ws-${{ hashFiles('rust-core/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-
-
-      - name: Install Rust toolchain
-        run: |
-          set -euo pipefail
-          export PATH="$HOME/.cargo/bin:$PATH"
-          if ! command -v cargo >/dev/null 2>&1; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
-          else
-            rustup default stable
-          fi
-          rustup component add rustfmt
-          rustc --version
-          cargo --version
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-
-      # Fetch before Flutter's native-assets hook filters the Git/Cargo auth
-      # environment. Restored Cargo caches may not contain the pinned revision.
-      - name: Fetch locked Rust dependencies
-        shell: bash
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-        run: cargo fetch --locked --manifest-path rust-core/Cargo.toml
-
-      - name: Install Flutter dependencies
-        run: flutter pub get
-
-      - name: Enable macOS desktop
-        run: flutter config --enable-macos-desktop
-
-      - name: Reset macOS build state
-        run: |
-          flutter clean
-          rm -rf macos/Flutter/ephemeral
-          rm -rf build/macos
-          flutter pub get
-
-      - name: Build macOS app
-        run: flutter build macos --debug
-
-      - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: processlama-macos-debug-app
-          path: build/macos/Build/Products/Debug/*.app
-
-
-  build-linux:
-    runs-on: ubuntu-24.04
-    needs: analyze-and-test
-    steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Linux desktop dependencies
-        run: |
-          set -euo pipefail
-          if command -v dnf >/dev/null 2>&1; then
-            sudo dnf install -y clang cmake ninja-build pkgconf-pkg-config gtk3-devel libblkid-devel xz-devel elfutils-libelf-devel
-          elif command -v apt-get >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev liblzma-dev libelf-dev
-          else
-            echo "Unsupported Linux runner distribution"
-            exit 1
-          fi
-
-      - name: Setup Flutter
-        uses: ./.github/actions/flutter
-
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.pub-cache
-            **/.dart_tool
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-
-
-      - name: Cache Rust
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            rust-core/target
-            linux/network-helper/target
-          key: ${{ runner.os }}-rust-ws-${{ hashFiles('rust-core/Cargo.lock', 'linux/network-helper/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-
-
-      - name: Install Rust toolchain
-        run: |
-          set -euo pipefail
-          export PATH="$HOME/.cargo/bin:$PATH"
-          if ! command -v cargo >/dev/null 2>&1; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
-          else
-            rustup default stable
-          fi
-          rustup component add rustfmt
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-
-      # Fetch before Flutter's native-assets hook filters the Git/Cargo auth
-      # environment. Restored Cargo caches may not contain the pinned revision.
-      - name: Fetch locked Rust dependencies
-        shell: bash
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-        run: cargo fetch --locked --manifest-path rust-core/Cargo.toml
-
-      - name: Build Linux app
-        run: |
-          cargo test --manifest-path linux/network-helper/Cargo.toml
-          flutter config --enable-linux-desktop
-          flutter pub get
-          flutter build linux --debug
-
-      - name: Upload Linux artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: processlama-linux-debug-bundle
-          path: build/linux/*/debug/bundle
-
-
-  build-windows:
-    runs-on: windows-2025
-    # A cold Flutter/Rust build on the shared Windows runner can exceed the
-    # runner's short default job limit while Cargo populates its cache.
-    timeout-minutes: 180
-    needs: analyze-and-test
-    steps:
-
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: ./.github/actions/flutter
-
-      - name: Install Rust toolchain
-        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Get-Content -Raw '{0}' | Invoke-Expression"
-        run: |
-          ./scripts/install-rustup-windows.ps1
-          rustup toolchain install stable --profile minimal --target x86_64-pc-windows-msvc
-          if ($LASTEXITCODE -ne 0) { throw "Rust toolchain setup failed with exit code $LASTEXITCODE" }
           rustup default stable
-          if ($LASTEXITCODE -ne 0) { throw "Could not select the stable Rust toolchain" }
-
-      # Fetch before Flutter's native-assets hook filters the Git/Cargo auth
-      # environment. Restored Cargo caches may not contain the pinned revision.
-      - name: Fetch locked Rust dependencies
-        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Get-Content -Raw '{0}' | Invoke-Expression"
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-        run: |
-          cargo fetch --locked --manifest-path rust-core/Cargo.toml
-          if ($LASTEXITCODE -ne 0) { throw "Rust dependency fetch failed with exit code $LASTEXITCODE" }
-
-      - name: Build Windows app
-        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Get-Content -Raw '{0}' | Invoke-Expression"
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-        run: |
-          . ./scripts/initialize-msvc-environment.ps1
-          flutter config --enable-windows-desktop
-          flutter pub get --enforce-lockfile
-          flutter build windows --debug
-          if ($LASTEXITCODE -ne 0) { throw "Windows desktop build failed with exit code $LASTEXITCODE" }
-
-      - name: Upload Windows artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: processlama-windows-debug-bundle
-          path: build/windows/x64/runner/Debug
-          if-no-files-found: error
-
-  # Real OpenSSH to a user-mode sshd: probe, install, connect, reconnect, prune, uninstall.
-
-  remote-ssh-loopback:
-    runs-on: ubuntu-24.04
-    needs: analyze-and-test
-    timeout-minutes: 60
-    steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install OpenSSH
-        run: |
-          set -euo pipefail
-          if command -v dnf >/dev/null 2>&1; then
-            sudo dnf install -y openssh-server openssh-clients
-          elif command -v apt-get >/dev/null 2>&1; then
-            sudo apt-get update -qq
-            sudo apt-get install -y --no-install-recommends openssh-server openssh-client
-          fi
-
-      - name: Setup Flutter
-        uses: ./.github/actions/flutter
-
-      - name: Install Rust toolchain
-        run: |
-          set -euo pipefail
-          export PATH="$HOME/.cargo/bin:$PATH"
-          if ! command -v cargo >/dev/null 2>&1; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
-          else
-            rustup default stable
-          fi
+          rustup component add rustfmt clippy
+          rustc --version
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Fetch locked Rust dependencies
-        shell: bash
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
         run: cargo fetch --locked --manifest-path rust-core/Cargo.toml
 
-      - name: Install Flutter dependencies
-        run: flutter pub get
-
-      - name: SSH loopback lane
-        run: python3 scripts/verify_remote_hosts.py --ssh-loopback
+      - name: Verify
+        run: ./scripts/verify.sh
 
   # The remote helpers every desktop package bundles (docs/10_remote_hosts.md §8).
 
   remote-helper-linux:
     runs-on: ubuntu-24.04
-    needs: analyze-and-test
     timeout-minutes: 90
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install the container engine
         run: |
           set -euo pipefail
-          if command -v dnf >/dev/null 2>&1; then
-            sudo dnf install -y crun podman
-          elif command -v apt-get >/dev/null 2>&1; then
-            sudo apt-get update -qq
-            sudo apt-get install -y --no-install-recommends crun podman
-          else
-            echo "Unsupported Linux runner distribution" >&2
-            exit 1
-          fi
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends crun podman
 
       - name: Install Rust toolchain
         run: |
-          set -euo pipefail
-          export PATH="$HOME/.cargo/bin:$PATH"
-          if ! command -v cargo >/dev/null 2>&1; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
-          fi
+          rustup default stable
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Fetch locked Rust dependencies
-        shell: bash
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
         run: cargo fetch --locked --manifest-path rust-core/Cargo.toml
 
       - name: Build the Linux remote helpers on the glibc 2.35 baseline
@@ -441,31 +105,24 @@ jobs:
           path: build/remote-helper/processlama-remote-helper-*.tar.gz
           if-no-files-found: error
 
-
   remote-helper-macos:
     runs-on: macos-15
-    needs: analyze-and-test
     timeout-minutes: 45
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install Rust toolchain
         run: |
           set -euo pipefail
-          export PATH="$HOME/.cargo/bin:$PATH"
-          if ! command -v cargo >/dev/null 2>&1; then
+          if ! command -v rustup >/dev/null 2>&1; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
-          else
-            rustup default stable
           fi
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup default stable
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Fetch locked Rust dependencies
-        shell: bash
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
         run: cargo fetch --locked --manifest-path rust-core/Cargo.toml
 
       - name: Build the macOS remote helpers
@@ -482,61 +139,48 @@ jobs:
 
   package-linux:
     runs-on: ubuntu-24.04
-    needs: [remote-helper-linux, remote-helper-macos]
+    needs: [verify, remote-helper-linux, remote-helper-macos]
     timeout-minutes: 120
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install Linux packaging prerequisites
-        shell: bash
         run: |
           set -euo pipefail
-          if command -v dnf >/dev/null; then
-            sudo dnf install -y clang cmake curl ninja-build gtk3-devel libblkid-devel \
-              xz-devel elfutils-libelf-devel patchelf rpm-build dpkg tar cpio
-          elif command -v apt-get >/dev/null; then
-            sudo apt-get update -qq
-            sudo apt-get install -y --no-install-recommends clang cmake curl ninja-build \
-              libgtk-3-dev libblkid-dev liblzma-dev libelf-dev pkg-config patchelf \
-              rpm dpkg-dev tar cpio
-          else
-            echo "::error::The Linux runner needs dnf or apt-get" >&2
-            exit 1
-          fi
-          appimage_tool_dir="${RUNNER_TEMP:-${TMPDIR:-/tmp}}/processlama-appimagetool"
-          appimage_tool="$appimage_tool_dir/appimagetool"
-          appimage_tool_download="$appimage_tool.download"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends clang pkg-config libelf-dev patchelf \
+            rpm dpkg-dev tar cpio libgl1-mesa-dev libegl1 libxkbcommon-x11-0 libxcb-cursor0 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
+            libxcb-shape0 libxcb-xinerama0 libfontconfig1 libdbus-1-3
+          appimage_tool_dir="$RUNNER_TEMP/processlama-appimagetool"
           mkdir -p "$appimage_tool_dir"
           curl --fail --location --proto '=https' --tlsv1.2 \
-            --output "$appimage_tool_download" \
+            --output "$appimage_tool_dir/appimagetool.download" \
             https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage
-          echo "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  $appimage_tool_download" \
+          echo "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  $appimage_tool_dir/appimagetool.download" \
             | sha256sum --check --strict
-          chmod 0755 "$appimage_tool_download"
-          mv -f "$appimage_tool_download" "$appimage_tool"
+          chmod 0755 "$appimage_tool_dir/appimagetool.download"
+          mv -f "$appimage_tool_dir/appimagetool.download" "$appimage_tool_dir/appimagetool"
           echo "$appimage_tool_dir" >> "$GITHUB_PATH"
 
-      - name: Setup Flutter
-        uses: ./.github/actions/flutter
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          setup-python: false
+          modules: qtwaylandcompositor
+          cache: true
 
       - name: Install Rust toolchain
         run: |
-          set -euo pipefail
-          export PATH="$HOME/.cargo/bin:$PATH"
-          if ! command -v cargo >/dev/null 2>&1; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
-          else
-            rustup default stable
-          fi
-          rustup component add rustfmt
+          rustup default stable
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Fetch locked Rust dependencies
-        shell: bash
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
         run: |
           cargo fetch --locked --manifest-path rust-core/Cargo.toml
           cargo fetch --locked --manifest-path linux/network-helper/Cargo.toml
@@ -554,22 +198,153 @@ jobs:
           path: build/remote-helper-artifacts
 
       - name: Package Linux bundles with every remote helper
-        shell: bash
         env:
           APPIMAGE_EXTRACT_AND_RUN: "1"
           MIM_RELEASE_CHANNEL: beta
           PROCESSLAMA_REQUIRE_REMOTE_HELPER: "1"
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
         run: |
           set -euo pipefail
           python3 scripts/package_remote_helper.py unpack \
             --archives build/remote-helper-artifacts --output build/remote-helper
-            ./scripts/package-linux.sh
+          ./scripts/package-linux.sh --formats appimage,rpm,deb,tar,arch
           python3 scripts/check_bundled_helpers.py build/archive
+
+      - name: Smoke test the packaged bundle
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/smoke"
+          tar -xzf build/archive/ProcessLama-*-linux-x86_64.tar.gz -C "$RUNNER_TEMP/smoke"
+          export PROCESSLAMA_DATA_DIR="$RUNNER_TEMP/smoke-data" QT_QPA_PLATFORM=offscreen
+          export PROCESSLAMA_SCREENSHOT="$RUNNER_TEMP/smoke/window.png"
+          timeout 60 "$RUNNER_TEMP/smoke/ProcessLama/processlama"
+          test -s "$RUNNER_TEMP/smoke/window.png"
 
       - name: Upload Linux packages
         uses: actions/upload-artifact@v4
         with:
           name: processlama-linux-packages
           path: build/archive/ProcessLama-*-linux-*
+          if-no-files-found: error
+
+  package-macos:
+    runs-on: macos-15
+    needs: [verify, remote-helper-linux, remote-helper-macos]
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          setup-python: false
+          cache: true
+
+      - name: Install Rust toolchain
+        run: |
+          set -euo pipefail
+          if ! command -v rustup >/dev/null 2>&1; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
+          fi
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup default stable
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Download the remote helpers
+        uses: actions/download-artifact@v4
+        with:
+          pattern: processlama-remote-helper-*
+          merge-multiple: true
+          path: build/remote-helper-artifacts
+
+      - name: Build ProcessLama.app and the DMG (ad hoc signed)
+        env:
+          PROCESSLAMA_REQUIRE_REMOTE_HELPER: "1"
+        run: |
+          set -euo pipefail
+          python3 scripts/package_remote_helper.py unpack \
+            --archives build/remote-helper-artifacts --output build/remote-helper
+          ./scripts/package-macos.sh
+
+      - name: Smoke test the app
+        run: |
+          set -euo pipefail
+          export PROCESSLAMA_DATA_DIR="$RUNNER_TEMP/smoke-data" PROCESSLAMA_SCREENSHOT="$RUNNER_TEMP/window.png"
+          build/macos/ProcessLama.app/Contents/MacOS/ProcessLama &
+          pid=$!
+          for _ in $(seq 60); do [[ -s "$RUNNER_TEMP/window.png" ]] && break; sleep 1; done
+          kill "$pid" 2>/dev/null || true
+          test -s "$RUNNER_TEMP/window.png"
+
+      - name: Upload the macOS DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: processlama-macos-dmg
+          path: build/archive/ProcessLama-*.dmg
+          if-no-files-found: error
+
+  build-windows:
+    runs-on: windows-2025
+    needs: verify
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # aqtinstall cannot read Qt 6.11's per-architecture Windows repository.
+      - name: Install Qt
+        shell: pwsh
+        run: python scripts/install-qt-windows.py --version $env:QT_VERSION --output "$env:RUNNER_TEMP/Qt"
+
+      - name: Install Rust toolchain
+        shell: pwsh
+        run: |
+          rustup default stable
+          rustc --version
+
+      - name: Build the application
+        shell: pwsh
+        run: cargo build --release --locked --manifest-path rust-core/Cargo.toml -p processlama
+
+      - name: Deploy Qt next to the executable
+        shell: pwsh
+        run: |
+          $out = "build/windows/ProcessLama"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          Copy-Item rust-core/target/release/processlama.exe $out/
+          windeployqt --release --qmldir qml/ProcessLama --qmlimport qml --no-translations "$out/processlama.exe"
+          python scripts/package_licenses.py $out
+          Compress-Archive -Path "$out/*" -DestinationPath build/windows/ProcessLama-windows-x64.zip
+
+      - name: Smoke test the build
+        shell: pwsh
+        run: |
+          $env:PROCESSLAMA_DATA_DIR = "$env:RUNNER_TEMP/smoke-data"
+          $env:PROCESSLAMA_SCREENSHOT = "$env:RUNNER_TEMP/window.png"
+          $env:QT_QPA_PLATFORM = "offscreen"
+          $env:QT_FORCE_STDERR_LOGGING = "1"
+          # The offscreen platform is for this test only; the package ships qwindows.
+          $smoke = "$env:RUNNER_TEMP/smoke"
+          Copy-Item -Recurse build/windows/ProcessLama $smoke
+          $platforms = Split-Path (Get-ChildItem -Recurse -Filter qwindows.dll $smoke | Select-Object -First 1).FullName
+          Copy-Item "$env:QT_ROOT_DIR/plugins/platforms/qoffscreen.dll" $platforms
+          $process = Start-Process -FilePath "$smoke/processlama.exe" -PassThru `
+            -RedirectStandardError "$env:RUNNER_TEMP/smoke.log" -RedirectStandardOutput "$env:RUNNER_TEMP/smoke.out"
+          for ($i = 0; $i -lt 60 -and -not (Test-Path "$env:RUNNER_TEMP/window.png"); $i++) { Start-Sleep 1 }
+          Stop-Process -Id $process.Id -ErrorAction SilentlyContinue
+          Get-Content "$env:RUNNER_TEMP/smoke.log" -ErrorAction SilentlyContinue | Select-Object -First 40
+          if (-not (Test-Path "$env:RUNNER_TEMP/window.png")) { throw "no window rendered" }
+
+      - name: Upload the Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: processlama-windows
+          path: build/windows/ProcessLama-windows-x64.zip
           if-no-files-found: error

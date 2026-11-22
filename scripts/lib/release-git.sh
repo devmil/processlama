@@ -38,7 +38,6 @@ mim_commit_release_artifacts() {
     VERSION
     CHANGELOG.md
     RELEASE_NOTES.md
-    pubspec.yaml
   )
 
   local missing=0
@@ -133,7 +132,7 @@ mim_create_release_git_tag() {
 }
 
 mim_resolve_existing_release_commit() {
-  local root tag tag_commit head_commit current_pubspec_version tag_pubspec_version subject path
+  local root tag tag_commit head_commit subject path
   root="$(mim_repo_root)"
   cd "$root"
   mim_read_version
@@ -162,7 +161,7 @@ mim_resolve_existing_release_commit() {
         return 1
         ;;
     esac
-    for path in VERSION pubspec.yaml CHANGELOG.md RELEASE_NOTES.md; do
+    for path in VERSION CHANGELOG.md RELEASE_NOTES.md; do
       git diff --quiet "$tag_commit" HEAD -- "$path" || {
         echo "release-git: $path changed after release preparation" >&2
         return 1
@@ -176,16 +175,6 @@ mim_resolve_existing_release_commit() {
   }
   [[ "$(git show "$tag_commit:VERSION")" == "$(cat VERSION)" ]] || {
     echo "release-git: VERSION no longer agrees with $tag" >&2
-    return 1
-  }
-  current_pubspec_version="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml)"
-  tag_pubspec_version="$(git show "$tag_commit:pubspec.yaml" | sed -n 's/^version:[[:space:]]*//p')"
-  [[ "$current_pubspec_version" == "$MIM_MARKETING_VERSION+$MIM_BUILD_NUMBER" ]] || {
-    echo "release-git: pubspec.yaml does not agree with VERSION" >&2
-    return 1
-  }
-  [[ "$tag_pubspec_version" == "$current_pubspec_version" ]] || {
-    echo "release-git: pubspec.yaml no longer agrees with $tag" >&2
     return 1
   }
   python3 - "$MIM_MARKETING_VERSION" CHANGELOG.md RELEASE_NOTES.md <<'PY'
