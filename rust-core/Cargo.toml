@@ -1,13 +1,37 @@
 # ProcessLama's Rust workspace.
-# - core (processlama_core): the flutter_rust_bridge facade; the library Flutter loads.
+#
+# Shared native crates (also built into the remote helper):
 # - telemetry (processlama_telemetry): use cases over processtree, shared by the
-#   desktop core and the remote helper.
+#   desktop app and the remote helper.
+# - wire (processlama_wire): the generated remote wire contract.
 # - devmil-remote (devmil_remote): product-neutral helper transport; it must not
 #   depend on any processlama crate.
-# The Flutter build hook builds only processlama_core.
+# - remote-helper: the headless helper run on remote hosts over SSH.
+#
+# The Qt Quick desktop application (rust-core/desktop/*):
+# - domain: values, identities, settings and snapshot documents
+# - application: process sessions, tabs, remote hosts, icons and ports
+# - presentation: Qt-independent formatting and column metadata
+# - infra-local / infra-remote / infra-storage / infra-platform: adapters
+# - qt: QObjects and item models (Qt Bridges)
+# - app: the composition root and the `processlama` executable
 [workspace]
 resolver = "3"
-members = ["core", "telemetry", "wire", "devmil-remote", "remote-helper"]
+members = [
+    "telemetry",
+    "wire",
+    "devmil-remote",
+    "remote-helper",
+    "desktop/domain",
+    "desktop/application",
+    "desktop/presentation",
+    "desktop/infra-local",
+    "desktop/infra-remote",
+    "desktop/infra-storage",
+    "desktop/infra-platform",
+    "desktop/qt",
+    "desktop/app",
+]
 
 [workspace.package]
 edition = "2024"
@@ -18,15 +42,40 @@ processlama_telemetry = { path = "telemetry" }
 devmil_remote = { path = "devmil-remote" }
 processlama_wire = { path = "wire" }
 processtree = { git = "https://github.com/devmil/processtree-rust.git", rev = "fa710ffa9e2344d8bf27c97f7ffa5cfd57355f00" }
+processlama-domain = { path = "desktop/domain" }
+processlama-application = { path = "desktop/application" }
+processlama-presentation = { path = "desktop/presentation" }
+processlama-infra-local = { path = "desktop/infra-local" }
+processlama-infra-remote = { path = "desktop/infra-remote" }
+processlama-infra-storage = { path = "desktop/infra-storage" }
+processlama-infra-platform = { path = "desktop/infra-platform" }
+processlama-qt = { path = "desktop/qt" }
+qtbridge = "=0.2.0"
+qtbridge-build-utils = "=0.2.0"
+cxx = "=1.0.199"
+cxx-build = "=1.0.199"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+base64 = "0.22"
+dirs = "6"
 
 [profile.release]
 lto = true
 codegen-units = 1
 
-# The build hook's remote helper for development builds: optimized enough for telemetry,
-# without the release profile's whole-program optimization.
+# The development remote helper: optimized enough for telemetry, without the
+# release profile's whole-program optimization.
 [profile.helper-dev]
 inherits = "release"
 lto = false
 codegen-units = 16
 incremental = true
+
+# Fast local builds of the desktop app that still run like release.
+[profile.dev-opt]
+inherits = "release"
+lto = false
+codegen-units = 16
+incremental = true
+debug = 1

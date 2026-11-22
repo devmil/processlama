@@ -63,3 +63,7 @@ website/download/*.zip
 /.fvm/
 /.claude/
 /docs/remote_hosts_evidence/
+
+# Rust/QML build output
+/rust-core/target/
+/target/
