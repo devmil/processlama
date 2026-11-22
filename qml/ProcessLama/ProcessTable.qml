@@ -284,6 +284,9 @@ FocusScope {
         readonly property bool dropTarget: dragState.active && dragState.target === columnId && dragState.source !== columnId
         width: root.columnWidths[index] ?? 0
         height: parent.height
+        // Earlier cells stack above later ones, so a grip's overhang past the
+        // divider wins over the next column's reorder drag.
+        z: root.columnIds.length - index
 
         MeridianColumnHeader {
             anchors.fill: parent
@@ -343,10 +346,13 @@ FocusScope {
             color: Theme.colors.accent
         }
 
-        // The resize grip; a double-click restores the default width.
+        // The resize grip, centred on the divider; a double-click restores
+        // the default width.
         Item {
+            objectName: "resizeGrip"
             anchors.right: parent.right
-            width: Theme.space.s4
+            anchors.rightMargin: -width / 2
+            width: Theme.space.s6
             height: parent.height
             HoverHandler { cursorShape: Qt.SplitHCursor }
             TapHandler { onDoubleTapped: { root.app.markTreeInteraction(); root.app.resetColumnWidth(headerCell.columnId) } }
