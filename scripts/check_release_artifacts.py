@@ -10,7 +10,7 @@ def required_files(version, build):
         raise ValueError('invalid candidate identity')
     base = f'ProcessLama-{version}-{build}'
     files = {base + '.dmg', base + '.dmg.sparkle-signature'}
-    files.update(base + '-linux-x86_64.' + suffix for suffix in ('AppImage', 'deb', 'rpm', 'tar.gz'))
+    files.update(base + '-linux-x86_64.' + suffix for suffix in ('AppImage', 'deb', 'rpm', 'pkg.tar.zst', 'tar.gz'))
     files.update(base + '-windows-x86_64.' + suffix for suffix in ('msi', 'zip'))
     files.update(f'processlama-network-service-{version}-{build}-linux-{arch}.{suffix}'
                  for arch in ('x86_64', 'aarch64') for suffix in ('deb', 'rpm', 'tar.gz'))

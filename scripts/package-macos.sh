@@ -77,6 +77,10 @@ python3 scripts/package_remote_helper.py bundle \
 
 "$MACDEPLOYQT" "$app" -qmldir="$ROOT/qml/ProcessLama" -qmlimport="$ROOT/qml" -always-overwrite
 
+# macdeployqt copies every SQL driver (some link libraries the build host
+# lacks); ProcessLama uses no Qt SQL.
+rm -rf "$app/Contents/PlugIns/sqldrivers"
+
 # Development builds also look in Qt's own lib folder; the bundle must not.
 qt_libs="$("$QMAKE" -query QT_INSTALL_LIBS)"
 install_name_tool -delete_rpath "$qt_libs" "$app/Contents/MacOS/ProcessLama" 2>/dev/null || true
@@ -139,6 +143,19 @@ staging="$(mktemp -d)"
 cp -R "$app" "$staging/"
 ln -s /Applications "$staging/Applications"
 rm -f "$dmg"
-hdiutil create -volname ProcessLama -srcfolder "$staging" -fs HFS+ -format UDZO "$dmg" >/dev/null
+# hdiutil intermittently fails with "Resource busy" on CI runners while
+# Spotlight or a previous image still holds the device; retry a few times.
+for attempt in 1 2 3 4 5; do
+  if hdiutil create -volname ProcessLama -srcfolder "$staging" -fs HFS+ -format UDZO "$dmg" >/dev/null; then
+    break
+  fi
+  rm -f "$dmg"
+  if [[ "$attempt" == 5 ]]; then
+    echo "package-macos.sh: hdiutil create failed $attempt times" >&2
+    exit 1
+  fi
+  echo "package-macos.sh: hdiutil create failed (attempt $attempt), retrying" >&2
+  sleep $((attempt * 5))
+done
 rm -rf "$staging"
 echo "==> $dmg" >&2

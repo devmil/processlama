@@ -57,6 +57,7 @@ class WebsiteReleaseTest(unittest.TestCase):
                 {"file": "ProcessLama.msi", "platform": "windows", "format": "msi"},
                 {"file": "ProcessLama.dmg", "platform": "macos", "format": "dmg"},
                 {"file": "ProcessLama.rpm", "platform": "linux", "format": "rpm"},
+                {"file": "ProcessLama.pkg.tar.zst", "platform": "linux", "format": "arch"},
             ]
             data.write_text(json.dumps({
                 "schemaVersion": 2,
@@ -68,12 +69,13 @@ class WebsiteReleaseTest(unittest.TestCase):
             website_release.render(Namespace(data=str(data), output=str(output)))
             document = output.read_text()
 
-        for mark in ("windows", "apple", "linux", "fedora"):
+        for mark in ("windows", "apple", "linux", "fedora", "arch"):
             self.assertIn(f'<span class="os-icon os-{mark}"></span>', document)
             self.assertIn(f".os-{mark} {{", STYLES)
             self.assertTrue((WEBSITE / "assets" / "platform" / f"{mark}.svg").is_file())
         self.assertIn("Download Windows installer", document)
         self.assertIn("sudo dnf install ./ProcessLama.rpm", document)
+        self.assertIn("sudo pacman -U ./ProcessLama.pkg.tar.zst", document)
 
     def test_reworked_assets_get_new_urls_on_both_pages(self):
         with tempfile.TemporaryDirectory() as directory:

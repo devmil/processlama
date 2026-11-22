@@ -14,7 +14,8 @@ class CandidateSetTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             expected = module.required_files('1.0.0-beta.35', '42')
-            self.assertEqual(len(expected), 14)
+            self.assertEqual(len(expected), 15)
+            self.assertIn('ProcessLama-1.0.0-beta.35-42-linux-x86_64.pkg.tar.zst', expected)
             for name in expected:
                 (root / name).write_bytes(b'candidate fixture')
             module.validate(root, '1.0.0-beta.35', '42')

@@ -31,11 +31,11 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://devmil.de/processlama/assets/brand/processlama-feature-graphic.png?v=0f01a3331868">
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ProcessLama", "url": "https://devmil.de/processlama/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "macOS, Linux, Windows", "author": {"@type": "Organization", "name": "Devmil Solutions", "url": "https://devmil.de/"}}</script>
-    <link rel="stylesheet" href="styles.css?v=75e899b1241a">
+    <link rel="stylesheet" href="styles.css?v=ee7443b4153f">
     <link rel="stylesheet" href="assets/lama/lama-antics.css?v=926d01e9bae2">
     <script>document.documentElement.classList.add("js");</script>
     <script src="assets/lama/lama-antics.js?v=fd9d7d8235fa" defer></script>
-    <script src="site.js?v=a55f555e30dc" defer></script>
+    <script src="site.js?v=7629b910bc3a" defer></script>
   </head>
   <body>
     <!-- Icons: Lucide (lucide-static 1.37.0, ISC), the set Meridian ships in the app. -->
@@ -293,7 +293,7 @@
         <dl class="facts">
           <div class="island reveal">
             <dt><svg class="icon" aria-hidden="true"><use href="#i-cpu"/></svg><span data-de="Rust-Kern">Rust core</span></dt>
-            <dd data-de="Die Prozessdaten werden in Rust erfasst. Die Oberfläche ist mit Flutter auf Basis von Meridian umgesetzt.">Process data is collected in Rust. The interface is built with Flutter on Meridian.</dd>
+            <dd data-de="Die Prozessdaten werden in Rust erfasst. Die Oberfläche ist mit Qt Quick auf Basis von Meridian umgesetzt.">Process data is collected in Rust. The interface is built with Qt Quick on Meridian.</dd>
           </div>
           <div class="island reveal">
             <dt><svg class="icon" aria-hidden="true"><use href="#i-shield-check"/></svg><span data-de="Keine Cloud">No cloud</span></dt>
@@ -408,6 +408,12 @@
                 <span class="file-size" data-size></span>
                 <span class="file-get" aria-hidden="true"><svg class="icon"><use href="#i-download"/></svg></span>
               </a></li>
+              <li class="file"><a class="file-link" href="releases.html" data-format="arch">
+                <span class="file-icons" aria-hidden="true"><span class="os-icon os-arch"></span></span>
+                <span class="file-main"><strong data-de="Arch-Paket">Arch package</strong><span>Arch Linux, Omarchy</span></span>
+                <span class="file-size" data-size></span>
+                <span class="file-get" aria-hidden="true"><svg class="icon"><use href="#i-download"/></svg></span>
+              </a></li>
               <li class="file"><a class="file-link" href="releases.html" data-format="appimage">
                 <span class="file-icons" aria-hidden="true"><span class="os-icon os-package"></span></span>
                 <span class="file-main"><strong>AppImage</strong><span data-de="Eine Datei, ohne Installation">Single file, no install</span></span>
@@ -421,7 +427,7 @@
                 <span class="file-get" aria-hidden="true"><svg class="icon"><use href="#i-download"/></svg></span>
               </a></li>
             </ul>
-            <p class="os-note" data-de="RPM und DEB enthalten den Dienst für Netzwerkwerte pro Prozess. Bei den portablen Builds lässt er sich aus der App heraus installieren.">RPM and DEB include the service for per-process network figures. The portable builds can install it from the app.</p>
+            <p class="os-note" data-de="RPM, DEB und das Arch-Paket enthalten den Dienst für Netzwerkwerte pro Prozess. Bei den portablen Builds lässt er sich aus der App heraus installieren.">RPM, DEB and the Arch package include the service for per-process network figures. The portable builds can install it from the app.</p>
           </article>
 
           <article class="os-card island reveal" data-platform="windows">

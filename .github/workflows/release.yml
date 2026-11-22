@@ -700,6 +700,7 @@ jobs:
               *.AppImage) platform=linux; format=appimage; arch="x86_64"; minimum="Linux"; extra=() ;;
               *.rpm) platform=linux; format=rpm; arch="x86_64"; minimum="Linux"; extra=() ;;
               *.deb) platform=linux; format=deb; arch="x86_64"; minimum="Linux"; extra=() ;;
+              *.pkg.tar.zst) platform=linux; format=arch; arch="x86_64"; minimum="Linux"; extra=() ;;
               *.tar.gz) platform=linux; format=tar; arch="x86_64"; minimum="Linux"; extra=() ;;
               *.msi) platform=windows; format=msi; arch="x86_64"; minimum="Windows 10 1809"; extra=() ;;
               *.zip) platform=windows; format=zip; arch="x86_64"; minimum="Windows 10 1809"; extra=() ;;

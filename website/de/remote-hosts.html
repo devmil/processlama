@@ -15,9 +15,9 @@
     <link rel="manifest" href="../site.webmanifest?v=4a1da52cc7f8">
     <meta name="theme-color" content="#e8ecee" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b151a" media="(prefers-color-scheme: dark)">
-    <link rel="stylesheet" href="../styles.css?v=75e899b1241a">
+    <link rel="stylesheet" href="../styles.css?v=ee7443b4153f">
     <script>document.documentElement.classList.add("js");</script>
-    <script src="../site.js?v=a55f555e30dc" defer></script>
+    <script src="../site.js?v=7629b910bc3a" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Zum Inhalt springen</a>
@@ -57,8 +57,8 @@
           <li>macOS-Hosts: Apple Silicon oder Intel, macOS 13 oder neuer.</li>
         </ul>
 
-        <h2>Deine ~/.ssh/config</h2>
-        <p>ProcessLama speichert nur einen Host-Alias. Benutzernamen, Ports, Schlüssel und Jump-Hosts gehören in die <code>~/.ssh/config</code>:</p>
+        <h2>SSH-Ziele</h2>
+        <p>Ein Host ist ein SSH-Ziel: ein Host-Alias aus der <code>~/.ssh/config</code>, ein Hostname oder <code>user@host</code> wie <code>deploy@build-box.example.net</code>. Für <code>user@host</code> brauchst du keinen Eintrag in der Konfiguration, wenn dein Schlüssel oder Agent die Anmeldung schon ohne Passwort erlaubt. Ports, Schlüssel und Jump-Hosts gehören in die <code>~/.ssh/config</code>:</p>
 <pre><code>Host build-box
     HostName build-box.example.net
     User deploy
@@ -68,10 +68,10 @@ Host db-internal
     HostName 10.0.4.12
     User ops
     ProxyJump bastion</code></pre>
-        <p>Prüfe, dass <code>ssh &lt;alias&gt; true</code> ohne Rückfrage zurückkehrt, und verwende dann den Alias in ProcessLama.</p>
+        <p>Prüfe, dass <code>ssh &lt;ziel&gt; true</code> ohne Rückfrage zurückkehrt, und verwende dann dasselbe Ziel in ProcessLama.</p>
 
         <h2>Einen Host hinzufügen</h2>
-        <p>Klick auf <strong>+</strong> am Ende der Tab-Leiste (Strg+T, unter macOS ⌘T) und wähle <strong>Entfernten Host hinzufügen …</strong>. Gib den Alias ein und klick auf <strong>Verbindung testen</strong>. Nach dem Speichern öffnet sich der Host in einem Tab. Fehlt der Helfer, zeigt ProcessLama Pfad, Version, Größe und Prüfsumme und fragt vor der Installation, sofern du <strong>Helfer automatisch installieren</strong> nicht eingeschaltet hast.</p>
+        <p>Klick auf <strong>+</strong> am Ende der Tab-Leiste (Strg+T, unter macOS ⌘T) und wähle <strong>Entfernten Host hinzufügen …</strong>. Gib das SSH-Ziel ein und klick auf <strong>Verbindung testen</strong>. Nach dem Speichern öffnet sich der Host in einem Tab. Fehlt der Helfer, zeigt ProcessLama Pfad, Version, Größe und Prüfsumme und fragt vor der Installation, sofern du <strong>Helfer automatisch installieren</strong> nicht eingeschaltet hast.</p>
         <p>Der Helfer liegt auf dem Host unter <code>~/.local/lib/processlama/</code>, sein Icon-Cache unter <code>~/.cache/processlama/</code>.</p>
 
         <h2>Häufige Probleme</h2>
@@ -91,10 +91,10 @@ Host db-internal
         <p>Der Tab behält seinen letzten Messwert und markiert ihn mit Uhrzeit und Grund als veraltet. ProcessLama verbindet sich nach 2, 5, 15 und 30 Sekunden neu, danach jede Minute für bis zu zehn Minuten. Ein Verbindungsabbruch lässt keinen Prozess als beendet erscheinen.</p>
 
         <h2>Den Helfer entfernen</h2>
-        <p>Öffne unter <strong>Einstellungen → Entfernte Hosts</strong> das Menü des Hosts und wähle <strong>Helfer vom Host entfernen …</strong>. Oder führe <code>ssh &lt;alias&gt; 'rm -rf ~/.local/lib/processlama ~/.cache/processlama'</code> aus.</p>
+        <p>Öffne unter <strong>Einstellungen → Entfernte Hosts</strong> das Menü des Hosts und wähle <strong>Helfer vom Host entfernen …</strong>. Oder führe <code>ssh &lt;ziel&gt; 'rm -rf ~/.local/lib/processlama ~/.cache/processlama'</code> aus.</p>
 
         <h2>Datenschutz</h2>
-        <p>ProcessLama speichert nur den Alias und was der Helfer zuletzt gemeldet hat (System, Architektur, Helferversion). Es speichert keine Benutzernamen, Ports, Schlüssel oder Passwörter, und seine Protokolle enthalten keine Host-Namen oder Aliasse.</p>
+        <p>ProcessLama speichert nur das SSH-Ziel, wie du es eingegeben hast (mit dem Benutzernamen, wenn du <code>user@host</code> verwendest), und was der Helfer zuletzt gemeldet hat (System, Architektur, Helferversion). Es speichert keine Ports, Schlüssel oder Passwörter, und seine Protokolle enthalten keine Host-Namen oder Ziele.</p>
       </article>
     </main>
 

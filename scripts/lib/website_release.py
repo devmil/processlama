@@ -116,6 +116,7 @@ FORMAT_LABELS = {
     "appimage": "AppImage",
     "rpm": "RPM",
     "deb": "DEB",
+    "arch": "Arch package",
     "tar": "Portable tarball",
     "dmg": "DMG",
     "msi": "Windows installer",
@@ -127,6 +128,7 @@ FORMAT_HINTS = {
     "appimage": "Single file, no install",
     "rpm": "Fedora",
     "deb": "Debian, Ubuntu",
+    "arch": "Arch Linux, Omarchy",
     "tar": "Unpack and run",
     "dmg": "Disk image",
     "msi": "Installer",
@@ -136,6 +138,7 @@ FORMAT_ICONS = {
     "appimage": ("package",),
     "rpm": ("fedora",),
     "deb": ("debian", "ubuntu"),
+    "arch": ("arch",),
     "tar": ("archive",),
     "dmg": ("apple",),
     "msi": ("windows",),
@@ -145,11 +148,12 @@ INSTALL_COMMANDS = {
     "appimage": "chmod +x {file} && ./{file}",
     "rpm": "sudo dnf install ./{file}",
     "deb": "sudo apt install ./{file}",
+    "arch": "sudo pacman -U ./{file}",
     "tar": "tar -xzf {file}",
 }
 PLATFORM_LABELS = {"linux": "Linux", "macos": "macOS", "windows": "Windows", "linux-network": "Network service for remote Linux hosts"}
 PLATFORM_DETAILS = {
-    "linux": "RPM and DEB include the service for per-process network figures. The portable builds can install it from the app.",
+    "linux": "RPM, DEB and the Arch package include the service for per-process network figures. The portable builds can install it from the app.",
     "macos": "Signed and notarized. Updates are installed from inside the app.",
     "windows": "The app checks for new builds and links back to this page.",
     "linux-network": "Install on a Linux host you watch from ProcessLama to see per-process network rates there. Machines with the ProcessLama RPM or DEB already have it.",
@@ -159,13 +163,14 @@ PLATFORM_ICONS = {"linux": "linux", "macos": "apple", "windows": "windows", "lin
 # swaps in these strings from `data-de` attributes when German is chosen.
 GERMAN = {
     "Portable tarball": "Portables Tar-Archiv",
+    "Arch package": "Arch-Paket",
     "Windows installer": "Windows-Installationsprogramm",
     "Portable ZIP": "Portables ZIP",
     "Single file, no install": "Eine Datei, ohne Installation",
     "Unpack and run": "Entpacken und starten",
     "Disk image": "Disk-Image",
     "Installer": "Installationsprogramm",
-    PLATFORM_DETAILS["linux"]: "RPM und DEB enthalten den Dienst für Netzwerkwerte pro Prozess. Bei den portablen Builds lässt er sich aus der App heraus installieren.",
+    PLATFORM_DETAILS["linux"]: "RPM, DEB und das Arch-Paket enthalten den Dienst für Netzwerkwerte pro Prozess. Bei den portablen Builds lässt er sich aus der App heraus installieren.",
     PLATFORM_DETAILS["macos"]: "Signiert und notarisiert. Updates werden direkt in der App installiert.",
     PLATFORM_DETAILS["windows"]: "Die App sucht nach neuen Builds und verweist dann auf diese Seite.",
     PLATFORM_LABELS["linux-network"]: "Netzwerkdienst für entfernte Linux-Hosts",
@@ -276,7 +281,7 @@ def release_card(item: dict | None, heading: str) -> str:
     grouped: dict[str, list[dict]] = {}
     for artifact in artifacts(item):
         grouped.setdefault(str(artifact.get("platform", "other")), []).append(artifact)
-    order = {"msi": 0, "rpm": 0, "dmg": 0, "deb": 1, "zip": 1, "appimage": 2, "tar": 3}
+    order = {"msi": 0, "rpm": 0, "dmg": 0, "deb": 1, "zip": 1, "arch": 2, "appimage": 3, "tar": 4}
     downloads = []
     leading = ("macos", "linux", "windows", "linux-network")
     for platform in (*leading, *sorted(set(grouped) - set(leading))):

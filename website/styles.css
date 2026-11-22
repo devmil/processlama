@@ -380,6 +380,11 @@ button {
   mask-image: url("assets/platform/debian.svg");
 }
 
+.os-arch {
+  -webkit-mask-image: url("assets/platform/arch.svg");
+  mask-image: url("assets/platform/arch.svg");
+}
+
 .os-ubuntu {
   -webkit-mask-image: url("assets/platform/ubuntu.svg");
   mask-image: url("assets/platform/ubuntu.svg");
