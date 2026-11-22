@@ -1,3 +1,4 @@
+#![cfg_attr(not(target_os = "macos"), allow(dead_code))]
 //! One-time import of the Flutter builds' `shared_preferences`.
 
 use serde_json::{Map, Value, json};

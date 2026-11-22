@@ -1105,10 +1105,12 @@ dependencies = [
 name = "processlama-infra-remote"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "devmil_remote",
  "processlama-application",
  "processlama-domain",
  "processlama_wire",
+ "rustix",
  "serde_json",
  "sha2",
 ]

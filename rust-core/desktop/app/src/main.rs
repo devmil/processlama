@@ -114,7 +114,7 @@ fn main() {
             std::env::var("PROCESSLAMA_RELEASE_MANIFEST_URL").ok(),
         )),
         network: Arc::new(LinuxNetworkService),
-        remote: Arc::new(SshConnector),
+        remote: Arc::new(SshConnector::new()),
         icon_cache: Arc::new(FileIconCache::open(support.join("remote-icons/v1"))),
     };
     let core = AppCore::new(ports);
