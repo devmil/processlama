@@ -60,10 +60,14 @@ jobs:
             echo "::error::Architecture validation accepted a missing Intel slice" >&2
             exit 1
           fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
+          setup-python: false
           cache: true
       - uses: actions/setup-python@v5
         with:
@@ -332,10 +336,14 @@ jobs:
           echo "$appimage_tool_dir" >> "$GITHUB_PATH"
           export PATH="$appimage_tool_dir:$PATH"
           command -v appimagetool >/dev/null
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
+          setup-python: false
           modules: qtwaylandcompositor
           cache: true
       - name: Install Rust toolchain
@@ -398,10 +406,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.release_sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
+          setup-python: false
           cache: true
       - name: Install Rust toolchain
         shell: bash
@@ -527,10 +539,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.release_sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
+          setup-python: false
           arch: win64_msvc2022_64
           cache: true
       - name: Install pinned .NET SDK for WiX

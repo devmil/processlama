@@ -92,6 +92,10 @@ Window {
                 case "menu": Store.requestTabMenu(); break
                 case "dark": appWindow.app.setAppearance("dark"); break
                 case "light": appWindow.app.setAppearance("light"); break
+                case "editor": actions.showRemoteHostEditor(null, false); break
+                case "freeze": appWindow.app.toggleFrozen(); break
+                case "inspector-off": Store.inspectorOpen = false; break
+                case "focus": appWindow.app.focusSelectedSubtree(); break
                 case "wait": break
                 }
                 interval = 1200

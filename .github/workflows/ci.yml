@@ -42,6 +42,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
+          setup-python: false
           cache: true
 
       - name: Cache Rust
@@ -163,10 +164,14 @@ jobs:
           mv -f "$appimage_tool_dir/appimagetool.download" "$appimage_tool_dir/appimagetool"
           echo "$appimage_tool_dir" >> "$GITHUB_PATH"
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
+          setup-python: false
           modules: qtwaylandcompositor
           cache: true
 
@@ -229,10 +234,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
+          setup-python: false
           cache: true
 
       - name: Install Rust toolchain
@@ -286,10 +295,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
+          setup-python: false
           arch: win64_msvc2022_64
           cache: true
 
