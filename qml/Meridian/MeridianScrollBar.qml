@@ -10,6 +10,25 @@ T.ScrollBar {
     /// Keep it visible (hover visibility is the default).
     property bool alwaysShown: false
     readonly property bool emphasized: hovered || pressed
+    /// The view scrolled recently without a flick (wheel, keys, code):
+    /// Qt marks the bar `active` only while the view is moving.
+    property bool scrolled: false
+
+    readonly property Flickable _view: parent as Flickable
+    Connections {
+        target: control._view
+        function onContentYChanged() { if (control.orientation === Qt.Vertical) control._noteScroll() }
+        function onContentXChanged() { if (control.orientation === Qt.Horizontal) control._noteScroll() }
+    }
+    function _noteScroll() {
+        scrolled = true
+        scrolledTimer.restart()
+    }
+    Timer {
+        id: scrolledTimer
+        interval: 100
+        onTriggered: control.scrolled = false
+    }
     property real _emphasis: emphasized ? 1 : 0
     Behavior on _emphasis { NumberAnimation { duration: Motion.overlay } }
 
@@ -25,15 +44,18 @@ T.ScrollBar {
     policy: T.ScrollBar.AsNeeded
 
     contentItem: Item {
+        id: thumb
         implicitWidth: control.thickness
         implicitHeight: Metrics.scrollbarMinLength
-        opacity: control.alwaysShown || control.active || control.emphasized ? 1 : 0
-        Behavior on opacity {
-            SequentialAnimation {
-                PauseAnimation { duration: control.active || control.emphasized ? 0 : 600 }
-                NumberAnimation { duration: 300 }
-            }
-        }
+        // Lingers 600 ms after the last reason to show, then fades. A
+        // timer rather than a paused animation: a Behavior restarted during
+        // its pause could leave the thumb invisible while scrolling.
+        readonly property bool wanted: control.alwaysShown || control.active || control.emphasized || control.scrolled
+        readonly property bool shown: wanted || linger.running
+        onWantedChanged: if (!wanted) linger.restart()
+        Timer { id: linger; interval: 600 }
+        opacity: shown ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 300 } }
         Rectangle {
             anchors.right: control.orientation === Qt.Vertical ? parent.right : undefined
             anchors.bottom: control.orientation === Qt.Horizontal ? parent.bottom : undefined
