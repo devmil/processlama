@@ -75,6 +75,8 @@ python3 scripts/package_remote_helper.py bundle \
   --source "${PROCESSLAMA_REMOTE_HELPER_DIR:-$ROOT/build/remote-helper}" \
   --dest "$app/Contents/Resources/remote-helper"
 
+"$MACDEPLOYQT" "$app" -qmldir="$ROOT/qml/ProcessLama" -qmlimport="$ROOT/qml" -always-overwrite
+
 # Development builds also look in Qt's own lib folder; the bundle must not.
 qt_libs="$("$QMAKE" -query QT_INSTALL_LIBS)"
 install_name_tool -delete_rpath "$qt_libs" "$app/Contents/MacOS/ProcessLama" 2>/dev/null || true
@@ -83,7 +85,6 @@ otool -l "$app/Contents/MacOS/ProcessLama" | grep -q '@executable_path/../Framew
   exit 1
 }
 
-"$MACDEPLOYQT" "$app" -qmldir="$ROOT/qml/ProcessLama" -qmlimport="$ROOT/qml" -always-overwrite
 
 if [[ "${MAC_SPARKLE:-1}" != 0 ]]; then
   # shellcheck source=lib/sparkle-tools.sh
