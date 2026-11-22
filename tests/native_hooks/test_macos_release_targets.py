@@ -50,5 +50,5 @@ with pathlib.Path(os.environ['MAC_TARGET_CALLS']).open('a') as log:
             actual = [json.loads(line) for line in calls.read_text(encoding='utf-8').splitlines()]
             self.assertEqual(actual[0], ['rustup', 'target', 'add', 'aarch64-apple-darwin', 'x86_64-apple-darwin'])
             self.assertEqual([call[2:] for call in actual[1:]], [['-verify_arch','arm64','x86_64']]*2)
-            self.assertTrue(actual[1][1].endswith('/Contents/MacOS/processlama'))
-            self.assertTrue(actual[2][1].endswith('/processlama_core.framework/processlama_core'))
+            self.assertTrue(actual[1][1].endswith('/Contents/MacOS/ProcessLama'))
+            self.assertTrue(actual[2][1].endswith('/QtCore.framework/QtCore'))

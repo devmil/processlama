@@ -512,6 +512,7 @@ jobs:
           export APPLE_API_ISSUER_ID="$api_issuer_id"
             ./scripts/package-release.sh
           lipo build/macos/ProcessLama.app/Contents/MacOS/ProcessLama -verify_arch arm64 x86_64
+          lipo build/macos/ProcessLama.app/Contents/Frameworks/QtCore.framework/QtCore -verify_arch arm64 x86_64
           ./scripts/notarize-release.sh build/archive/ProcessLama.dmg
           mkdir -p build/release-upload
           dmg="build/release-upload/ProcessLama-${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.build }}.dmg"
