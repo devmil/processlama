@@ -84,7 +84,7 @@ Window {
                 switch (name) {
                 case "preferences": actions.showPreferences(Number(argument ?? 0)); break
                 case "about": actions.showAbout(); break
-                case "licenses": actions.showAbout(); break
+                case "licenses": actions.showLicenses(); break
                 case "inspector": Store.inspectorTab = Number(argument ?? 0); break
                 case "select": appWindow.app.selectNextVisible(); break
                 case "search": appWindow.app.setTreeSearch(argument ?? ""); Store.requestTreeSearch(); break
@@ -98,6 +98,8 @@ Window {
                 restart()
                 return
             }
+            if (path === "-")
+                return
             appWindow.contentItem.grabToImage(result => {
                 result.saveToFile(path)
                 Qt.quit()

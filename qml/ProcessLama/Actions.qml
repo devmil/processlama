@@ -260,6 +260,7 @@ Item {
     // About and licenses
 
     function showAbout() { aboutDialog.open() }
+    function showLicenses() { licenseDialog.open() }
 
     readonly property string versionLabel: Store.platform.version
         ? L10n.t("aboutVersion", [Store.platform.version, Store.platform.build]) : ""

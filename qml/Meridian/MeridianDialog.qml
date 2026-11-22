@@ -29,6 +29,11 @@ T.Dialog {
         Metrics.dialogWorkflowWidth][widthClass]
     readonly property real pad: Theme.touch ? Theme.space.s8 : Theme.space.s7
 
+    // Templates compute no implicit size for a dialog.
+    implicitWidth: preferredWidth
+    implicitHeight: implicitContentHeight + topPadding + bottomPadding
+        + (implicitHeaderHeight > 0 ? implicitHeaderHeight + spacing : 0)
+        + (implicitFooterHeight > 0 ? implicitFooterHeight + spacing : 0)
     parent: T.Overlay.overlay
     modal: true
     focus: true
@@ -110,12 +115,15 @@ T.Dialog {
         Accessible.name: control.title
         implicitWidth: column.implicitWidth
         implicitHeight: column.implicitHeight
+        contentWidth: width
         contentHeight: column.height
         clip: contentHeight > height
         boundsBehavior: Flickable.StopAtBounds
         Column {
             id: column
-            width: parent.width
+            // The popup's width, not the content item's: that one follows
+            // its children and would collapse to zero.
+            width: control.availableWidth
             spacing: control.spacing
             MeridianText {
                 width: parent.width
@@ -138,11 +146,11 @@ T.Dialog {
     footer: Item {
         visible: actionRow.children.length > 0
         implicitHeight: visible ? actionRow.height + control.pad : 0
-        Flow {
+        // Actions in declaration order, end-aligned: Cancel first, the verb
+        // last at the trailing edge.
+        Row {
             id: actionRow
-            layoutDirection: Qt.RightToLeft
-            x: control.pad
-            width: parent.width - 2 * control.pad
+            x: Math.max(control.pad, parent.width - control.pad - width)
             spacing: Theme.space.s4
         }
     }
