@@ -101,7 +101,7 @@ QtObject {
         if (Qt.colorEqual(surface, colors.ground))
             return colors.groundHover
         if (Qt.colorEqual(surface, colors.accent))
-            return brighten(colors.accent, colors.onAccent)
+            return brighten(colors.accent, colors.inkOnAccent)
         return pressed(blend(onGround ? colors.ground : colors.pane, surface, 1))
     }
 

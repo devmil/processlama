@@ -42,7 +42,7 @@ T.Switch {
         height: control.trackHeight
         radius: height / 2
         color: !control.enabled ? Theme.colors.line
-             : control.checked ? (control.hovered ? Theme.brighten(Theme.colors.accent, Theme.colors.onAccent) : Theme.colors.accent)
+             : control.checked ? (control.hovered ? Theme.brighten(Theme.colors.accent, Theme.colors.inkOnAccent) : Theme.colors.accent)
              : (control.hovered ? Theme.pressed(Theme.colors.lineStrong) : Theme.colors.lineStrong)
         border.width: control.checked ? 0 : 1
         border.color: Theme.colors.controlEdge

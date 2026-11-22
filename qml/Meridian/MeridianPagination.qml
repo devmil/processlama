@@ -6,6 +6,11 @@ import QtQuick.Templates as T
 // show in full; beyond that the first, the last and the current page's
 // neighbours with … for the gaps. Nothing shows for a single page. Labels are
 // the app's localized strings; `pageLabel` takes %1 for the number.
+//
+// A non-empty `jumpLabel` adds Flutter's direct page field after the pages:
+// "<jumpLabel> [field] <pageCountLabel>". `pageCountLabel` and
+// `jumpAccessibleName` take %1 for the page count. Enter selects the typed
+// page, clamped to 1…pageCount; anything else restores the current page.
 Item {
     id: root
 
@@ -14,6 +19,21 @@ Item {
     property string previousLabel
     property string nextLabel
     property string pageLabel: "%1"
+    property string jumpLabel
+    property string jumpAccessibleName
+    property string pageCountLabel
+
+    function submitJump(text) {
+        const typed = parseInt(text, 10)
+        if (isNaN(typed)) {
+            jumpField.text = String(page)
+            return
+        }
+        const target = Math.max(1, Math.min(pageCount, typed))
+        jumpField.text = String(target)
+        if (target !== page)
+            pageSelected(target)
+    }
 
     signal pageSelected(int page)
 
@@ -39,7 +59,7 @@ Item {
 
     Row {
         id: row
-        spacing: Theme.space.s1
+        spacing: Theme.space.s2
 
         MeridianIconButton {
             objectName: "paginationPrevious"
@@ -87,6 +107,41 @@ Item {
                     }
                 }
             }
+        }
+        MeridianText {
+            visible: root.jumpLabel.length > 0
+            anchors.verticalCenter: parent.verticalCenter
+            role: MeridianText.Caption
+            color: Theme.colors.inkMuted
+            text: root.jumpLabel
+        }
+        MeridianTextField {
+            id: jumpField
+            objectName: "paginationJump"
+            visible: root.jumpLabel.length > 0
+            width: Metrics.paginationFieldWidth
+            controlSize: MeridianButton.Small
+            enabled: root.enabled
+            horizontalAlignment: TextInput.AlignHCenter
+            maximumLength: Metrics.paginationFieldMaxDigits
+            inputMethodHints: Qt.ImhDigitsOnly
+            validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
+            text: String(root.page)
+            Accessible.name: root.jumpAccessibleName.length > 0 ? root.jumpAccessibleName.arg(root.pageCount) : ""
+            onAccepted: root.submitJump(text)
+            onActiveFocusChanged: if (!activeFocus) text = String(root.page)
+            Connections {
+                target: root
+                function onPageChanged() { jumpField.text = String(root.page) }
+            }
+        }
+        MeridianText {
+            visible: root.jumpLabel.length > 0 && root.pageCountLabel.length > 0
+            anchors.verticalCenter: parent.verticalCenter
+            role: MeridianText.Caption
+            color: Theme.colors.inkMuted
+            tabular: true
+            text: root.pageCountLabel.length > 0 ? root.pageCountLabel.arg(root.pageCount) : ""
         }
         MeridianIconButton {
             objectName: "paginationNext"

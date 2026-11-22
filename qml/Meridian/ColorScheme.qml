@@ -45,13 +45,13 @@ QtObject {
     /// Destructive actions, errors, failed states.
     readonly property color danger: palette.danger ?? "transparent"
     /// Text and icons on a `danger` fill.
-    readonly property color onDanger: palette.onDanger ?? "transparent"
+    readonly property color inkOnDanger: palette.inkOnDanger ?? "transparent"
     /// Error banner and toast tint; hover fill of a danger-quiet button; background of removed lines.
     readonly property color dangerBg: palette.dangerBg ?? "transparent"
     /// Work the person has to do that is not a failure: conflicts, pending review, action required.
     readonly property color attention: palette.attention ?? "transparent"
     /// Text on an `attention` fill, such as the attention count badge.
-    readonly property color onAttention: palette.onAttention ?? "transparent"
+    readonly property color inkOnAttention: palette.inkOnAttention ?? "transparent"
     /// Attention banner tint and background of regions that need a decision.
     readonly property color attentionBg: palette.attentionBg ?? "transparent"
     /// Categorical colour 1 (blue): chart series, avatars, labels, graph lanes.
@@ -73,9 +73,9 @@ QtObject {
     /// The one accent, spent on intent: primary button fill, the selected row in the focused island, checked controls, progress, the active tab rule.
     readonly property color accent: palette.accent ?? "transparent"
     /// Text and icons on an `accent` fill (at least 4.5:1).
-    readonly property color onAccent: palette.onAccent ?? "transparent"
+    readonly property color inkOnAccent: palette.inkOnAccent ?? "transparent"
     /// Secondary text (metadata, keycaps) inside an `accent`-filled selected row (at least 4.5:1 on `accent`).
-    readonly property color onAccentMuted: palette.onAccentMuted ?? "transparent"
+    readonly property color inkOnAccentMuted: palette.inkOnAccentMuted ?? "transparent"
     /// Selection in an island without keyboard focus, the active navigation row, toggled icon buttons, tinted chips.
     readonly property color accentSoft: palette.accentSoft ?? "transparent"
     /// Accent-coloured text and icons: links, the current location, toggled icon buttons, info banner icon.

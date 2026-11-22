@@ -198,7 +198,7 @@ T.Dialog {
             contentHeight: textColumn.height + 2 * control.inset
             clip: true
             boundsBehavior: Flickable.StopAtBounds
-            C.ScrollBar.vertical: MeridianScrollBar { alwaysShown: true }
+            C.ScrollBar.vertical: MeridianScrollBar { visibility: MeridianScrollBar.Always }
             Column {
                 id: textColumn
                 x: control.inset

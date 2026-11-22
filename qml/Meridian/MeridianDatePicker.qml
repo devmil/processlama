@@ -158,7 +158,7 @@ T.Control {
                         horizontalAlignment: Text.AlignHCenter
                         role: day.chosen || day.isToday ? MeridianText.BodyStrong : MeridianText.Body
                         text: day.text
-                        color: day.chosen ? Theme.colors.onAccent
+                        color: day.chosen ? Theme.colors.inkOnAccent
                              : !day.usable ? Theme.colors.inkFaint
                              : day.isToday ? Theme.colors.accentInk
                              : day.outside ? Theme.colors.inkMuted : Theme.colors.ink

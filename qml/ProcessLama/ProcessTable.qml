@@ -79,9 +79,9 @@ FocusScope {
             return Qt.alpha(AppTheme.rowHeat, AppTheme.maxRowHeatOpacity * Math.max(0, Math.min(1, heat / 100)))
         return "transparent"
     }
-    function primaryInk(row) { return strong(row) ? Theme.colors.onAccent : Theme.colors.ink }
-    function secondaryInk(row) { return strong(row) ? Theme.colors.onAccentMuted : Theme.colors.inkMuted }
-    function iconInk(row) { return strong(row) ? Theme.colors.onAccent : Theme.colors.inkMuted }
+    function primaryInk(row) { return strong(row) ? Theme.colors.inkOnAccent : Theme.colors.ink }
+    function secondaryInk(row) { return strong(row) ? Theme.colors.inkOnAccentMuted : Theme.colors.inkMuted }
+    function iconInk(row) { return strong(row) ? Theme.colors.inkOnAccent : Theme.colors.inkMuted }
 
     function nameCell(row) {
         const column = columnIds.indexOf("name")

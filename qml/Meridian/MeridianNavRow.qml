@@ -44,9 +44,9 @@ T.ItemDelegate {
         : Theme.clear(Theme.colors.groundHover)
     readonly property color inkColor: !enabled || dropState === MeridianNavRow.Reject ? Theme.colors.inkFaint
         : dropState === MeridianNavRow.Accept ? Theme.colors.accentInk
-        : solid ? Theme.colors.onAccent
+        : solid ? Theme.colors.inkOnAccent
         : Theme.colors.ink
-    readonly property color mutedInk: solid ? Theme.colors.onAccentMuted : Theme.colors.inkMuted
+    readonly property color mutedInk: solid ? Theme.colors.inkOnAccentMuted : Theme.colors.inkMuted
 
     hoverEnabled: true
     focusPolicy: Qt.StrongFocus

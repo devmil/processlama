@@ -31,8 +31,8 @@ T.ItemDelegate {
         : down ? Theme.pressed(Theme.colors.paneHover)
         : hovered ? Theme.colors.paneHover
         : Theme.clear(Theme.colors.paneHover)
-    readonly property color inkColor: !enabled ? Theme.colors.inkFaint : solid ? Theme.colors.onAccent : Theme.colors.ink
-    readonly property color mutedInk: !enabled ? Theme.colors.inkFaint : solid ? Theme.colors.onAccentMuted : Theme.colors.inkMuted
+    readonly property color inkColor: !enabled ? Theme.colors.inkFaint : solid ? Theme.colors.inkOnAccent : Theme.colors.ink
+    readonly property color mutedInk: !enabled ? Theme.colors.inkFaint : solid ? Theme.colors.inkOnAccentMuted : Theme.colors.inkMuted
 
     hoverEnabled: true
     focusPolicy: Qt.StrongFocus

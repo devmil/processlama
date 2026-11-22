@@ -28,9 +28,9 @@ Item {
     readonly property color inkColor: {
         const c = Theme.colors
         switch (tone) {
-        case MeridianCount.Accent: return c.onAccent
-        case MeridianCount.Attention: return c.onAttention
-        case MeridianCount.Danger: return c.onDanger
+        case MeridianCount.Accent: return c.inkOnAccent
+        case MeridianCount.Attention: return c.inkOnAttention
+        case MeridianCount.Danger: return c.inkOnDanger
         case MeridianCount.Quiet: return c.inkMuted
         default: return c.ink
         }

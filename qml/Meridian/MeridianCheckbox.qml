@@ -26,8 +26,8 @@ T.CheckBox {
     Accessible.checked: checked
 
     readonly property color onFill: !enabled ? Theme.colors.inkFaint
-        : down ? Theme.pressed(Theme.brighten(Theme.colors.accent, Theme.colors.onAccent))
-        : hovered ? Theme.brighten(Theme.colors.accent, Theme.colors.onAccent) : Theme.colors.accent
+        : down ? Theme.pressed(Theme.brighten(Theme.colors.accent, Theme.colors.inkOnAccent))
+        : hovered ? Theme.brighten(Theme.colors.accent, Theme.colors.inkOnAccent) : Theme.colors.accent
     readonly property color offFill: !enabled ? Theme.colors.paneAlt
         : down ? Theme.pressed(Theme.colors.paneHover) : hovered ? Theme.colors.paneHover : Theme.colors.pane
 
@@ -94,14 +94,14 @@ T.CheckBox {
             width: Metrics.checkboxIconSize - 4
             height: 2
             radius: 1
-            color: control.enabled ? Theme.colors.onAccent : Theme.colors.pane
+            color: control.enabled ? Theme.colors.inkOnAccent : Theme.colors.pane
         }
         MeridianIcon {
             visible: !control.mixed && control._check > 0
             anchors.centerIn: parent
             name: "check"
             extent: Metrics.checkboxIconSize
-            color: control.enabled ? Theme.colors.onAccent : Theme.colors.pane
+            color: control.enabled ? Theme.colors.inkOnAccent : Theme.colors.pane
             opacity: Math.min(1, control._check)
             scale: 0.6 + 0.4 * control._check
         }

@@ -54,8 +54,8 @@ T.Button {
     readonly property color hoverFill: {
         const c = Theme.colors
         switch (variant) {
-        case MeridianButton.Primary: return Theme.brighten(c.accent, c.onAccent)
-        case MeridianButton.Danger: return Theme.brighten(c.danger, c.onDanger)
+        case MeridianButton.Primary: return Theme.brighten(c.accent, c.inkOnAccent)
+        case MeridianButton.Danger: return Theme.brighten(c.danger, c.inkOnDanger)
         case MeridianButton.Secondary: return c.paneHover
         case MeridianButton.DangerQuiet: return c.dangerBg
         default: return Theme.hoverFillOn(surfaceColor, onGround)
@@ -79,8 +79,8 @@ T.Button {
         if (!active)
             return primary ? c.inkMuted : c.inkFaint
         switch (variant) {
-        case MeridianButton.Primary: return c.onAccent
-        case MeridianButton.Danger: return c.onDanger
+        case MeridianButton.Primary: return c.inkOnAccent
+        case MeridianButton.Danger: return c.inkOnDanger
         case MeridianButton.DangerQuiet: return c.danger
         default: return c.ink
         }

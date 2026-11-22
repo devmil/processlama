@@ -42,7 +42,7 @@ T.AbstractButton {
         if (iconColorOverride.a > 0)
             return iconColorOverride
         if (onAccent)
-            return hovered ? c.onAccent : c.onAccentMuted
+            return hovered ? c.inkOnAccent : c.inkOnAccentMuted
         if (active)
             return c.accentInk
         return hovered || down ? c.ink : c.inkMuted

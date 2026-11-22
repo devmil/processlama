@@ -43,6 +43,8 @@ MeridianSelectionBar 1.0 MeridianSelectionBar.qml
 MeridianDropZone 1.0 MeridianDropZone.qml
 MeridianDatePicker 1.0 MeridianDatePicker.qml
 MeridianSettingsRow 1.0 MeridianSettingsRow.qml
+MeridianResizeHandle 1.0 MeridianResizeHandle.qml
+MeridianScrollBar 1.0 MeridianScrollBar.qml
 MeridianHairline 1.0 MeridianHairline.qml
 MeridianStatusDot 1.0 MeridianStatusDot.qml
 MeridianAvatar 1.0 MeridianAvatar.qml
@@ -52,7 +54,6 @@ MeridianMeter 1.0 MeridianMeter.qml
 MeridianTooltip 1.0 MeridianTooltip.qml
 MeridianStatusBar 1.0 MeridianStatusBar.qml
 MeridianStatusBarText 1.0 MeridianStatusBarText.qml
-MeridianResizeHandle 1.0 MeridianResizeHandle.qml
 MeridianToolbarButton 1.0 MeridianToolbarButton.qml
 MeridianBadgeDot 1.0 MeridianBadgeDot.qml
 MeridianSelect 1.0 MeridianSelect.qml
@@ -68,6 +69,5 @@ MeridianSettingsGroup 1.0 MeridianSettingsGroup.qml
 MeridianDisclosure 1.0 MeridianDisclosure.qml
 MeridianSettingsDialog 1.0 MeridianSettingsDialog.qml
 MeridianTabStrip 1.0 MeridianTabStrip.qml
-MeridianScrollBar 1.0 MeridianScrollBar.qml
 MeridianWheelScroll 1.0 MeridianWheelScroll.qml
 MeridianLicenseDialog 1.0 MeridianLicenseDialog.qml
