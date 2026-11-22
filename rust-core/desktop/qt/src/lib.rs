@@ -1,15 +1,13 @@
-//! Qt Bridges adapters.
-use qtbridge::qobject;
+#![recursion_limit = "512"]
+//! Qt Bridges adapters: the event pump and inbox, the window's state object
+//! and the process tree model.
 
-#[derive(Default)]
-pub struct Probe {
-    value: i32,
-}
+mod app_state;
+mod driver;
+mod plumbing;
+mod tree_model;
 
-#[qobject(ConvertToCamelCase)]
-impl Probe {
-    qproperty!("value", Member = value, Notify = value_changed);
-
-    #[qsignal]
-    fn value_changed(&mut self);
-}
+pub use app_state::{AppState, local_path};
+pub use driver::{Driver, Pump};
+pub use plumbing::{Inbox, SystemClock, TimerThread, WorkerPool};
+pub use tree_model::ProcessTreeModel;

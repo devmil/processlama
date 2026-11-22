@@ -4,10 +4,10 @@ SPDX-License-Identifier: GPL-2.0-only. The network service embeds that program;
 packages include the GPL v2 license alongside the MIT application license.
 The libbpf-rs/libbpf code uses its BSD-2-Clause licensing option; its copyright
 and license notices are included here. Geist fonts retain SIL OFL 1.1.
-RUST-DEPENDENCIES.md and FLUTTER-DEPENDENCIES.md inventory the other
-locked production dependency notices. Flutter also generates runtime
-notices from the resolved packages. Cargo.lock and pubspec.lock identify source
-versions. No third-party code is relicensed by the root MIT license.
+Qt and Qt Bridges are used under the LGPL v3 (see QT-NOTICE.md and
+LGPL-3.0.txt). RUST-DEPENDENCIES.md inventories the other locked production
+dependency notices; rust-core/Cargo.lock identifies source versions. No
+third-party code is relicensed by the root MIT license.
 
 Source: https://github.com/devmil/processlama
 Use the release tag vVERSION-BUILD matching the installed package to obtain

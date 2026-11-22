@@ -3,5 +3,16 @@ name = "processlama-infra-storage"
 version = "0.1.0"
 edition.workspace = true
 publish.workspace = true
+description = "ProcessLama storage: preferences, snapshot documents and the remote icon cache"
 
 [dependencies]
+processlama-domain = { workspace = true }
+processlama-application = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints.rust]
+unsafe_code = "forbid"

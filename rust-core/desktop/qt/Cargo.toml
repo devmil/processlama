@@ -3,10 +3,11 @@ name = "processlama-qt"
 version = "0.1.0"
 edition.workspace = true
 publish.workspace = true
-description = "Qt Bridges adapters: QObjects and item models over the application layer"
+description = "Qt Bridges adapters: the event pump, QObjects and the process tree model"
 
 [dependencies]
 processlama-domain = { workspace = true }
 processlama-application = { workspace = true }
 processlama-presentation = { workspace = true }
-qtbridge = { workspace = true }
+qtbridge = { workspace = true, features = ["serde_json"] }
+serde_json = { workspace = true }

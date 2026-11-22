@@ -3,5 +3,12 @@ name = "processlama-infra-local"
 version = "0.1.0"
 edition.workspace = true
 publish.workspace = true
+description = "This computer's telemetry for ProcessLama sessions, over processlama_telemetry"
 
 [dependencies]
+processlama-domain = { workspace = true }
+processlama-application = { workspace = true }
+processlama_telemetry = { workspace = true }
+
+[lints.rust]
+unsafe_code = "forbid"
