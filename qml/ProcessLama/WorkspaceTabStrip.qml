@@ -174,9 +174,11 @@ Rectangle {
             onObjectAdded: (index, object) => addMenu.insertItem(index, object)
             onObjectRemoved: (index, object) => addMenu.removeItem(object)
         }
+        // A placeholder, not a command: never highlighted or triggered.
         MeridianMenuItem {
             visible: strip.closedProfiles.length === 0
             height: visible ? implicitHeight : 0
+            enabled: false
             text: L10n.t("remoteHostMenuEmpty")
         }
         MeridianMenuSeparator {}

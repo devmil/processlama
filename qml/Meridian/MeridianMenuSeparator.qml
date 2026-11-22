@@ -6,10 +6,16 @@ T.MenuSeparator {
     implicitWidth: Metrics.menuMinWidth
     implicitHeight: Theme.space.s4 + 1
     padding: 0
-    contentItem: Rectangle {
+    // The control stretches its content item over the whole gap; the 1px
+    // rule sits centred inside it.
+    contentItem: Item {
         implicitHeight: 1
-        x: Theme.space.s4
-        width: parent ? parent.width - 2 * Theme.space.s4 : 0
-        color: Theme.colors.line
+        Rectangle {
+            x: Theme.space.s4
+            width: parent.width - 2 * Theme.space.s4
+            height: 1
+            anchors.verticalCenter: parent.verticalCenter
+            color: Theme.colors.line
+        }
     }
 }

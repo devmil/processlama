@@ -15,6 +15,24 @@ T.Menu {
 
     property bool nativeMenu: false
     property string _typed: ""
+    /// False until the pointer moves after opening: a menu that opens under
+    /// a resting pointer does not highlight the row it happens to cover.
+    property bool pointerArmed: false
+    property point _pointerOrigin: Qt.point(NaN, NaN)
+    onAboutToShow: {
+        pointerArmed = false
+        _pointerOrigin = Qt.point(NaN, NaN)
+    }
+    /// Rows report pointer positions; the first one is where the menu
+    /// opened, and a move of 2px or more arms hover highlighting.
+    function notePointer(position) {
+        if (pointerArmed)
+            return
+        if (isNaN(_pointerOrigin.x))
+            _pointerOrigin = position
+        else if (Math.abs(position.x - _pointerOrigin.x) + Math.abs(position.y - _pointerOrigin.y) >= 2)
+            pointerArmed = true
+    }
 
     popupType: nativeMenu ? T.Popup.Native : T.Popup.Item
     implicitWidth: Math.min(Metrics.menuMaxWidth, Math.max(Metrics.menuMinWidth, contentWidth + leftPadding + rightPadding))

@@ -14,7 +14,10 @@ T.MenuItem {
     property string hint
     property bool danger: false
 
-    readonly property bool highlightedRow: highlighted && enabled
+    // A menu that opened under a resting pointer shows no hover highlight
+    // until the pointer moves; keyboard highlights show at once.
+    readonly property bool pointerWaiting: hovered && !!(menu as MeridianMenu) && !(menu as MeridianMenu).pointerArmed
+    readonly property bool highlightedRow: highlighted && enabled && !pointerWaiting
     readonly property color inkColor: !enabled ? Theme.colors.inkFaint
         : highlightedRow ? (danger ? Theme.colors.onDanger : Theme.colors.onAccent)
         : danger ? Theme.colors.danger : Theme.colors.ink
@@ -23,6 +26,10 @@ T.MenuItem {
 
     icon.name: iconName
     hoverEnabled: true
+    HoverHandler {
+        enabled: !!(control.menu as MeridianMenu) && !(control.menu as MeridianMenu).pointerArmed
+        onPointChanged: if (hovered) (control.menu as MeridianMenu).notePointer(point.scenePosition)
+    }
     implicitWidth: Math.max(Metrics.menuMinWidth, Math.ceil(implicitContentWidth + leftPadding + rightPadding))
     implicitHeight: visible ? Math.max(Theme.size.row, Theme.type.bodyLineHeight + 2 * Theme.space.s1) : 0
     leftPadding: Theme.space.s4
