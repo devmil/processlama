@@ -537,8 +537,9 @@ pub fn local_path(url: &str) -> String {
     let mut index = 0;
     while index < raw.len() {
         if raw[index] == b'%'
-            && index + 2 < raw.len()
-            && let Ok(byte) = u8::from_str_radix(&rest[index + 1..index + 3], 16)
+            && index + 3 <= raw.len()
+            && let Ok(hex) = std::str::from_utf8(&raw[index + 1..index + 3])
+            && let Ok(byte) = u8::from_str_radix(hex, 16)
         {
             bytes.push(byte);
             index += 3;
@@ -556,3 +557,18 @@ pub fn local_path(url: &str) -> String {
 }
 
 pub use app_state::AppState;
+
+#[cfg(test)]
+mod tests {
+    use super::local_path;
+
+    #[test]
+    fn decodes_file_urls() {
+        assert_eq!(local_path("file:///tmp/a%20b.json"), "/tmp/a b.json");
+        assert_eq!(local_path("file:///tmp/%C3%A4.json"), "/tmp/ä.json");
+        assert_eq!(local_path("file:///tmp/x%2"), "/tmp/x%2");
+        assert_eq!(local_path("file:///tmp/ä%"), "/tmp/ä%");
+        assert_eq!(local_path("file:///C:/Users/x.json"), "C:/Users/x.json");
+        assert_eq!(local_path("/plain/path"), "/plain/path");
+    }
+}

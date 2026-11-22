@@ -1,6 +1,9 @@
 //! ProcessLama's composition root: builds the core over its adapters, the Qt
 //! objects and the QML window, and owns every lifetime until exit.
 
+mod hooks;
+
+use hooks::PlatformHooks;
 use processlama_application::{AppCore, CorePorts, InstalledVersion, diagnostics};
 use processlama_domain::ReleaseChannel;
 use processlama_infra_local::{LocalTelemetryAdapter, configure_icon_cache, local_operating_system};
@@ -146,16 +149,31 @@ fn main() {
     driver.borrow_mut().pump();
     inbox.bind(pump.borrow().get_qml_method_invoker());
 
+    let hooks = Rc::new(RefCell::new(PlatformHooks::default()));
+    PlatformHooks::attach_qobject(&hooks);
+
+    // PROCESSLAMA_QML_DIR loads the QML from a checkout instead of the
+    // embedded resource, for iterating on the UI without rebuilding.
+    let (import_path, main_qml) = match std::env::var("PROCESSLAMA_QML_DIR") {
+        Ok(dir) if !dir.is_empty() => {
+            let dir = std::path::Path::new(&dir).canonicalize().unwrap_or_else(|_| dir.clone().into());
+            (
+                dir.display().to_string(),
+                format!("file://{}/ProcessLama/Main.qml", dir.display()),
+            )
+        }
+        _ => ("qrc:/".to_owned(), "qrc:/ProcessLama/Main.qml".to_owned()),
+    };
     let properties = vec![
         ("app", state.borrow().as_qvariant()),
         ("treeModel", model.borrow().as_qvariant()),
-        ("pump", pump.borrow().as_qvariant()),
+        ("hooks", hooks.borrow().as_qvariant()),
         ("licensePackages", QVariant::from(license_packages().to_string())),
     ];
     let exit_code = application
-        .add_import_path("qrc:/")
+        .add_import_path(&import_path)
         .with_initial_properties(&properties)
-        .load_qml_from_file("qrc:/ProcessLama/Main.qml")
+        .load_qml_from_file(&main_qml)
         .run();
 
     {
@@ -167,6 +185,7 @@ fn main() {
     drop(application);
     workers.shutdown();
     drop(pump);
+    drop(hooks);
     if exit_code != 0 {
         std::process::exit(exit_code);
     }

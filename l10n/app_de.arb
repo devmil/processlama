@@ -422,5 +422,7 @@
   "diagnosticsSave": "In Datei speichern",
   "diagnosticsShare": "Teilen…",
   "diagnosticsFailed": "Diagnose konnte nicht exportiert werden. Versuche ein anderes Ziel.",
-  "diagnosticsSaved": "Diagnose gespeichert."
+  "diagnosticsSaved": "Diagnose gespeichert.",
+
+  "inspectorDetailsPending": "Details erscheinen nach der nächsten Aktualisierung."
 }

@@ -58,7 +58,7 @@ Item {
         id: text
         anchors.centerIn: parent
         width: contentWidth
-        height: Metrics.countLineHeight
+        height: root.height
         style: MeridianSwapText.Roll
         text: root.label
         role: MeridianText.Caption

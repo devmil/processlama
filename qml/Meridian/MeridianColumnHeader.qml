@@ -55,13 +55,13 @@ Item {
         spacing: Theme.space.s2
         anchors.verticalCenter: parent.verticalCenter
         x: root.alignEnd ? root.width - Theme.space.s4 - width : Theme.space.s4
-        width: Math.min(implicitWidth, root.width - 2 * Theme.space.s4)
         MeridianText {
             id: label
             anchors.verticalCenter: parent.verticalCenter
-            width: Math.min(implicitWidth, content.width - (arrow.visible ? arrow.width + content.spacing : 0))
+            width: Math.max(0, Math.min(implicitWidth,
+                root.width - 2 * Theme.space.s4 - (arrow.visible ? arrow.width + content.spacing : 0)))
             role: MeridianText.Caption
-            font.weight: root.sorted ? Font.DemiBold : roleFont.weight
+            fontWeight: root.sorted ? Font.DemiBold : -1
             color: root.sorted ? Theme.colors.ink : Theme.colors.inkMuted
             text: root.text
         }

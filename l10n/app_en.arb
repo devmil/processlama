@@ -1620,5 +1620,10 @@
   "diagnosticsSaved": "Diagnostics saved.",
   "@diagnosticsSaved": {
     "description": "User-controlled diagnostic capture and export: diagnosticsSaved"
+  },
+
+  "inspectorDetailsPending": "Inspector details will appear after the next refresh.",
+  "@inspectorDetailsPending": {
+    "description": "Inspector section shown before the first detail refresh arrives."
   }
 }

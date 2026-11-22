@@ -25,6 +25,9 @@ QtObject {
     /// Qt has no portable reduce-motion signal; the app's platform adapter
     /// supplies it.
     property bool reducedMotion: false
+    /// Multiplies type sizes: the platform's text scale (GTK's
+    /// text-scaling-factor on Linux). Layout sizes stay put.
+    property real textScale: 1
 
     readonly property var brandInfo: Tokens.brands[brand] ?? Tokens.brands[Tokens.brandIds[0]]
     readonly property bool dark: mode === Theme.Dark || (mode === Theme.System && systemDark)
@@ -37,6 +40,7 @@ QtObject {
 
     readonly property TypeScale type: TypeScale {
         touch: theme.touch
+        scale: theme.textScale
         sansFamily: theme.brandInfo.sans
         monoFamily: theme.brandInfo.mono
         readingFamily: theme.brandInfo.reading

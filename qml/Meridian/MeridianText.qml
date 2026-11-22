@@ -46,10 +46,20 @@ Text {
         }
     }
 
-    font: tabular ? Qt.font({ family: roleFont.family, pixelSize: roleFont.pixelSize, weight: roleFont.weight,
-                              letterSpacing: roleFont.letterSpacing, capitalization: roleFont.capitalization,
-                              features: { "tnum": 1 } })
-                  : roleFont
+    /// Overrides on top of the role. Never assign `font.*` on a
+    /// MeridianText: that replaces the role font with the default one.
+    property int fontWeight: -1
+    property real fontPixelSize: -1
+    property bool strikeout: false
+
+    readonly property bool _plainRole: !tabular && fontWeight < 0 && fontPixelSize <= 0 && !strikeout
+    font: _plainRole ? roleFont
+        : Qt.font({ family: roleFont.family,
+                    pixelSize: fontPixelSize > 0 ? fontPixelSize : roleFont.pixelSize,
+                    weight: fontWeight >= 0 ? fontWeight : roleFont.weight,
+                    letterSpacing: roleFont.letterSpacing, capitalization: roleFont.capitalization,
+                    strikeout: strikeout,
+                    features: tabular ? { "tnum": 1 } : {} })
     color: Theme.colors.ink
     // Fixed line boxes keep rows on the token grid; a larger line count still
     // grows the item.

@@ -88,6 +88,21 @@ T.TextField {
 
     background: Item {
         implicitHeight: control.extent
+        // The template draws no placeholder; it sits where the text starts
+        // and elides before the trailing controls.
+        Text {
+            z: 1
+            visible: control.text.length === 0 && control.preeditText.length === 0
+            x: control.leftPadding
+            width: Math.max(0, parent.width - control.leftPadding - control.rightPadding)
+            height: parent.height
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
+            font: control.font
+            color: control.placeholderTextColor
+            text: control.placeholderText
+            Accessible.ignored: true
+        }
         Rectangle {
             id: well
             anchors.fill: parent

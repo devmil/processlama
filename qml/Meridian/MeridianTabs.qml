@@ -99,7 +99,7 @@ FocusScope {
                         anchors.verticalCenter: parent.verticalCenter
                         width: Math.min(implicitWidth, Metrics.tabLabelMaxWidth)
                         role: MeridianText.Label
-                        font.weight: tab.active ? Font.DemiBold : roleFont.weight
+                        fontWeight: tab.active ? Font.DemiBold : -1
                         text: tab.modelData.label
                         color: content.ink
                         Behavior on color { ColorAnimation { duration: Motion.hoverFor(hover.hovered) } }

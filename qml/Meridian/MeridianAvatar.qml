@@ -80,8 +80,8 @@ Item {
         smooth: true
         mipmap: false
         fillMode: Image.PreserveAspectFit
-        sourceSize.width: Math.min(96, Math.max(16, Math.ceil(root.dimension * root.sourceScale)))
-        sourceSize.height: sourceSize.width
+        readonly property real decoded: Math.min(96, Math.max(16, Math.ceil(root.dimension * root.sourceScale)))
+        sourceSize: Qt.size(decoded, decoded)
         opacity: status === Image.Ready ? 1 : 0
         Behavior on opacity {
             enabled: picture.status === Image.Ready

@@ -1,0 +1,6 @@
+module ProcessLama
+singleton L10n 1.0 L10n.qml
+singleton Store 1.0 Store.qml
+singleton Format 1.0 Format.qml
+singleton Labels 1.0 Labels.qml
+singleton AppTheme 1.0 AppTheme.qml

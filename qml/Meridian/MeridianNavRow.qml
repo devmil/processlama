@@ -20,16 +20,25 @@ T.ItemDelegate {
     property bool expandable: false
     property bool expanded: false
     property bool current: false
+    /// Marked like `current` but without the strong label (a chosen item
+    /// rather than where the person is).
+    property bool selected: false
+    readonly property bool marked: current || selected
     property bool sidebarFocused: false
     property int dropState: MeridianNavRow.None
+    /// Text at the trailing edge instead of a count (a PID, "now").
+    property string trailingText
+    /// A leading item instead of the icon (an avatar, a process icon).
+    property alias leadingContent: leadingSlot.data
+    readonly property bool hasLeading: leadingSlot.children.length > 0
 
     signal toggleExpanded()
     signal contextMenuRequested(real x, real y)
 
-    readonly property bool solid: current && sidebarFocused
+    readonly property bool solid: marked && sidebarFocused
     readonly property color fillColor: dropState === MeridianNavRow.Accept ? Theme.colors.accentSoft
         : solid ? Theme.colors.accent
-        : current ? Theme.colors.accentSoft
+        : marked ? Theme.colors.accentSoft
         : down ? Theme.pressed(Theme.colors.groundHover)
         : hovered ? Theme.colors.groundHover
         : Theme.clear(Theme.colors.groundHover)
@@ -41,7 +50,7 @@ T.ItemDelegate {
 
     hoverEnabled: true
     focusPolicy: Qt.StrongFocus
-    highlighted: current
+    highlighted: marked
     implicitHeight: Math.max(Theme.size.row, Theme.type.bodyLineHeight + 2 * Theme.space.s1)
     implicitWidth: Metrics.sidebarMinWidth
     leftPadding: Theme.space.s4 + depth * Metrics.treeIndent
@@ -51,7 +60,7 @@ T.ItemDelegate {
 
     Accessible.role: Accessible.ListItem
     Accessible.name: count > 0 ? text + ", " + count : text
-    Accessible.selected: current
+    Accessible.selected: marked
 
     Keys.onRightPressed: event => {
         if (expandable && !expanded) { toggleExpanded(); event.accepted = true } else event.accepted = false
@@ -81,28 +90,37 @@ T.ItemDelegate {
             surfaceColor: control.fillColor
             onClicked: control.toggleExpanded()
         }
+        Item {
+            id: leadingSlot
+            visible: control.hasLeading
+            anchors.verticalCenter: parent.verticalCenter
+            width: childrenRect.width
+            height: childrenRect.height
+        }
         MeridianIcon {
             id: glyph
-            visible: control.iconName.length > 0
+            visible: control.iconName.length > 0 && !control.hasLeading
             anchors.verticalCenter: parent.verticalCenter
             name: control.iconName
             color: control.iconColor.a > 0 && !control.solid ? control.iconColor : control.mutedInk
         }
         MeridianText {
             anchors.verticalCenter: parent.verticalCenter
-            x: glyph.visible ? glyph.width + Theme.space.s4 : 0
+            x: control.hasLeading ? leadingSlot.width + Theme.space.s4 : glyph.visible ? glyph.width + Theme.space.s4 : 0
             width: parent.width - x - (countText.visible ? countText.width + Theme.space.s4 : 0)
+            elide: Text.ElideRight
             role: control.current ? MeridianText.BodyStrong : MeridianText.Body
             text: control.text
             color: control.inkColor
         }
         MeridianText {
             id: countText
-            visible: control.count > 0
+            visible: control.count > 0 || control.trailingText.length > 0
             anchors.verticalCenter: parent.verticalCenter
             x: parent.width - width
-            role: control.countEmphasized ? MeridianText.Label : MeridianText.Caption
-            text: control.count
+            role: control.trailingText.length > 0 ? MeridianText.CodeSm
+                : control.countEmphasized ? MeridianText.Label : MeridianText.Caption
+            text: control.trailingText.length > 0 ? control.trailingText : control.count
             color: control.countEmphasized && !control.solid ? Theme.colors.accentInk : control.mutedInk
             tabular: true
         }
@@ -113,7 +131,7 @@ T.ItemDelegate {
         color: control.fillColor
         border.width: control.dropState === MeridianNavRow.Accept ? 1 : 0
         border.color: Theme.colors.accent
-        Behavior on color { ColorAnimation { duration: control.current ? Motion.select : Motion.hoverFor(control.hovered) } }
+        Behavior on color { ColorAnimation { duration: control.marked ? Motion.select : Motion.hoverFor(control.hovered) } }
         MeridianFocusRing {
             target: control
             shown: control.visualFocus

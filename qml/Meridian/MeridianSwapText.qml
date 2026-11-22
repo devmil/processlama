@@ -43,6 +43,7 @@ Item {
     MeridianText {
         id: leaving
         width: root.width
+        height: root.height
         role: root.role
         color: root.color
         tabular: root.tabular
@@ -54,6 +55,7 @@ Item {
     MeridianText {
         id: current
         width: root.width
+        height: root.height
         role: root.role
         color: root.color
         tabular: root.tabular

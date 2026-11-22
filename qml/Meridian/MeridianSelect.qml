@@ -33,10 +33,8 @@ T.AbstractButton {
         let longest = 0
         const choices = values.slice()
         choices.push(value)
-        for (let i = 0; i < choices.length; ++i) {
-            metrics.text = valueLabel(choices[i])
-            longest = Math.max(longest, metrics.advanceWidth)
-        }
+        for (let i = 0; i < choices.length; ++i)
+            longest = Math.max(longest, metrics.advanceWidth(valueLabel(choices[i])))
         return Math.ceil(Theme.space.s4 + longest + Theme.space.s4 + Theme.size.iconSmall + Theme.space.s3 + 2)
     }
 
@@ -50,7 +48,7 @@ T.AbstractButton {
     Accessible.name: label
     Accessible.description: currentLabel
 
-    TextMetrics {
+    FontMetrics {
         id: metrics
         font: Theme.type.body
     }

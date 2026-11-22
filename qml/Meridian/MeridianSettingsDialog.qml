@@ -133,11 +133,11 @@ T.Dialog {
 
         Flickable {
             id: body
-            readonly property real top: control.paged ? pagePicker.y + pagePicker.height : topRule.y + 1
+            readonly property real topEdge: control.paged ? pagePicker.y + pagePicker.height : topRule.y + 1
             x: control.paged ? 0 : pageList.width
-            y: top
+            y: topEdge
             width: parent.width - x
-            height: (footerRule.visible ? footerRule.y : parent.height) - top
+            height: (footerRule.visible ? footerRule.y : parent.height) - topEdge
             contentHeight: page.height + 2 * control.inset
             clip: true
             boundsBehavior: Flickable.StopAtBounds
