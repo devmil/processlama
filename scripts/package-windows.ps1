@@ -39,7 +39,8 @@ if (-not $SkipBuild) {
     New-Item -ItemType Directory -Force $bundle | Out-Null
     Copy-Item (Join-Path $root "rust-core\target\release\processlama.exe") $bundle
     # The Qt runtime, plugins and the QML modules the embedded QML imports.
-    windeployqt --release --qmldir (Join-Path $root "qml") --no-translations --no-system-d3d-compiler `
+    windeployqt --release --qmldir (Join-Path $root "qml\ProcessLama") --qmlimport (Join-Path $root "qml") `
+        --no-translations --no-system-d3d-compiler `
         (Join-Path $bundle "processlama.exe")
     if ($LASTEXITCODE -ne 0) { throw "windeployqt failed with exit code $LASTEXITCODE" }
     python (Join-Path $PSScriptRoot "package_licenses.py") $bundle

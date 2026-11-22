@@ -319,7 +319,7 @@ jobs:
           $out = "build/windows/ProcessLama"
           New-Item -ItemType Directory -Force -Path $out | Out-Null
           Copy-Item rust-core/target/release/processlama.exe $out/
-          windeployqt --release --qmldir qml --no-translations "$out/processlama.exe"
+          windeployqt --release --qmldir qml/ProcessLama --qmlimport qml --no-translations "$out/processlama.exe"
           python scripts/package_licenses.py $out
           Compress-Archive -Path "$out/*" -DestinationPath build/windows/ProcessLama-windows-x64.zip
 
@@ -329,9 +329,16 @@ jobs:
           $env:PROCESSLAMA_DATA_DIR = "$env:RUNNER_TEMP/smoke-data"
           $env:PROCESSLAMA_SCREENSHOT = "$env:RUNNER_TEMP/window.png"
           $env:QT_QPA_PLATFORM = "offscreen"
-          $process = Start-Process -FilePath build/windows/ProcessLama/processlama.exe -PassThru
+          $env:QT_FORCE_STDERR_LOGGING = "1"
+          # The offscreen platform is for this test only; the package ships qwindows.
+          $smoke = "$env:RUNNER_TEMP/smoke"
+          Copy-Item -Recurse build/windows/ProcessLama $smoke
+          Copy-Item "$env:QT_ROOT_DIR/plugins/platforms/qoffscreen.dll" "$smoke/plugins/platforms/"
+          $process = Start-Process -FilePath "$smoke/processlama.exe" -PassThru `
+            -RedirectStandardError "$env:RUNNER_TEMP/smoke.log" -RedirectStandardOutput "$env:RUNNER_TEMP/smoke.out"
           for ($i = 0; $i -lt 60 -and -not (Test-Path "$env:RUNNER_TEMP/window.png"); $i++) { Start-Sleep 1 }
           Stop-Process -Id $process.Id -ErrorAction SilentlyContinue
+          Get-Content "$env:RUNNER_TEMP/smoke.log" -ErrorAction SilentlyContinue | Select-Object -First 40
           if (-not (Test-Path "$env:RUNNER_TEMP/window.png")) { throw "no window rendered" }
 
       - name: Upload the Windows build
