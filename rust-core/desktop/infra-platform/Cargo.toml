@@ -11,6 +11,12 @@ processlama-domain = { workspace = true }
 processlama-application = { workspace = true }
 serde_json = { workspace = true }
 ureq = { version = "2.12", default-features = false, features = ["tls"] }
+base64 = { workspace = true }
+ring = "0.17"
+sha2 = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
 
 [build-dependencies]
 cc = "1"

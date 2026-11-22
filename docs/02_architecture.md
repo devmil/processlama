@@ -19,7 +19,7 @@ rust-core/desktop/      the desktop application (Cargo workspace members)
   presentation/         display formats and column definitions shared by the bridge
   infra-local/          local telemetry adapter over processlama_telemetry
   infra-storage/        settings, snapshot store, remote icon cache, Flutter settings import
-  infra-platform/       update checks (Sparkle on macOS), Linux network service setup,
+  infra-platform/       update checks (Sparkle on macOS, in-place AppImage updates), Linux network service setup,
                         macOS window chrome
   infra-remote/         OpenSSH client, helper channel, scripts, telemetry decoding,
                         bundled helpers

@@ -424,5 +424,12 @@
   "diagnosticsFailed": "Diagnose konnte nicht exportiert werden. Versuche ein anderes Ziel.",
   "diagnosticsSaved": "Diagnose gespeichert.",
 
-  "inspectorDetailsPending": "Details erscheinen nach der nächsten Aktualisierung."
+  "inspectorDetailsPending": "Details erscheinen nach der nächsten Aktualisierung.",
+  "updateInstallBody": "Installiert ist {installedVersion} (Build {installedBuild}). ProcessLama kann Build {availableBuild} laden und dieses AppImage ersetzen.",
+  "installUpdate": "Update installieren",
+  "updateDownloading": "{received} von {total} geladen …",
+  "updateInstalledBody": "Das Update ist installiert. Starte ProcessLama neu, um es zu verwenden.",
+  "restartNow": "Jetzt neu starten",
+  "updateInstallFailed": "Update fehlgeschlagen: {error}",
+  "updateRelaunchFailed": "ProcessLama konnte nicht neu starten: {error}"
 }

@@ -46,7 +46,19 @@ pub enum UiEvent {
         installed_build: u64,
         version: String,
         build: u64,
+        installable: bool,
     },
+    /// Bytes of an in-place update received so far.
+    UpdateProgress {
+        received: u64,
+        total: u64,
+    },
+    /// An in-place update finished: installed, or failed (with a toast).
+    UpdateInstalled {
+        ok: bool,
+    },
+    /// The updated app started; the window quits.
+    QuitForUpdate,
     ConfirmHelperInstall(crate::remote::InstallPrompt),
     ProfileSaved {
         request: u64,
@@ -150,6 +162,7 @@ pub struct AppCore {
     pub(crate) next_network_check: Option<u64>,
     persist_at: Option<u64>,
     remote_writes_pending: usize,
+    installing_update: bool,
     ui_events: Vec<UiEvent>,
     changes: CoreChanges,
     disposed: bool,
@@ -167,6 +180,7 @@ impl AppCore {
             active: 0,
             next_source: 1,
             snapshots: Vec::new(),
+            installing_update: false,
             remote: RemoteHosts::default(),
             icons: IconService::default(),
             network_available: true,
@@ -473,6 +487,10 @@ impl AppCore {
                 self.on_remote_hosts_saved(section, result)
             }
             CoreEvent::UpdateChecked(result) => self.on_update_checked(result),
+            CoreEvent::UpdateProgress { received, total } => {
+                self.emit(UiEvent::UpdateProgress { received, total })
+            }
+            CoreEvent::UpdateInstalled(result) => self.on_update_installed(result),
             CoreEvent::NetworkAvailability(available) => {
                 if self.network_available != available {
                     self.network_available = available;
@@ -667,6 +685,11 @@ impl AppCore {
             Command::SetRemoteIconCacheBytes(bytes) => self.set_icon_cache_bytes(bytes),
             Command::ClearRemoteIconCache => self.clear_icon_cache(),
             Command::CheckForUpdates => self.check_for_updates(),
+            Command::InstallUpdate => self.install_update(),
+            Command::RelaunchAfterUpdate => match self.ports.updates.relaunch() {
+                Ok(()) => self.emit(UiEvent::QuitForUpdate),
+                Err(error) => self.toast("updateRelaunchFailed", vec![error], ToastTone::Error),
+            },
             Command::RefreshNetworkAvailability => self.check_network_availability(),
             Command::InstallNetworkTelemetry => {
                 let network = Arc::clone(&self.ports.network);
@@ -1083,16 +1106,48 @@ impl AppCore {
             Ok(UpdateCheck::NoPublishedRelease) => {
                 self.toast("updateNoPublishedRelease", vec![], ToastTone::Neutral)
             }
-            Ok(UpdateCheck::UpdateAvailable { version, build }) => {
-                self.emit(UiEvent::UpdateAvailable {
-                    installed_version: installed.version,
-                    installed_build: installed.build,
-                    version,
-                    build,
-                })
-            }
+            Ok(UpdateCheck::UpdateAvailable {
+                version,
+                build,
+                installable,
+            }) => self.emit(UiEvent::UpdateAvailable {
+                installed_version: installed.version,
+                installed_build: installed.build,
+                version,
+                build,
+                installable,
+            }),
             Err(error) => self.toast("updateCheckFailed", vec![error], ToastTone::Error),
         }
+    }
+
+    fn install_update(&mut self) {
+        if self.installing_update {
+            return;
+        }
+        self.installing_update = true;
+        let updates = Arc::clone(&self.ports.updates);
+        let sink = self.sink();
+        self.spawn(move || {
+            // About a hundred progress events per download.
+            let mut reported = 0u64;
+            let result = updates.install(&mut |received, total| {
+                if received == total || received - reported >= (total / 100).max(1) {
+                    reported = received;
+                    sink.post(CoreEvent::UpdateProgress { received, total });
+                }
+            });
+            sink.post(CoreEvent::UpdateInstalled(result));
+        });
+    }
+
+    fn on_update_installed(&mut self, result: Result<(), String>) {
+        self.installing_update = false;
+        let ok = result.is_ok();
+        if let Err(error) = result {
+            self.toast("updateInstallFailed", vec![error], ToastTone::Error);
+        }
+        self.emit(UiEvent::UpdateInstalled { ok });
     }
 
     fn check_network_availability(&self) {

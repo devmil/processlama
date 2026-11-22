@@ -1,5 +1,6 @@
 //! Platform adapters.
 
+mod appimage;
 #[cfg(target_os = "macos")]
 pub mod macos;
 mod network;

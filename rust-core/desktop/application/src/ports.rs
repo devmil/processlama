@@ -87,6 +87,8 @@ pub enum UpdateCheck {
     UpdateAvailable {
         version: String,
         build: u64,
+        /// The app can install it in place (a signed AppImage update).
+        installable: bool,
     },
     NoPublishedRelease,
 }
@@ -98,6 +100,16 @@ pub trait UpdateChecker: Send + Sync {
     fn configure(&self, channel: processlama_domain::ReleaseChannel);
     /// Blocking; runs on a worker.
     fn check(&self, channel: processlama_domain::ReleaseChannel) -> Result<UpdateCheck, String>;
+    /// Blocking; downloads and installs the update of the last check that
+    /// reported `installable`. Reports bytes received and the total.
+    fn install(&self, progress: &mut dyn FnMut(u64, u64)) -> Result<(), String> {
+        let _ = progress;
+        Err("This installation cannot update itself.".into())
+    }
+    /// Starts the installed update; the window quits afterwards.
+    fn relaunch(&self) -> Result<(), String> {
+        Err("This installation cannot update itself.".into())
+    }
 }
 
 /// Failures installing the local Linux network service.

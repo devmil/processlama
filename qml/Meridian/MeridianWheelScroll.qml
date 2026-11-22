@@ -5,9 +5,10 @@ import QtQuick
 //
 // Qt Quick turns each wheel notch into a velocity-capped flick, so a fast
 // wheel spin barely outruns a single notch. This moves the content by
-// `wheelScrollLines` lines per notch instead, adds notches linearly, follows
-// touchpad pixel deltas one to one and keeps their momentum when the fingers
-// lift. Shift, or a view that only scrolls sideways, turns vertical wheel
+// `wheelScrollLines` lines per notch instead, adds notches linearly and
+// follows touchpad pixel deltas one to one. On Qt Wayland, which sends no
+// inertia, lifting the fingers flicks with their last speed; other platforms
+// deliver their own momentum (`ScrollMomentum`), which it follows instead. Shift, or a view that only scrolls sideways, turns vertical wheel
 // motion horizontal.
 WheelHandler {
     id: scroller
@@ -15,6 +16,9 @@ WheelHandler {
     required property Flickable flickable
     /// The distance of one line; a notch moves `wheelScrollLines` of them.
     property real lineHeight: 20
+
+    /// Synthetic touchpad momentum: only Qt Wayland lacks native inertia.
+    property bool syntheticMomentum: Qt.platform.pluginName === "wayland" && !Motion.reduced
 
     property real _vx: 0
     property real _vy: 0
@@ -41,13 +45,6 @@ WheelHandler {
         if (!f || !f.interactive)
             return
         const pixels = event.pixelDelta.x !== 0 || event.pixelDelta.y !== 0
-        if (pixels && event.phase === Qt.ScrollEnd) {
-            // Fingers lifted: hand the last speed to the flick.
-            if (Math.abs(_vx) > 50 || Math.abs(_vy) > 50)
-                f.flick(_vx, _vy)
-            _vx = _vy = 0
-            return
-        }
         let dx, dy
         if (pixels) {
             dx = event.pixelDelta.x
@@ -63,9 +60,19 @@ WheelHandler {
             dx = dy
             dy = 0
         }
-        f.cancelFlick()
-        scrollBy(dx, dy)
-        if (pixels) {
+        if (dx !== 0 || dy !== 0) {
+            f.cancelFlick()
+            scrollBy(dx, dy)
+        }
+        if (event.phase === Qt.ScrollMomentum) {
+            // The platform's own inertia: no synthetic flick after it.
+            _vx = _vy = 0
+        } else if (event.phase === Qt.ScrollEnd) {
+            // Fingers lifted: hand the last speed to a flick.
+            if (syntheticMomentum && (Math.abs(_vx) > 50 || Math.abs(_vy) > 50))
+                f.flick(_vx, _vy)
+            _vx = _vy = 0
+        } else if (pixels) {
             const now = Date.now()
             const dt = Math.max(1, now - _time)
             if (event.phase === Qt.ScrollBegin || dt > 100)

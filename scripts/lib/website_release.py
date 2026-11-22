@@ -67,6 +67,10 @@ def publish(args: argparse.Namespace) -> None:
         if args.platform != "macos" or args.format != "dmg":
             raise SystemExit("--sparkle-signature is valid only for a macOS DMG")
         new_artifact["sparkleSignature"] = args.sparkle_signature
+    if args.update_signature:
+        if args.platform != "linux" or args.format != "appimage":
+            raise SystemExit("--update-signature is valid only for a Linux AppImage")
+        new_artifact["updateSignature"] = args.update_signature
     track = data if args.channel == "stable" else data["beta"]
     build = int(args.build)
     candidates = [track.get("latest"), *(track.get("history") or [])]
@@ -453,6 +457,7 @@ def make_parser() -> argparse.ArgumentParser:
         command.add_argument(f"--{name}", required=name != "minimum-system", default="")
     command.add_argument("--download-url", default="")
     command.add_argument("--sparkle-signature", default="")
+    command.add_argument("--update-signature", default="")
     command.set_defaults(func=publish)
     command = commands.add_parser("render"); command.add_argument("--data", required=True); command.add_argument("--output", required=True); command.set_defaults(func=render)
     command = commands.add_parser("notes"); command.add_argument("--notes", required=True); command.add_argument("--version", required=True); command.add_argument("--output", required=True); command.set_defaults(func=notes)

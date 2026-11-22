@@ -96,6 +96,8 @@ Window {
                 case "freeze": appWindow.app.toggleFrozen(); break
                 case "inspector-off": Store.inspectorOpen = false; break
                 case "focus": appWindow.app.focusSelectedSubtree(); break
+                case "update": actions.showUpdateAvailable("1.0.0-beta.38", "45", "1.0.0-beta.39", "46", argument !== "link"); break
+                case "update-stage": actions.previewUpdateStage(argument ?? "installing"); break
                 case "wait": break
                 }
                 interval = 1200
@@ -185,8 +187,18 @@ Window {
         function onToast(key, args, tone) {
             actions.toast(Labels.toast(key, args), tone)
         }
-        function onUpdateAvailable(installedVersion, installedBuild, version, build) {
-            actions.showUpdateAvailable(installedVersion, installedBuild, version, build)
+        function onUpdateAvailable(installedVersion, installedBuild, version, build, installable) {
+            actions.showUpdateAvailable(installedVersion, installedBuild, version, build, installable)
+        }
+        function onUpdateProgress(received, total) {
+            actions.updateProgress(received, total)
+        }
+        function onUpdateInstalled(ok) {
+            actions.updateInstalled(ok)
+        }
+        // Closing (not Qt.quit) flushes settings like any other quit.
+        function onQuitForUpdate() {
+            appWindow.close()
         }
         function onConfirmHelperInstall(prompt) {
             actions.showHelperInstall(prompt)

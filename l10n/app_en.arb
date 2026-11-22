@@ -1625,5 +1625,55 @@
   "inspectorDetailsPending": "Inspector details will appear after the next refresh.",
   "@inspectorDetailsPending": {
     "description": "Inspector section shown before the first detail refresh arrives."
+  },
+
+  "updateInstallBody": "You have {installedVersion} (build {installedBuild}). ProcessLama can download build {availableBuild} and replace this AppImage.",
+  "@updateInstallBody": {
+    "description": "Body for the new release dialog when the running AppImage can update itself.",
+    "placeholders": {
+      "installedVersion": { "type": "String", "example": "1.0.0" },
+      "installedBuild": { "type": "String", "example": "15" },
+      "availableBuild": { "type": "String", "example": "16" }
+    }
+  },
+
+  "installUpdate": "Install update",
+  "@installUpdate": {
+    "description": "Button that downloads and installs an AppImage update."
+  },
+
+  "updateDownloading": "Downloading {received} of {total}…",
+  "@updateDownloading": {
+    "description": "Progress line while an AppImage update downloads.",
+    "placeholders": {
+      "received": { "type": "String", "example": "4.2 MB" },
+      "total": { "type": "String", "example": "16.5 MB" }
+    }
+  },
+
+  "updateInstalledBody": "The update is installed. Restart ProcessLama to use it.",
+  "@updateInstalledBody": {
+    "description": "Body after an AppImage update was installed."
+  },
+
+  "restartNow": "Restart now",
+  "@restartNow": {
+    "description": "Button that starts the updated AppImage and quits."
+  },
+
+  "updateInstallFailed": "Update failed: {error}",
+  "@updateInstallFailed": {
+    "description": "Toast when downloading or installing an AppImage update fails.",
+    "placeholders": {
+      "error": { "type": "String", "example": "The download ended early." }
+    }
+  },
+
+  "updateRelaunchFailed": "Could not restart ProcessLama: {error}",
+  "@updateRelaunchFailed": {
+    "description": "Toast when the updated AppImage cannot be started.",
+    "placeholders": {
+      "error": { "type": "String", "example": "Permission denied" }
+    }
   }
 }

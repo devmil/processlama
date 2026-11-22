@@ -204,30 +204,89 @@ Item {
 
     function checkForUpdates() { app.checkForUpdates() }
 
-    function showUpdateAvailable(installedVersion, installedBuild, version, build) {
+    function showUpdateAvailable(installedVersion, installedBuild, version, build, installable) {
+        if (updateDialog.stage !== "offer" && updateDialog.opened)
+            return
+        updateDialog.installable = installable
+        updateDialog.stage = "offer"
         updateDialog.title = L10n.t("updateAvailableTitle", [version])
-        updateDialog.description = L10n.t("updateAvailableBody", [installedVersion, installedBuild, build])
+        updateDialog.offerText = L10n.t(installable ? "updateInstallBody" : "updateAvailableBody",
+                                        [installedVersion, installedBuild, build])
         updateDialog.open()
     }
 
+    function updateProgress(received, total) {
+        updateDialog.received = received
+        updateDialog.total = total
+    }
+
+    /// Development: shows a dialog stage without a download (screenshots).
+    function previewUpdateStage(stage) {
+        updateDialog.received = 6.2e6
+        updateDialog.total = 16.5e6
+        updateDialog.stage = stage
+    }
+
+    function updateInstalled(ok) {
+        if (ok) {
+            updateDialog.stage = "installed"
+            if (!updateDialog.opened)
+                updateDialog.open()
+        } else {
+            updateDialog.stage = "offer"
+            updateDialog.close()
+        }
+    }
+
+    // A new release: an AppImage installs it in place ("offer", "installing",
+    // "installed"); other installations open the downloads page.
     MeridianDialog {
         id: updateDialog
-        onOpened: openDownloads.forceActiveFocus()
-        onSubmitted: openDownloads.clicked()
+        property bool installable: false
+        property string stage: "offer"
+        property string offerText
+        property real received: 0
+        property real total: 0
+        description: stage === "installed" ? L10n.t("updateInstalledBody")
+            : stage === "installing" ? L10n.t("updateDownloading", [Format.bytes(received), Format.bytes(total)])
+            : offerText
+        onOpened: primaryUpdate.forceActiveFocus()
+        onSubmitted: if (primaryUpdate.enabled) primaryUpdate.clicked()
+
+        MeridianProgressBar {
+            visible: updateDialog.stage === "installing"
+            width: parent ? parent.width : 0
+            track: true
+            value: updateDialog.total > 0 ? updateDialog.received / updateDialog.total : -1
+        }
+
         actions: [
             MeridianButton {
                 text: L10n.t("later")
                 variant: MeridianButton.Quiet
+                visible: updateDialog.stage !== "installing"
                 onClicked: updateDialog.close()
             },
             MeridianButton {
-                id: openDownloads
-                text: L10n.t("openDownloads")
-                iconName: "external-link"
+                id: primaryUpdate
+                text: updateDialog.stage === "installed" ? L10n.t("restartNow")
+                    : updateDialog.installable ? L10n.t("installUpdate") : L10n.t("openDownloads")
+                iconName: updateDialog.stage === "installed" ? "rotate-ccw"
+                    : updateDialog.installable ? "download" : "external-link"
                 variant: MeridianButton.Primary
+                enabled: updateDialog.stage !== "installing"
                 onClicked: {
-                    updateDialog.close()
-                    dialogs.openUrl(dialogs.releasesUrl, "updateDownloadOpenFailed")
+                    if (updateDialog.stage === "installed") {
+                        dialogs.app.relaunchAfterUpdate()
+                    } else if (updateDialog.installable) {
+                        updateDialog.received = 0
+                        updateDialog.total = 0
+                        updateDialog.stage = "installing"
+                        dialogs.app.installUpdate()
+                    } else {
+                        updateDialog.close()
+                        dialogs.openUrl(dialogs.releasesUrl, "updateDownloadOpenFailed")
+                    }
                 }
             }
         ]

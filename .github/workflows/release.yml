@@ -650,6 +650,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY_NAME: ${{ github.repository }}
+          SPARKLE_PRIVATE_KEY_BASE64: ${{ secrets.SPARKLE_PRIVATE_KEY_BASE64 }}
         run: |
           set -euo pipefail
           [[ "$GITHUB_REPOSITORY_NAME" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] || {
@@ -697,7 +698,16 @@ jobs:
                   *) echo "::error::Unexpected network service artifact $filename" >&2; exit 1 ;;
                 esac ;;
               *.dmg) platform=macos; format=dmg; arch="Apple Silicon & Intel"; minimum="macOS 14.0"; extra=(--sparkle-signature "$signature") ;;
-              *.AppImage) platform=linux; format=appimage; arch="x86_64"; minimum="Linux"; extra=() ;;
+              *.AppImage)
+                platform=linux; format=appimage; arch="x86_64"; minimum="Linux"
+                # The in-app updater installs only an AppImage signed by the
+                # Sparkle key (scripts/lib/update_signature.py).
+                update_signature="$(python3 scripts/lib/update_signature.py sign --artifact "$artifact" \
+                  --build "${{ needs.prepare.outputs.build }}" --arch "$arch" --seed-env SPARKLE_PRIVATE_KEY_BASE64)"
+                python3 scripts/lib/update_signature.py verify --artifact "$artifact" \
+                  --build "${{ needs.prepare.outputs.build }}" --arch "$arch" --signature "$update_signature" \
+                  --public-key "$(python3 -c "import plistlib;print(plistlib.load(open('packaging/macos/Info.plist.in','rb'))['SUPublicEDKey'])")"
+                extra=(--update-signature "$update_signature") ;;
               *.rpm) platform=linux; format=rpm; arch="x86_64"; minimum="Linux"; extra=() ;;
               *.deb) platform=linux; format=deb; arch="x86_64"; minimum="Linux"; extra=() ;;
               *.pkg.tar.zst) platform=linux; format=arch; arch="x86_64"; minimum="Linux"; extra=() ;;

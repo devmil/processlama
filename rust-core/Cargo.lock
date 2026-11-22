@@ -1094,10 +1094,14 @@ dependencies = [
 name = "processlama-infra-platform"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "cc",
  "processlama-application",
  "processlama-domain",
+ "ring",
  "serde_json",
+ "sha2",
+ "tempfile",
  "ureq",
 ]
 

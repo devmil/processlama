@@ -139,7 +139,16 @@ mod app_state {
             installed_build: String,
             version: String,
             build: String,
+            installable: bool,
         );
+        /// An in-place update download: bytes received of `total`.
+        #[qsignal]
+        pub fn update_progress(&mut self, received: f64, total: f64);
+        #[qsignal]
+        pub fn update_installed(&mut self, ok: bool);
+        /// The updated app started; the window quits.
+        #[qsignal]
+        pub fn quit_for_update(&mut self);
         #[qsignal]
         pub fn confirm_helper_install(&mut self, prompt: Value);
         #[qsignal]
@@ -536,6 +545,14 @@ mod app_state {
         #[qslot]
         fn check_for_updates(&mut self) {
             self.send(Command::CheckForUpdates);
+        }
+        #[qslot]
+        fn install_update(&mut self) {
+            self.send(Command::InstallUpdate);
+        }
+        #[qslot]
+        fn relaunch_after_update(&mut self) {
+            self.send(Command::RelaunchAfterUpdate);
         }
         #[qslot]
         fn install_network_telemetry(&mut self) {

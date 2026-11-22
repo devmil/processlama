@@ -10,6 +10,7 @@
 
 ### Added
 
+- The Linux AppImage now updates itself: install a new release from the update dialog and restart, without visiting the downloads page.
 - Add a remote host as `user@host` or by hostname, not only by an alias from your `~/.ssh/config`, as long as it signs in without a password.
 
 - About › Licenses now opens a licenses window that matches the rest of ProcessLama. Filter the package list, move through it with the arrow keys and read each license beside it.
@@ -153,6 +154,7 @@
 
 ### Added
 
+- The Linux AppImage now updates itself: install a new release from the update dialog and restart, without visiting the downloads page.
 - Add a remote host as `user@host` or by hostname, not only by an alias from your `~/.ssh/config`, as long as it signs in without a password.
 
 ## [1.0.0-beta.38] - 2026-11-21

@@ -11,6 +11,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ### Added
 
+- The Linux AppImage updates itself, like Sparkle on macOS: when a check finds a newer release, ProcessLama downloads its AppImage, checks the size and SHA-256 from the release list and an Ed25519 `updateSignature` by the Sparkle key over build, architecture, size and hash (`scripts/lib/update_signature.py`; the app embeds the public key), renames it over the running file and offers a restart. Downloads are bounded at 512 MiB and written next to the AppImage, so a failed or tampered download leaves it untouched. Other Linux packages keep opening the downloads page. The release workflow signs the AppImage while publishing, and `MeridianWheelScroll` now synthesizes touchpad momentum only on Qt Wayland.
+
 - Remote hosts accept an SSH destination of the form `user@host` (or a plain hostname) besides a `~/.ssh/config` alias, for hosts that sign in without a password through existing keys or the agent. Validation (`is_valid_alias` and the host editor) takes a host or `user@host`, each part starting with a letter or digit and holding letters, digits, `.`, `_` or `-`, at most 128 characters; ports, URIs and options are still refused, and the destination stays one argument after `--`. The remote helper keeps its version.
 
 - Open-source licenses (About › Licenses) now open in ProcessLama's own licenses window from the Meridian design system: a filterable package list with arrow-key navigation beside the selected package's license text. It lists ProcessLama, the GPL-2.0 network eBPF program, libbpf, the Geist font and the bundled Flutter and Rust dependency inventories.
@@ -210,6 +212,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 - Rebuilt the desktop application with Rust and Qt Quick (QML) instead of Flutter, with the same features and look and lower idle CPU. Linux packages carry a private Qt runtime; Arch Linux and Omarchy get a package. Settings, snapshots and remote hosts carry over.
 
 ### Added
+
+- The Linux AppImage updates itself, like Sparkle on macOS: when a check finds a newer release, ProcessLama downloads its AppImage, checks the size and SHA-256 from the release list and an Ed25519 `updateSignature` by the Sparkle key over build, architecture, size and hash (`scripts/lib/update_signature.py`; the app embeds the public key), renames it over the running file and offers a restart. Downloads are bounded at 512 MiB and written next to the AppImage, so a failed or tampered download leaves it untouched. Other Linux packages keep opening the downloads page. The release workflow signs the AppImage while publishing, and `MeridianWheelScroll` now synthesizes touchpad momentum only on Qt Wayland.
 
 - Remote hosts accept an SSH destination of the form `user@host` (or a plain hostname) besides a `~/.ssh/config` alias, for hosts that sign in without a password through existing keys or the agent. Validation (`is_valid_alias` and the host editor) takes a host or `user@host`, each part starting with a letter or digit and holding letters, digits, `.`, `_` or `-`, at most 128 characters; ports, URIs and options are still refused, and the destination stays one argument after `--`. The remote helper keeps its version.
 

@@ -240,12 +240,19 @@ impl Driver {
                     installed_build,
                     version,
                     build,
+                    installable,
                 } => state.update_available(
                     installed_version,
                     installed_build.to_string(),
                     version,
                     build.to_string(),
+                    installable,
                 ),
+                UiEvent::UpdateProgress { received, total } => {
+                    state.update_progress(received as f64, total as f64)
+                }
+                UiEvent::UpdateInstalled { ok } => state.update_installed(ok),
+                UiEvent::QuitForUpdate => state.quit_for_update(),
                 UiEvent::ConfirmHelperInstall(prompt) => state.confirm_helper_install(json!({
                     "profileId": prompt.profile_id,
                     "host": prompt.host,

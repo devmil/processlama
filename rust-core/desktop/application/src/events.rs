@@ -59,6 +59,11 @@ pub enum CoreEvent {
         result: Result<(), String>,
     },
     UpdateChecked(Result<UpdateCheck, String>),
+    UpdateProgress {
+        received: u64,
+        total: u64,
+    },
+    UpdateInstalled(Result<(), String>),
     NetworkAvailability(bool),
     NetworkInstalled(Result<(), NetworkSetupFailure>),
     Remote(RemoteEvent),
@@ -137,6 +142,8 @@ pub enum Command {
     ClearRemoteIconCache,
     // Platform
     CheckForUpdates,
+    InstallUpdate,
+    RelaunchAfterUpdate,
     RefreshNetworkAvailability,
     InstallNetworkTelemetry,
 }
