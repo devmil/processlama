@@ -58,6 +58,10 @@ fn main() {
     let out = PathBuf::from(env::var("OUT_DIR").expect("out dir"));
     let qrc = out.join("processlama.qrc");
     fs::write(&qrc, document).expect("write qrc");
+    if env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("linux") {
+        build_desktop_file_shim(&manifest);
+    }
+
     let rcc =
         find_rcc().expect("Qt rcc was not found; set RCC or install the Qt 6 development tools");
     let status = Command::new(&rcc)
@@ -118,6 +122,39 @@ fn find_rcc() -> Option<PathBuf> {
                     return Some(candidate);
                 }
             }
+        }
+    }
+    None
+}
+
+/// Compiles the QGuiApplication::setDesktopFileName shim against Qt's headers.
+fn build_desktop_file_shim(manifest: &Path) {
+    let source = manifest.join("src/native/desktop_file.cpp");
+    println!("cargo:rerun-if-changed={}", source.display());
+    let headers = qt_query("QT_INSTALL_HEADERS").expect("qmake -query QT_INSTALL_HEADERS");
+    let headers = PathBuf::from(headers);
+    cc::Build::new()
+        .cpp(true)
+        .std("c++17")
+        .flag_if_supported("-fPIC")
+        .include(&headers)
+        .include(headers.join("QtCore"))
+        .include(headers.join("QtGui"))
+        .file(&source)
+        .compile("processlama_desktop_file");
+}
+
+fn qt_query(key: &str) -> Option<String> {
+    let configured = env::var("QMAKE").ok();
+    for qmake in configured
+        .iter()
+        .map(String::as_str)
+        .chain(["qmake6", "qmake"])
+    {
+        if let Ok(output) = Command::new(qmake).args(["-query", key]).output()
+            && output.status.success()
+        {
+            return Some(String::from_utf8_lossy(&output.stdout).trim().to_owned());
         }
     }
     None

@@ -1052,6 +1052,7 @@ dependencies = [
 name = "processlama"
 version = "0.1.0"
 dependencies = [
+ "cc",
  "processlama-application",
  "processlama-domain",
  "processlama-infra-local",

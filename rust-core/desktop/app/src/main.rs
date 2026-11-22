@@ -98,8 +98,24 @@ fn startup_snapshot() -> Option<String> {
         .find(|argument| !argument.starts_with('-') && argument.ends_with(".json"))
 }
 
+#[cfg(target_os = "linux")]
+unsafe extern "C" {
+    fn processlama_set_desktop_file_name(name: *const std::ffi::c_char);
+}
+
+/// The Wayland app id and X11 class, matching the desktop entry.
+fn set_desktop_file_name() {
+    #[cfg(target_os = "linux")]
+    {
+        let name = c"de.devmil.processlama";
+        // SAFETY: a static NUL-terminated string; the setter copies it.
+        unsafe { processlama_set_desktop_file_name(name.as_ptr()) };
+    }
+}
+
 fn main() {
     diagnostics::info("process_start");
+    set_desktop_file_name();
     let mut application = QApp::new();
     application.application_name(APPLICATION_NAME);
     assert!(

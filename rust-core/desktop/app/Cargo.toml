@@ -21,3 +21,6 @@ processlama-qt = { workspace = true }
 qtbridge = { workspace = true, features = ["serde_json"] }
 serde_json = { workspace = true }
 sys-locale = "=0.3.2"
+
+[build-dependencies]
+cc = "1"
