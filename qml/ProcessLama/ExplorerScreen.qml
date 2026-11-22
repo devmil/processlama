@@ -7,7 +7,14 @@ Item {
     id: screen
 
     readonly property var app: Store.app
-    readonly property real inspectorWidth: Store.settings.inspectorWidth ?? 360
+    readonly property real savedInspectorWidth: Store.settings.inspectorWidth ?? 360
+    // A drag resizes locally and commits once on release: a round trip
+    // through the core and the open/close animation per pointer event made
+    // the inspector trail the pointer.
+    property real dragInspectorWidth: -1
+    readonly property real inspectorWidth: dragInspectorWidth >= 0 ? dragInspectorWidth : savedInspectorWidth
+    readonly property real minInspectorWidth: 240
+    readonly property real maxInspectorWidth: 720
 
     WindowToolbar {
         id: toolbar
@@ -55,7 +62,24 @@ Item {
             x: inspectorHost.x - width
             height: parent.height
             semanticLabel: L10n.t("resizeInspector")
-            onDragged: delta => screen.app.setInspectorWidth(screen.inspectorWidth - delta)
+            onDragStarted: {
+                screen.dragInspectorWidth = screen.savedInspectorWidth
+                screen.app.setWindowResizing(true)
+            }
+            onDragged: delta => {
+                const width = Math.max(screen.minInspectorWidth, Math.min(screen.maxInspectorWidth, screen.inspectorWidth - delta))
+                if (dragging)
+                    screen.dragInspectorWidth = width
+                else
+                    screen.app.setInspectorWidth(width)
+            }
+            onDragFinished: {
+                screen.app.setInspectorWidth(screen.dragInspectorWidth)
+                screen.app.setWindowResizing(false)
+                // The local width yields once the committed one comes back.
+                if (Math.abs(screen.savedInspectorWidth - screen.dragInspectorWidth) < 0.5)
+                    screen.dragInspectorWidth = -1
+            }
             onReset: screen.app.resetInspectorWidth()
         }
 
@@ -65,6 +89,7 @@ Item {
             id: inspectorHost
             property real openWidth: Store.inspectorOpen ? screen.inspectorWidth : 0
             Behavior on openWidth {
+                enabled: screen.dragInspectorWidth < 0
                 NumberAnimation { duration: Motion.emphasized; easing.type: Easing.BezierSpline; easing.bezierCurve: Motion.standard }
             }
             x: parent.width - openWidth
@@ -87,6 +112,8 @@ Item {
             }
         }
     }
+
+    onSavedInspectorWidthChanged: if (!resize.dragging) dragInspectorWidth = -1
 
     ExplorerStatusBar {
         id: statusBar

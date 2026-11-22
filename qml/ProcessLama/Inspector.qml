@@ -219,32 +219,43 @@ MeridianIsland {
             color: Theme.colors.inkMuted
             text: !chips.ports ? L10n.t("portsNotReported") : L10n.t("noOccupiedPorts")
         }
-        Repeater {
-            model: chips.ports ? [
-                { label: L10n.t("listeningPorts"), values: chips.ports.listening, tone: MeridianChip.Accent },
-                { label: L10n.t("otherLocalPorts"), values: chips.ports.other, tone: MeridianChip.Neutral }
-            ].filter(group => group.values.length > 0) : []
-            Column {
-                id: group
-                required property var modelData
-                width: chips.width
-                bottomPadding: Theme.space.s4
-                spacing: Theme.space.s2
-                MeridianText { text: group.modelData.label; role: MeridianText.Caption; color: Theme.colors.inkMuted }
-                Flow {
-                    width: parent.width
-                    spacing: Theme.space.s2
-                    Repeater {
-                        model: group.modelData.values
-                        MeridianChip {
-                            required property int modelData
-                            text: String(modelData)
-                            tone: group.modelData.tone
-                            interactive: true
-                            Accessible.name: L10n.t("showPortProcesses", [modelData])
-                            onClicked: inspector.app.showPort(modelData)
-                        }
-                    }
+        // Fixed groups and counted chips: telemetry arrives as new arrays
+        // every poll, and an array model would recreate every chip.
+        PortGroup {
+            label: L10n.t("listeningPorts")
+            values: chips.ports ? chips.ports.listening : []
+            tone: MeridianChip.Accent
+        }
+        PortGroup {
+            label: L10n.t("otherLocalPorts")
+            values: chips.ports ? chips.ports.other : []
+            tone: MeridianChip.Neutral
+        }
+    }
+
+    component PortGroup: Column {
+        id: group
+        property string label
+        property var values: []
+        property int tone
+        visible: values.length > 0
+        width: parent ? parent.width : 0
+        bottomPadding: Theme.space.s4
+        spacing: Theme.space.s2
+        MeridianText { text: group.label; role: MeridianText.Caption; color: Theme.colors.inkMuted }
+        Flow {
+            width: parent.width
+            spacing: Theme.space.s2
+            Repeater {
+                model: group.values.length
+                MeridianChip {
+                    required property int index
+                    readonly property int port: group.values[index] ?? 0
+                    text: String(port)
+                    tone: group.tone
+                    interactive: true
+                    Accessible.name: L10n.t("showPortProcesses", [port])
+                    onClicked: inspector.app.showPort(port)
                 }
             }
         }
@@ -646,9 +657,12 @@ MeridianIsland {
                         width: parent.width
                         spacing: Theme.space.s2
                         Repeater {
-                            model: filesContent.owners.slice().sort((a, b) => a.port - b.port)
+                            id: peers
+                            readonly property var sorted: filesContent.owners.slice().sort((a, b) => a.port - b.port)
+                            model: sorted.length
                             MeridianButton {
-                                required property var modelData
+                                required property int index
+                                readonly property var modelData: peers.sorted[index]
                                 text: ":" + modelData.port + " · " + L10n.t("goToPortOwner", [modelData.name, modelData.pid])
                                 variant: MeridianButton.Quiet
                                 controlSize: MeridianButton.Small

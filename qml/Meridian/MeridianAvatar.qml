@@ -27,7 +27,7 @@ Item {
             return "?"
         if (parts.length === 1)
             return Array.from(parts[0])[0].toUpperCase()
-        return (Array.from(parts[0])[0] + Array.from(parts[1])[0]).toUpperCase()
+        return String(Array.from(parts[0])[0] + Array.from(parts[1])[0]).toUpperCase()
     }
     function colorIndex(key) {
         const order = [0, 1, 5, 4, 6, 3, 2, 7]

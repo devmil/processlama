@@ -244,28 +244,46 @@ mod process_tree_model {
                 .count();
             let old_end = before.len() - suffix;
             let new_end = next.len() - suffix;
-            if prefix < old_end {
+            // Rows are positional: the changed middle keeps its overlapping
+            // rows as value changes, and only the length difference is
+            // removed or inserted at its end. A sort by a live metric
+            // reorders most rows every poll; removing and inserting them
+            // would rebuild every visible delegate.
+            let overlap = (old_end - prefix).min(new_end - prefix);
+            let kept_end = prefix + overlap;
+            if kept_end < old_end {
                 // Publish the shortened list while Qt asks for data.
                 let mut remaining: Vec<TreeRow> =
-                    Vec::with_capacity(before.len() - (old_end - prefix));
-                remaining.extend_from_slice(&before[..prefix]);
+                    Vec::with_capacity(before.len() - (old_end - kept_end));
+                remaining.extend_from_slice(&before[..kept_end]);
                 remaining.extend_from_slice(&before[old_end..]);
-                self.begin_remove_rows(&QModelIndex::default(), prefix as i32, old_end as i32 - 1);
+                self.begin_remove_rows(
+                    &QModelIndex::default(),
+                    kept_end as i32,
+                    old_end as i32 - 1,
+                );
                 self.rows = Arc::new(remaining);
                 self.end_remove_rows();
             }
-            if prefix < new_end {
-                self.begin_insert_rows(&QModelIndex::default(), prefix as i32, new_end as i32 - 1);
+            if kept_end < new_end {
+                self.begin_insert_rows(
+                    &QModelIndex::default(),
+                    kept_end as i32,
+                    new_end as i32 - 1,
+                );
                 self.rows = Arc::clone(next);
                 self.end_insert_rows();
             } else {
                 self.rows = Arc::clone(next);
             }
-            // Value changes in the kept prefix and suffix.
+            // Value changes in the kept rows and the suffix.
             let column_count = self.columns.len();
             let mut spans: Vec<(usize, usize, usize)> = Vec::new();
             let mut compare = |old: &TreeRow, new: &TreeRow, index: usize, this: &Self| {
-                if let Some((first, last)) = this.changed_columns(
+                // A different process at this position: every cell and role.
+                if old.identity != new.identity {
+                    spans.push((index, 0, column_count.saturating_sub(1)));
+                } else if let Some((first, last)) = this.changed_columns(
                     old,
                     new,
                     pinned_before,
@@ -276,7 +294,7 @@ mod process_tree_model {
                     spans.push((index, first, last));
                 }
             };
-            for index in 0..prefix {
+            for index in 0..kept_end {
                 compare(&before[index], &next[index], index, self);
             }
             for offset in 0..suffix {
@@ -284,22 +302,18 @@ mod process_tree_model {
                 let new_index = new_end + offset;
                 compare(old, &next[new_index], new_index, self);
             }
-            spans.sort_unstable();
-            let mut start = 0;
-            while start < spans.len() {
-                let (row, first, last) = spans[start];
-                let mut end = start;
-                while end + 1 < spans.len()
-                    && spans[end + 1].0 == spans[end].0 + 1
-                    && spans[end + 1].1 == first
-                    && spans[end + 1].2 == last
-                {
-                    end += 1;
-                }
-                let top_left = self.create_index(row as i32, first as i32, 0);
-                let bottom_right = self.create_index(spans[end].0 as i32, last as i32, 0);
+            // One signal over the changed rows' bounding box: the view walks
+            // every loaded delegate per signal, while the delegates that
+            // exist are only the visible rows, which re-read cheaply.
+            if let (Some(top), Some(bottom)) = (
+                spans.iter().map(|span| span.0).min(),
+                spans.iter().map(|span| span.0).max(),
+            ) {
+                let first = spans.iter().map(|span| span.1).min().unwrap_or(0);
+                let last = spans.iter().map(|span| span.2).max().unwrap_or(0);
+                let top_left = self.create_index(top as i32, first as i32, 0);
+                let bottom_right = self.create_index(bottom as i32, last as i32, 0);
                 self.data_changed(&top_left, &bottom_right);
-                start = end + 1;
             }
         }
 

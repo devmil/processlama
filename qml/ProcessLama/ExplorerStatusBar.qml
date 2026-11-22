@@ -38,6 +38,7 @@ MeridianStatusBar {
     MeridianStatusBarText {
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined
         visible: bar.remote !== null
+        animated: false
         text: bar.hostLine
     }
     MeridianStatusBarText {
@@ -56,6 +57,9 @@ MeridianStatusBar {
     trailing: [
         MeridianStatusBarText {
             anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+            // Changes on most polls; a swap would redraw the window for its
+            // whole duration every time.
+            animated: false
             text: L10n.t("processCount", [bar.session.processCount ?? 0]) + bar.queued
         }
     ]

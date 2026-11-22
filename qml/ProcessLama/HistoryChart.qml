@@ -94,10 +94,12 @@ Rectangle {
                 width: 64
                 height: parent.height
                 spacing: (height - 3 * Theme.type.codeSm.pixelSize) / 2
+                // Counted, not the label array: a new array each poll would
+                // recreate the labels.
                 Repeater {
-                    model: root.scaleLabels
+                    model: root.scaleLabels.length
                     MeridianText {
-                        required property string modelData
+                        required property int index
                         width: scaleColumn.width
                         height: Theme.type.codeSm.pixelSize
                         horizontalAlignment: Text.AlignRight
@@ -108,7 +110,7 @@ Rectangle {
                         tabular: true
                         color: Theme.colors.inkMuted
                         lineHeight: 1
-                        text: modelData
+                        text: root.scaleLabels[index] ?? ""
                     }
                 }
             }

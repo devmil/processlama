@@ -18,6 +18,9 @@ Item {
     property int role: MeridianText.Body
     property color color: Theme.colors.ink
     property bool tabular: false
+    /// False swaps at once. For text that changes on every refresh: each
+    /// animation frame redraws the whole window.
+    property bool animated: true
     property int horizontalAlignment: Text.AlignLeft
     property int elide: Text.ElideRight
     readonly property real contentWidth: current.implicitWidth
@@ -30,7 +33,9 @@ Item {
     property string _shown: text
 
     onTextChanged: {
-        if (!_ready || text === _shown) {
+        // Hidden text has nothing to show moving.
+        if (!_ready || text === _shown || !animated || !visible) {
+            swap.complete()
             _shown = text
             return
         }

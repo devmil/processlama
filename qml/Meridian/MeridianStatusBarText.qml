@@ -7,6 +7,8 @@ Item {
 
     property string text
     property string iconName
+    /// False swaps at once: for text that changes on every refresh.
+    property bool animated: true
     /// Caps the width; the text ellipsizes.
     property real maxWidth: -1
 
@@ -34,6 +36,7 @@ Item {
         color: Theme.colors.inkMuted
         tabular: true
         rise: Metrics.statusBarRise
+        animated: root.animated
         Accessible.ignored: true
     }
 }

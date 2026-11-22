@@ -28,6 +28,20 @@ FocusScope {
     readonly property real headerHeight: Theme.size.control
     readonly property string treeQuery: session.treeSearchQuery ?? ""
     property int hoveredRow: -1
+    // When each spawned process first rose. Rows are positional, so a cell
+    // can show another process after a poll; a process rises once, all of
+    // its cells together.
+    property var _riseStarts: ({})
+    function riseStart(key) {
+        const now = Date.now()
+        const start = _riseStarts[key]
+        if (start !== undefined)
+            return start
+        if (Object.keys(_riseStarts).length > 512)
+            _riseStarts = {}
+        _riseStarts[key] = now
+        return now
+    }
     property bool overlayVisible: false
     property bool revealing: false
 
@@ -487,6 +501,7 @@ FocusScope {
         required property int row
         required property int column
         required property int marker
+        required property string processKey
         required property bool rowMatch
         required property real heat
         required property bool cellMatch
@@ -531,14 +546,16 @@ FocusScope {
             easing.bezierCurve: Motion.standard
         }
         function _rise() {
-            if (marker === 1 && !Motion.reduced)
+            // Within one frame of the process's first rise: its other cells.
+            if (marker === 1 && !Motion.reduced && Date.now() - root.riseStart(processKey) < 50)
                 rise.restart()
-            else {
+            else if (marker !== 1 || Motion.reduced) {
                 rise.stop()
                 slide = 0
             }
         }
         onMarkerChanged: _rise()
+        onProcessKeyChanged: _rise()
         Component.onCompleted: _rise()
         TableView.onReused: _rise()
     }
@@ -651,7 +668,6 @@ FocusScope {
 
     component NameCell: CellBase {
         id: nameCell
-        required property string processKey
         required property string processName
         required property string iconUrl
         required property int depth
