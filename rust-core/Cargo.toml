@@ -79,3 +79,6 @@ lto = false
 codegen-units = 16
 incremental = true
 debug = 1
+
+[patch.crates-io]
+qtbridge-interfaces = { path = "third_party/qtbridge-interfaces" }
