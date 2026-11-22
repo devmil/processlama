@@ -78,6 +78,27 @@ def _decode32(value: str, what: str) -> bytes:
     return raw
 
 
+def decode_seed(value: str, what: str) -> bytes:
+    """The Ed25519 seed from a secret value.
+
+    The release secret holds Sparkle's exported key file (base64 text of the
+    32-byte seed) encoded in base64 again, as validate-release-secrets.sh
+    reads it. A bare base64 seed is accepted too.
+    """
+    try:
+        raw = base64.b64decode("".join(value.split()), validate=True)
+    except ValueError:
+        raw = b""
+    if len(raw) != 32:
+        try:
+            raw = base64.b64decode(b"".join(raw.split()), validate=True)
+        except ValueError:
+            raw = b""
+    if len(raw) != 32:
+        raise SystemExit(f"update_signature: {what} must hold a 32-byte Ed25519 seed (Sparkle's exported key)")
+    return raw
+
+
 def sign(data: bytes, seed: bytes, openssl: str) -> str:
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
@@ -136,7 +157,7 @@ def main() -> None:
     if args.command == "message":
         sys.stdout.buffer.write(data)
     elif args.command == "sign":
-        seed = _decode32(os.environ.get(args.seed_env, ""), args.seed_env)
+        seed = decode_seed(os.environ.get(args.seed_env, ""), args.seed_env)
         print(sign(data, seed, args.openssl))
     elif not verify(data, args.signature, _decode32(args.public_key, "--public-key"), args.openssl):
         raise SystemExit("update_signature: the signature does not match")

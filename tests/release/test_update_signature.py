@@ -1,3 +1,4 @@
+import base64
 import importlib.util
 import os
 import tempfile
@@ -35,6 +36,15 @@ class UpdateSignatureTest(unittest.TestCase):
         self.assertEqual(message.split(b"\n")[:4],
                          [b"ProcessLama AppImage update v1", b"build=47", b"arch=x86_64", b"size=14"])
         self.assertTrue(message.endswith(b"\n"))
+
+    def test_reads_the_release_secret_like_the_preflight(self):
+        exported = base64.b64encode(TEST_SEED)  # Sparkle's exported key file
+        secret = base64.b64encode(exported + b"\n").decode()
+        self.assertEqual(update_signature.decode_seed(secret, "secret"), TEST_SEED)
+        self.assertEqual(update_signature.decode_seed(exported.decode(), "secret"), TEST_SEED)
+        for bad in ("", "not base64!", base64.b64encode(b"short").decode()):
+            with self.assertRaises(SystemExit):
+                update_signature.decode_seed(bad, "secret")
 
     @unittest.skipUnless(OPENSSL, "OpenSSL 3 is required")
     def test_sign_matches_the_rust_vector_and_verifies(self):
