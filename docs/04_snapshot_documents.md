@@ -9,7 +9,7 @@ process snapshot:
 - `display_name`: optional user-facing saved snapshot name.
 - `snapshot`: the `ProcessSnapshot` payload rendered by the app.
 
-The Flutter repository implementation writes files ending in
+The snapshot store (`rust-core/desktop/infra-storage`) writes files ending in
 `.processlama-snapshot.json` under the app support `snapshots/` directory. Import
 uses the same document wrapper, copies opened external snapshot documents into
 the app support snapshot directory, and rebuilds the process tree through

@@ -5,10 +5,10 @@ opens in its own process-session tab. See [setup](remote_hosts_setup.md) for ins
 
 ## Layers
 
-The UI uses ProcessSession and RemoteHostService. Shared Dart transport lives in
-packages/devmil_remote and shared Rust transport in rust-core/devmil-remote; neither
-imports ProcessLama application code. The helper shares rust-core/telemetry with the
-local core. Native access remains behind repositories and flutter_rust_bridge.
+The UI uses the application core's ProcessSession and remote host workflows. The client
+side (OpenSSH, the helper channel and telemetry decoding) lives in
+rust-core/desktop/infra-remote; the shared transport in rust-core/devmil-remote imports no
+ProcessLama application code. The helper shares rust-core/telemetry with the local core.
 
 ## Protocol and compatibility
 

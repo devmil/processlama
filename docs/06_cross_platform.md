@@ -1,15 +1,15 @@
 # Cross-Platform Preparation
 
 ProcessLama supports Windows, Linux, and macOS. Each platform uses the shared
-Flutter UI and Rust `processtree` backend, with explicit capability states for
+Rust core, Qt Quick UI and `processtree` backend, with explicit capability states for
 detail modules that are not available everywhere.
 
 ## Current Shape
 
 - Rust process enumeration uses the native `processtree` backend on Windows,
   Linux, and macOS, with explicit capability states for unavailable detail modules.
-- Flutter renders a platform capability matrix from
-  `PlatformCapabilities.matrix`.
+- Capabilities come from `HostCapabilities` (the local platform, or a remote helper's
+  hello); the UI shows unavailable features as such instead of guessing.
 - Snapshot documents and tree synthesis are platform-neutral.
 - Network telemetry remains Rust-owned. macOS uses `nettop`; Linux RPM and DEB
   packages install a root-owned eBPF service that publishes read-only cumulative

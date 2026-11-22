@@ -6,6 +6,7 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ### Changed
 
+- Rebuilt the desktop application with Rust and Qt Quick (QML) instead of Flutter. The process session, tabs, snapshots, settings, updates and the remote host client (SSH channel, scripts and telemetry decoding) moved into Rust crates behind ports; the UI uses the Meridian QML library with the same layout, interactions and motion. Idle CPU on Linux drops from about 18% to about 10% of one core in our measurement. Settings, snapshots, remote host profiles and the remote icon cache keep their locations; settings from Flutter builds are imported on first launch. Linux packages carry an application-private Qt runtime, and Arch Linux (including Omarchy) gets its own package. Linux follows the desktop's GTK text scaling. Third-party input method plugins such as fcitx5 are not bundled; Qt's compose and IBus input contexts are.
 - Build with Flutter 3.47.9 and the stock Linux engine (Meridian 2.0.3). Flutter 3.50's Wayland renderer showed black frames and black edges while a window was resized, and the pinned custom engine only patched that renderer. 3.47.9 keeps the eMudhra certificate fix from 3.47.8.
 
 ### Added
@@ -201,6 +202,10 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   process tree instead of looking like another copy of the parent app bundle.
 
 ## [Unreleased Beta]
+
+### Changed
+
+- Rebuilt the desktop application with Rust and Qt Quick (QML) instead of Flutter, with the same features and look and lower idle CPU. Linux packages carry a private Qt runtime; Arch Linux and Omarchy get a package. Settings, snapshots and remote hosts carry over.
 
 ## [1.0.0-beta.38] - 2026-11-21
 
