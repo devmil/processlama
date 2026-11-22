@@ -122,7 +122,6 @@ Rectangle {
                 anchors.right: parent.right
                 height: parent.height
                 readonly property real slotWidth: width / root.slots
-                readonly property real barWidth: Math.max(1, slotWidth * 0.7)
                 readonly property real zeroY: root.diverging ? height / 2 : height
                 readonly property real span: root.diverging ? height / 2 : height
                 readonly property real effectiveMax: Math.max(0.1, root.scaleMax)
@@ -136,12 +135,16 @@ Rectangle {
                 }
 
                 Repeater {
+                    objectName: "bars"
                     model: root.sampleCount
                     Item {
                         id: bar
                         required property int index
                         readonly property bool latest: index === root.highlighted
-                        readonly property real x0: (root.leading + index) * chart.slotWidth + (chart.slotWidth - chart.barWidth) / 2
+                        // Bars fill their slots edge to edge on whole pixels, so
+                        // no uneven gaps appear between them.
+                        readonly property real x0: Math.round((root.leading + index) * chart.slotWidth)
+                        readonly property real x1: Math.round((root.leading + index + 1) * chart.slotWidth)
                         readonly property real upper: root.sampleAt(root.samples, index)
                         readonly property real lower: root.diverging ? root.sampleAt(root.lowerSamples, index) : 0
                         readonly property real upperHeight: isFinite(upper) ? chart.span * Math.max(0, Math.min(1, upper / chart.effectiveMax)) : 0
@@ -150,7 +153,7 @@ Rectangle {
                             visible: bar.upperHeight > 0
                             x: bar.x0
                             y: chart.zeroY - bar.upperHeight
-                            width: chart.barWidth
+                            width: Math.max(1, bar.x1 - bar.x0)
                             height: bar.upperHeight
                             color: root.diverging
                                 ? (bar.latest ? AppTheme.chartUpper : Qt.alpha(AppTheme.chartUpper, AppTheme.chartHistoryOpacity))
@@ -160,7 +163,7 @@ Rectangle {
                             visible: root.diverging && bar.lowerHeight > 0
                             x: bar.x0
                             y: chart.zeroY
-                            width: chart.barWidth
+                            width: Math.max(1, bar.x1 - bar.x0)
                             height: bar.lowerHeight
                             color: bar.latest ? AppTheme.chartLower : Qt.alpha(AppTheme.chartLower, AppTheme.chartHistoryOpacity)
                         }
