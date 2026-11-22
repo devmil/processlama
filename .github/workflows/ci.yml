@@ -70,6 +70,58 @@ jobs:
       - name: Verify
         run: ./scripts/verify.sh
 
+  # The same checks on macOS: the release's prepare job runs verify.sh there.
+  verify-macos:
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          setup-python: false
+          cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install the workflow validator
+        run: python3 -m pip install --disable-pip-version-check -r tooling/requirements-ci.txt
+
+      - name: Cache Rust
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rust-core/target
+          key: ${{ runner.os }}-rust-verify-${{ hashFiles('rust-core/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-verify-
+
+      - name: Install Rust toolchain
+        run: |
+          set -euo pipefail
+          if ! command -v rustup >/dev/null 2>&1; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
+          fi
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup default stable
+          rustup component add rustfmt
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch locked Rust dependencies
+        run: cargo fetch --locked --manifest-path rust-core/Cargo.toml
+
+      - name: Verify
+        run: ./scripts/verify.sh
+
   # The remote helpers every desktop package bundles (docs/10_remote_hosts.md §8).
 
   remote-helper-linux:
