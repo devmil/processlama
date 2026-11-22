@@ -11,6 +11,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ### Added
 
+- Remote hosts accept an SSH destination of the form `user@host` (or a plain hostname) besides a `~/.ssh/config` alias, for hosts that sign in without a password through existing keys or the agent. Validation (`is_valid_alias` and the host editor) takes a host or `user@host`, each part starting with a letter or digit and holding letters, digits, `.`, `_` or `-`, at most 128 characters; ports, URIs and options are still refused, and the destination stays one argument after `--`. The remote helper keeps its version.
+
 - Open-source licenses (About › Licenses) now open in ProcessLama's own licenses window from the Meridian design system: a filterable package list with arrow-key navigation beside the selected package's license text. It lists ProcessLama, the GPL-2.0 network eBPF program, libbpf, the Geist font and the bundled Flutter and Rust dependency inventories.
 
 - ProcessLama is now open source under the MIT license, with public build and contribution instructions.
@@ -206,6 +208,10 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 ### Changed
 
 - Rebuilt the desktop application with Rust and Qt Quick (QML) instead of Flutter, with the same features and look and lower idle CPU. Linux packages carry a private Qt runtime; Arch Linux and Omarchy get a package. Settings, snapshots and remote hosts carry over.
+
+### Added
+
+- Remote hosts accept an SSH destination of the form `user@host` (or a plain hostname) besides a `~/.ssh/config` alias, for hosts that sign in without a password through existing keys or the agent. Validation (`is_valid_alias` and the host editor) takes a host or `user@host`, each part starting with a letter or digit and holding letters, digits, `.`, `_` or `-`, at most 128 characters; ports, URIs and options are still refused, and the destination stays one argument after `--`. The remote helper keeps its version.
 
 ## [1.0.0-beta.38] - 2026-11-21
 

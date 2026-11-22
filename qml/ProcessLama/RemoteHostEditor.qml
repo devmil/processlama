@@ -2,8 +2,9 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Meridian
 
-// Adds or edits a remote host profile. Only the alias is stored; users,
-// ports and keys belong in ~/.ssh/config.
+// Adds or edits a remote host profile. Only the SSH destination (a host
+// alias, hostname or user@host) is stored; ports and keys belong in
+// ~/.ssh/config.
 MeridianDialog {
     id: dialog
 
@@ -25,7 +26,9 @@ MeridianDialog {
 
     readonly property string aliasValue: aliasField.text.trim()
     readonly property string nameValue: nameField.text.trim().length > 0 ? nameField.text.trim() : aliasValue
-    readonly property bool aliasValid: /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(aliasValue)
+    // A host alias, hostname or user@host (the core's is_valid_alias).
+    readonly property bool aliasValid: aliasValue.length <= 128
+        && /^[A-Za-z0-9][A-Za-z0-9._-]*(@[A-Za-z0-9][A-Za-z0-9._-]*)?$/.test(aliasValue)
     readonly property bool nameValid: nameValue.length > 0 && nameValue.length <= 64 && !/[\x00-\x1F]/.test(nameValue)
     readonly property string defaultMode: (app.remoteHosts ?? {}).defaultBackgroundRefresh ?? "slow"
 

@@ -53,7 +53,8 @@ pub fn posix_shell_command(script: &str) -> String {
     format!("exec /bin/sh -c '{}'", script.replace('\'', "'\\''"))
 }
 
-/// The full argument list, or None for an alias that is not a plain host alias.
+/// The full argument list, or None for a destination that is not a host alias,
+/// hostname or `user@host`.
 pub fn arguments(
     alias: &str,
     remote_command: &str,
@@ -254,5 +255,18 @@ mod tests {
             &arguments[arguments.len() - 3..],
             ["--", "build-box", "true"]
         );
+    }
+
+    #[test]
+    fn user_destinations_stay_one_argument() {
+        for destination in ["user@host", "me@192.0.2.1", "build.bot@dev-box"] {
+            let arguments = arguments(destination, "true", None).unwrap();
+            assert_eq!(
+                &arguments[arguments.len() - 3..],
+                ["--", destination, "true"]
+            );
+        }
+        assert!(arguments("user@host:22", "true", None).is_none());
+        assert!(arguments("-oProxyCommand=x@host", "true", None).is_none());
     }
 }

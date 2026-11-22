@@ -10,6 +10,8 @@
 
 ### Added
 
+- Add a remote host as `user@host` or by hostname, not only by an alias from your `~/.ssh/config`, as long as it signs in without a password.
+
 - About › Licenses now opens a licenses window that matches the rest of ProcessLama. Filter the package list, move through it with the arrow keys and read each license beside it.
 
 - ProcessLama is now open source under the MIT license, with public build and contribution instructions.
@@ -148,6 +150,10 @@
 ### Changed
 
 - ProcessLama now runs on Rust and Qt instead of Flutter: the same app with noticeably lower CPU use. Settings, snapshots and remote hosts carry over, and Arch Linux and Omarchy get a native package.
+
+### Added
+
+- Add a remote host as `user@host` or by hostname, not only by an alias from your `~/.ssh/config`, as long as it signs in without a password.
 
 ## [1.0.0-beta.38] - 2026-11-21
 

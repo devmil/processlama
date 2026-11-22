@@ -430,15 +430,26 @@ pub const DEFAULT_REMOTE_ICON_CACHE_BYTES: u64 = 64 * 1024 * 1024;
 pub const MIN_REMOTE_ICON_CACHE_BYTES: u64 = 1024 * 1024;
 pub const MAX_REMOTE_ICON_CACHE_BYTES: u64 = 4096 * 1024 * 1024;
 
-/// `^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$`: a plain `~/.ssh/config` host alias.
+/// An SSH destination: a `~/.ssh/config` host alias, a hostname or
+/// `user@host`, at most 128 ASCII bytes. Each part starts with a letter or
+/// digit and holds letters, digits, `.`, `_` or `-`; ports, URIs, options,
+/// whitespace and shell syntax are refused.
 pub fn is_valid_alias(alias: &str) -> bool {
-    let bytes = alias.as_bytes();
-    !bytes.is_empty()
-        && bytes.len() <= REMOTE_HOST_ALIAS_MAX_LENGTH
-        && bytes[0].is_ascii_alphanumeric()
-        && bytes[1..]
-            .iter()
-            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+    fn part(text: &str) -> bool {
+        let bytes = text.as_bytes();
+        !bytes.is_empty()
+            && bytes[0].is_ascii_alphanumeric()
+            && bytes[1..]
+                .iter()
+                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+    }
+    if alias.len() > REMOTE_HOST_ALIAS_MAX_LENGTH {
+        return false;
+    }
+    match alias.split_once('@') {
+        Some((user, host)) => part(user) && part(host),
+        None => part(alias),
+    }
 }
 
 pub fn is_valid_display_name(name: &str) -> bool {
@@ -655,7 +666,25 @@ mod tests {
     fn aliases_are_plain_host_aliases() {
         assert!(is_valid_alias("build-box.lan_1"));
         assert!(!is_valid_alias("-oProxyCommand=x"));
-        assert!(!is_valid_alias("user@host"));
+        assert!(is_valid_alias("user@host"));
+        assert!(is_valid_alias("me@192.0.2.1"));
+        assert!(is_valid_alias("build.bot@dev-box"));
+        for invalid in [
+            "user@@host",
+            "-oProxyCommand=x@host",
+            "user@host;id",
+            "user name@host",
+            "user@-host",
+            "@host",
+            "user@",
+            "user@host:22",
+            "ssh://x",
+            "host*",
+            "$(id)",
+            "a|b",
+        ] {
+            assert!(!is_valid_alias(invalid), "{invalid}");
+        }
         assert!(!is_valid_alias(""));
         assert!(!is_valid_alias(&"a".repeat(129)));
     }

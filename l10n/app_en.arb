@@ -1275,11 +1275,11 @@
 
   "remoteHostDisplayName": "Display name",
 
-  "remoteHostAlias": "SSH host alias",
+  "remoteHostAlias": "SSH destination",
 
-  "remoteHostAliasHelp": "A Host entry of your ~/.ssh/config. User names, ports, keys and jump hosts belong there; ProcessLama stores only the alias.",
+  "remoteHostAliasHelp": "An SSH host alias, hostname or user@host. Uses your SSH configuration, keys and agent; the host must already be trusted and sign in without a password. Ports and jump hosts belong in ~/.ssh/config.",
 
-  "remoteHostAliasInvalid": "Use letters, digits, dots, dashes and underscores, starting with a letter or digit.",
+  "remoteHostAliasInvalid": "Enter a host alias, hostname or user@host. Use letters, digits, dots, dashes and underscores; start the host and the user name with a letter or digit.",
 
   "remoteHostDisplayNameInvalid": "Use 1 to 64 characters.",
 
