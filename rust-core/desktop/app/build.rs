@@ -61,6 +61,14 @@ fn main() {
     if env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("linux") {
         build_desktop_file_shim(&manifest);
     }
+    if env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("macos") {
+        // Qt frameworks are linked by @rpath: the app bundle's Frameworks
+        // folder, and Qt's own for development runs (packaging removes it).
+        println!("cargo:rustc-link-arg=-Wl,-rpath,@executable_path/../Frameworks");
+        if let Some(libs) = qt_query("QT_INSTALL_LIBS") {
+            println!("cargo:rustc-link-arg=-Wl,-rpath,{libs}");
+        }
+    }
 
     let rcc =
         find_rcc().expect("Qt rcc was not found; set RCC or install the Qt 6 development tools");
