@@ -111,6 +111,8 @@ T.Dialog {
     }
 
     contentItem: Flickable {
+        id: dialogBody
+        MeridianWheelScroll { flickable: dialogBody }
         Accessible.role: Accessible.Dialog
         Accessible.name: control.title
         implicitWidth: column.implicitWidth

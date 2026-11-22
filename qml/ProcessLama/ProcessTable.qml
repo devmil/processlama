@@ -444,6 +444,7 @@ FocusScope {
         columnWidthProvider: column => root.columnWidths[column] ?? 0
         T.ScrollBar.vertical: MeridianScrollBar {}
         T.ScrollBar.horizontal: MeridianScrollBar {}
+        MeridianWheelScroll { flickable: table; lineHeight: root.rowHeight }
 
         // The tree takes keyboard focus when the window opens.
         Component.onCompleted: forceActiveFocus()

@@ -44,6 +44,7 @@ Column {
         color: Theme.colors.paneAlt
         Flickable {
             id: previewScroll
+            MeridianWheelScroll { flickable: previewScroll }
             anchors.fill: parent
             anchors.margins: Theme.space.s3
             clip: true

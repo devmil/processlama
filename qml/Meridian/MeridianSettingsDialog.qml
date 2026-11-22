@@ -104,6 +104,7 @@ T.Dialog {
             color: Theme.colors.ground
             ListView {
                 id: list
+                MeridianWheelScroll { flickable: list }
                 anchors.fill: parent
                 anchors.margins: Theme.space.s3
                 model: control.pages
@@ -133,6 +134,7 @@ T.Dialog {
 
         Flickable {
             id: body
+            MeridianWheelScroll { flickable: body }
             readonly property real topEdge: control.paged ? pagePicker.y + pagePicker.height : topRule.y + 1
             x: control.paged ? 0 : pageList.width
             y: topEdge

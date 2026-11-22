@@ -91,6 +91,7 @@ MeridianIsland {
     // Pinned processes as chips above the table.
     ListView {
         id: pinnedStrip
+        MeridianWheelScroll { flickable: pinnedStrip }
         visible: !island.empty && island.pinned.length > 0
         y: focusBar.height
         width: parent.width

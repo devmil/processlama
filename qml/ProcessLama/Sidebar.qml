@@ -29,6 +29,7 @@ Item {
 
     Flickable {
         id: scroller
+        MeridianWheelScroll { flickable: scroller }
         anchors.top: parent.top
         anchors.bottom: brand.top
         width: parent.width

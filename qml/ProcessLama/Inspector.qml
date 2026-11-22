@@ -144,6 +144,7 @@ MeridianIsland {
 
     Flickable {
         id: page
+        MeridianWheelScroll { flickable: page }
         visible: inspector.hasProcess
         anchors.top: snapshotBanner.bottom
         anchors.bottom: parent.bottom

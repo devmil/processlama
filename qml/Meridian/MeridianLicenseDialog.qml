@@ -151,6 +151,7 @@ T.Dialog {
             }
             ListView {
                 id: packageList
+                MeridianWheelScroll { flickable: packageList }
                 y: filter.y + filter.height + Theme.space.s2
                 width: parent.width
                 height: parent.height - y
@@ -188,6 +189,7 @@ T.Dialog {
 
         Flickable {
             id: licenseText
+            MeridianWheelScroll { flickable: licenseText }
             visible: !control.paged || control.showingPackage
             x: control.paged ? 0 : list.width
             y: rule.y + 1

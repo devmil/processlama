@@ -69,4 +69,5 @@ MeridianDisclosure 1.0 MeridianDisclosure.qml
 MeridianSettingsDialog 1.0 MeridianSettingsDialog.qml
 MeridianTabStrip 1.0 MeridianTabStrip.qml
 MeridianScrollBar 1.0 MeridianScrollBar.qml
+MeridianWheelScroll 1.0 MeridianWheelScroll.qml
 MeridianLicenseDialog 1.0 MeridianLicenseDialog.qml

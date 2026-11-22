@@ -69,6 +69,8 @@ T.Menu {
     }
 
     contentItem: ListView {
+        id: menuList
+        MeridianWheelScroll { flickable: menuList }
         focus: true
         Accessible.role: Accessible.PopupMenu
         implicitHeight: contentHeight
