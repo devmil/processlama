@@ -25177,7 +25177,7 @@ DEALINGS IN THE SOFTWARE.
 ## processtree 0.1.0
 
 Declared license: `MIT`  
-Source: `git+https://github.com/devmil/processtree-rust.git?rev=fa710ffa9e2344d8bf27c97f7ffa5cfd57355f00#fa710ffa9e2344d8bf27c97f7ffa5cfd57355f00`
+Source: `git+https://github.com/devmil/processtree-rust.git?rev=b73ed8b4d8a083b2d8c1a29056ec19c10dfa8281#b73ed8b4d8a083b2d8c1a29056ec19c10dfa8281`
 
 ### LICENSE
 
