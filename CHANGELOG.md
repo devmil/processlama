@@ -210,6 +210,8 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
 
 ## [Unreleased Beta]
 
+## [2.0.0-beta.2] - 2026-11-24
+
 ### Changed
 
 - Save battery in the background: while another window has the focus, ProcessLama samples every 5 s (or at the polling interval when it is slower), and every 10 s while it is minimized or hidden; regaining the focus samples at once. Background remote tabs follow the same floor, and the Linux network service check runs every 30 s instead of 3 s. Preferences › Process tree › In the background turns this off. The inspector now fetches process detail (open files, sockets, threads, security) only while its Details, Threads or Files & Sockets page is shown, not every 2 s on Overview and Network. In our offscreen Linux measurement at the default 1 s interval, ProcessLama used about 7.5% of one core while focused, 2.4% while unfocused and 1.4% while minimized.
@@ -678,6 +680,6 @@ All notable changes to ProcessLama, formerly Mimameidr are documented here.
   sparklines.
 
 
-[Unreleased Stable]: https://github.com/devmil/processlama/compare/v2.0.0-beta.1-46...HEAD
-[Unreleased Beta]: https://github.com/devmil/processlama/compare/v2.0.0-beta.1-46...HEAD
-[2.0.0-beta.1]: https://github.com/devmil/processlama/releases/tag/v2.0.0-beta.1-46
+[Unreleased Stable]: https://github.com/devmil/processlama/compare/v2.0.0-beta.2-47...HEAD
+[Unreleased Beta]: https://github.com/devmil/processlama/compare/v2.0.0-beta.2-47...HEAD
+[2.0.0-beta.2]: https://github.com/devmil/processlama/releases/tag/v2.0.0-beta.2-47

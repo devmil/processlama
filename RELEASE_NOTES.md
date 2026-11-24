@@ -151,6 +151,8 @@
 
 ## [Unreleased Beta]
 
+## [2.0.0-beta.2] - 2026-11-24
+
 ### Changed
 
 - ProcessLama uses much less battery while you work in another window: it refreshes every 5 seconds while unfocused and every 10 seconds while minimized, and catches up as soon as you return. Turn this off in Preferences › Process tree if you watch processes on a second screen.
