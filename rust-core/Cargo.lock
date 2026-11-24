@@ -1182,7 +1182,7 @@ dependencies = [
 [[package]]
 name = "processtree"
 version = "0.1.0"
-source = "git+https://github.com/devmil/processtree-rust.git?rev=b73ed8b4d8a083b2d8c1a29056ec19c10dfa8281#b73ed8b4d8a083b2d8c1a29056ec19c10dfa8281"
+source = "git+https://github.com/devmil/processtree-rust.git?rev=25a3e0e1226e278d0f7e6ce8a97324764b553f8a#25a3e0e1226e278d0f7e6ce8a97324764b553f8a"
 dependencies = [
  "core-foundation",
  "libc",
