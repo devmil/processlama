@@ -102,6 +102,9 @@ pub enum Command {
     SetModalOverlayOpen(bool),
     MarkTreeInteraction,
     SetWindowResizing(bool),
+    SetWindowActivity(crate::session::WindowActivity),
+    /// Whether the inspector shows a page that reads process detail.
+    SetInspectorDetailVisible(bool),
     ToggleFrozen,
     ShowPort(u16),
     SendSignal(ProcessIdentity, ProcessSignal),
@@ -110,17 +113,27 @@ pub enum Command {
     TakeSnapshot,
     OpenSnapshot(String),
     ShowLive,
-    ExportSnapshot { path: String, target: String },
-    RenameSnapshot { path: String, name: String },
+    ExportSnapshot {
+        path: String,
+        target: String,
+    },
+    RenameSnapshot {
+        path: String,
+        name: String,
+    },
     DeleteSnapshot(String),
     // Settings
     SetPollingInterval(u32),
     SetRememberTreeExpansion(bool),
+    SetReduceBackgroundRefresh(bool),
     SaveCurrentFilter,
     ApplySavedFilter(String),
     RemoveSavedFilter(String),
     SetVisibleColumns(Vec<String>),
-    SetColumnWidth { column: String, width: f64 },
+    SetColumnWidth {
+        column: String,
+        width: f64,
+    },
     ResetColumnWidth(String),
     SetInspectorWidth(f64),
     ResetInspectorWidth,
@@ -132,9 +145,14 @@ pub enum Command {
     // Tabs
     ActivateTab(TabKey),
     ActivateTabIndex(usize),
-    CycleTabs { backwards: bool },
+    CycleTabs {
+        backwards: bool,
+    },
     CloseTab(TabKey),
-    MoveTab { from: usize, to: usize },
+    MoveTab {
+        from: usize,
+        to: usize,
+    },
     // Remote hosts
     Remote(crate::remote::RemoteCommand),
     SetDefaultBackgroundRefresh(BackgroundRefreshMode),

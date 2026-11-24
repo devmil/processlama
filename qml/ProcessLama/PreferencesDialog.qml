@@ -92,6 +92,16 @@ MeridianSettingsDialog {
         }
         MeridianSettingsRow {
             width: parent.width
+            label: L10n.t("backgroundRefresh")
+            MeridianSwitch {
+                text: L10n.t("reduceBackgroundRefresh")
+                description: L10n.t("reduceBackgroundRefreshDescription")
+                checked: dialog.settings.reduceBackgroundRefresh ?? true
+                onToggled: dialog.app.setReduceBackgroundRefresh(checked)
+            }
+        }
+        MeridianSettingsRow {
+            width: parent.width
             label: L10n.t("tree")
             MeridianSwitch {
                 text: L10n.t("rememberTreeExpansion")

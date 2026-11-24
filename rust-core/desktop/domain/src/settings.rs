@@ -266,6 +266,9 @@ pub const SUPPORTED_LANGUAGES: [&str; 2] = ["en", "de"];
 pub struct AppSettings {
     pub polling_interval_ms: u32,
     pub remember_tree_expansion: bool,
+    /// Refresh less often while another window has the focus or the window
+    /// is minimized.
+    pub reduce_background_refresh: bool,
     pub saved_filters: Vec<String>,
     pub visible_columns: Vec<String>,
     pub column_widths: BTreeMap<String, f64>,
@@ -284,6 +287,7 @@ impl Default for AppSettings {
         Self {
             polling_interval_ms: DEFAULT_POLLING_INTERVAL_MS,
             remember_tree_expansion: true,
+            reduce_background_refresh: true,
             saved_filters: Vec::new(),
             visible_columns: default_visible_columns(),
             column_widths: BTreeMap::new(),
@@ -304,6 +308,7 @@ impl AppSettings {
         json!({
             "polling_interval_ms": self.polling_interval_ms,
             "remember_tree_expansion": self.remember_tree_expansion,
+            "reduce_background_refresh": self.reduce_background_refresh,
             "saved_filters": self.saved_filters,
             "visible_columns": self.visible_columns,
             "column_widths": self.column_widths,
@@ -329,6 +334,12 @@ impl AppSettings {
         }
         if let Some(v) = map.get("remember_tree_expansion").and_then(Value::as_bool) {
             settings.remember_tree_expansion = v;
+        }
+        if let Some(v) = map
+            .get("reduce_background_refresh")
+            .and_then(Value::as_bool)
+        {
+            settings.reduce_background_refresh = v;
         }
         if let Some(v) = map.get("saved_filters").and_then(Value::as_array) {
             settings.saved_filters = v
@@ -424,8 +435,15 @@ mod tests {
         settings.column_widths.insert("pid".into(), 99.0);
         settings.saved_filters = vec!["all:foo".into()];
         settings.release_channel = ReleaseChannel::Beta;
+        settings.reduce_background_refresh = false;
         let back = AppSettings::from_json(&settings.to_json(), &AppSettings::default());
         assert_eq!(back, settings);
+    }
+
+    #[test]
+    fn stored_settings_without_the_energy_setting_save_energy() {
+        let settings = AppSettings::from_json(&json!({}), &AppSettings::default());
+        assert!(settings.reduce_background_refresh);
     }
 
     #[test]

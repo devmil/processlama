@@ -496,6 +496,19 @@
     "description": "Setting label for remembering tree expansion state."
   },
 
+  "reduceBackgroundRefresh": "Save energy in the background",
+  "@reduceBackgroundRefresh": {
+    "description": "Setting label: refresh less often while the window is not focused."
+  },
+  "reduceBackgroundRefreshDescription": "Refreshes every 5 s while another window has the focus and every 10 s while ProcessLama is minimized.",
+  "@reduceBackgroundRefreshDescription": {
+    "description": "Explains the background refresh setting."
+  },
+  "backgroundRefresh": "In the background",
+  "@backgroundRefresh": {
+    "description": "Settings row label for behavior while the window is not focused."
+  },
+
   "rowHeatmap": "CPU row heatmap",
   "@rowHeatmap": {
     "description": "Setting label for subtle CPU-tinted process rows."

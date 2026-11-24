@@ -99,6 +99,11 @@ pub struct ProcessSession {
     initialized: bool,
     disposed: bool,
     polling_interval_ms: u32,
+    window_activity: WindowActivity,
+    /// Whether an unfocused or hidden window slows refreshes down.
+    reduce_background_refresh: bool,
+    /// Whether the inspector shows a page that reads the selection's detail.
+    detail_visible: bool,
 
     filter: String,
     search_options: SearchOptions,
@@ -160,6 +165,9 @@ impl ProcessSession {
             initialized: false,
             disposed: false,
             polling_interval_ms: processlama_domain::DEFAULT_POLLING_INTERVAL_MS,
+            window_activity: WindowActivity::Focused,
+            reduce_background_refresh: true,
+            detail_visible: true,
             filter: String::new(),
             search_options: SearchOptions::default(),
             chosen_aspect: SearchAspect::All,
@@ -292,6 +300,45 @@ impl ProcessSession {
         self.configure_detail_timer(now);
     }
 
+    /// Records whether the window is focused, merely visible, or hidden.
+    /// Regaining the focus samples at once instead of waiting out the slow
+    /// interval.
+    pub fn set_window_activity(&mut self, activity: WindowActivity, now: u64) {
+        if self.window_activity == activity || self.disposed {
+            return;
+        }
+        let was_throttled = self.refresh_floor_ms().is_some();
+        self.window_activity = activity;
+        self.configure_cadence();
+        self.configure_detail_timer(now);
+        if was_throttled && self.refresh_floor_ms().is_none() && self.active {
+            self.refresh();
+            self.refresh_inspector_detail();
+        }
+    }
+
+    /// Records whether the inspector shows a page that needs process detail.
+    /// Detail is fetched only while one does.
+    pub fn set_detail_visible(&mut self, visible: bool, now: u64) {
+        if self.detail_visible == visible || self.disposed {
+            return;
+        }
+        self.detail_visible = visible;
+        self.configure_detail_timer(now);
+        if visible && self.active {
+            self.refresh_inspector_detail();
+        }
+    }
+
+    /// The slowest refresh the window currently allows, or None.
+    fn refresh_floor_ms(&self) -> Option<u32> {
+        if self.reduce_background_refresh {
+            self.window_activity.refresh_floor_ms()
+        } else {
+            None
+        }
+    }
+
     pub fn set_background_cadence(&mut self, cadence: Cadence) {
         if self.background_cadence == cadence {
             return;
@@ -333,6 +380,7 @@ impl ProcessSession {
         self.sort_direction = settings.process_sort_direction;
         self.tree_search_columns = visible_search_columns(&settings.visible_columns);
         self.polling_interval_ms = settings.polling_interval_ms;
+        self.reduce_background_refresh = settings.reduce_background_refresh;
         self.configure_cadence();
         self.configure_detail_timer(now);
     }
@@ -346,7 +394,8 @@ impl ProcessSession {
     }
 
     /// Selects the source cadence: paused for a loaded snapshot or while the
-    /// window resizes, live while visible, background while hidden.
+    /// window resizes, live while the tab shows, background while another tab
+    /// does. An unfocused or hidden window slows either down to its floor.
     fn configure_cadence(&mut self) {
         if self.disposed || !self.initialized {
             return;
@@ -354,11 +403,27 @@ impl ProcessSession {
         let cadence = if self.loaded_snapshot_path.is_some() || self.window_resizing {
             Cadence::Paused
         } else if self.active {
-            Cadence::Live(self.polling_interval_ms)
+            match self.refresh_floor_ms() {
+                Some(floor) => Cadence::Background(self.polling_interval_ms.max(floor)),
+                None => Cadence::Live(self.polling_interval_ms),
+            }
         } else {
-            self.background_cadence
+            match (self.background_cadence, self.refresh_floor_ms()) {
+                (Cadence::Live(ms) | Cadence::Background(ms), Some(floor)) => {
+                    Cadence::Background(ms.max(floor))
+                }
+                (cadence, _) => cadence,
+            }
         };
         self.source.set_cadence(cadence, self.polling_interval_ms);
+    }
+
+    /// How often the inspector refreshes the selection's detail.
+    fn detail_interval_ms(&self) -> u64 {
+        self.refresh_floor_ms()
+            .map_or(INSPECTOR_DETAIL_INTERVAL_MS, |floor| {
+                INSPECTOR_DETAIL_INTERVAL_MS.max(u64::from(floor))
+            })
     }
 
     fn configure_detail_timer(&mut self, now: u64) {
@@ -366,10 +431,11 @@ impl ProcessSession {
             || !self.initialized
             || self.loaded_snapshot_path.is_some()
             || !self.active
+            || !self.detail_visible
         {
             None
         } else {
-            Some(now + INSPECTOR_DETAIL_INTERVAL_MS)
+            Some(now + self.detail_interval_ms())
         };
     }
 
@@ -387,7 +453,7 @@ impl ProcessSession {
             self.publish_tree(true, false, now);
         }
         if self.next_detail_refresh.is_some_and(|at| at <= now) {
-            self.next_detail_refresh = Some(now + INSPECTOR_DETAIL_INTERVAL_MS);
+            self.next_detail_refresh = Some(now + self.detail_interval_ms());
             self.refresh_inspector_detail();
         }
     }
@@ -784,7 +850,7 @@ impl ProcessSession {
     }
 
     fn refresh_inspector_detail(&mut self) {
-        if self.loaded_snapshot_path.is_some() {
+        if self.loaded_snapshot_path.is_some() || !self.detail_visible {
             return;
         }
         let Some(identity) = self.selected else {

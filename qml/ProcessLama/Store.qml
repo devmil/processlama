@@ -14,6 +14,10 @@ QtObject {
     property bool inspectorOpen: true
     /// The inspector's tab: overview, details, network, threads, files.
     property int inspectorTab: 0
+    /// Whether the inspector shows a page that reads the selection's detail:
+    /// details, threads or files. The core fetches detail only then.
+    readonly property bool inspectorShowsDetail:
+        inspectorOpen && (inspectorTab === 1 || inspectorTab === 3 || inspectorTab === 4)
 
     /// Cmd/Ctrl+F: the tree island opens its search overlay.
     signal treeSearchRequested()

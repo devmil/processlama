@@ -5,7 +5,8 @@
 //! a borrowed bridge object.
 
 use processlama_application::{
-    Command, CoreEvent, EventSink, InstallChoice, ProfileDraft, RemoteCommand, diagnostics,
+    Command, CoreEvent, EventSink, InstallChoice, ProfileDraft, RemoteCommand, WindowActivity,
+    diagnostics,
 };
 use processlama_domain::{
     AppearanceMode, BackgroundRefreshMode, ProcessIdentity, ProcessSignal, ReleaseChannel,
@@ -298,6 +299,20 @@ mod app_state {
         fn set_window_resizing(&mut self, value: bool) {
             self.send(Command::SetWindowResizing(value));
         }
+        /// `focused`, `unfocused` or `hidden`.
+        #[qslot]
+        fn set_window_activity(&mut self, value: String) {
+            let activity = match value.as_str() {
+                "hidden" => WindowActivity::Hidden,
+                "unfocused" => WindowActivity::Unfocused,
+                _ => WindowActivity::Focused,
+            };
+            self.send(Command::SetWindowActivity(activity));
+        }
+        #[qslot]
+        fn set_inspector_detail_visible(&mut self, value: bool) {
+            self.send(Command::SetInspectorDetailVisible(value));
+        }
         #[qslot]
         fn toggle_frozen(&mut self) {
             self.send(Command::ToggleFrozen);
@@ -362,6 +377,10 @@ mod app_state {
         #[qslot]
         fn set_remember_tree_expansion(&mut self, value: bool) {
             self.send(Command::SetRememberTreeExpansion(value));
+        }
+        #[qslot]
+        fn set_reduce_background_refresh(&mut self, value: bool) {
+            self.send(Command::SetReduceBackgroundRefresh(value));
         }
         #[qslot]
         fn save_current_filter(&mut self) {

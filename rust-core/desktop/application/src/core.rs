@@ -11,7 +11,9 @@ use crate::ports::{
 };
 use crate::remote::RemoteHosts;
 use crate::remote_ports::{IconCache, RemoteConnector};
-use crate::session::{Cadence, DEFAULT_BACKGROUND_REFRESH_MS, ProcessSession, SourceState};
+use crate::session::{
+    Cadence, DEFAULT_BACKGROUND_REFRESH_MS, ProcessSession, SourceState, WindowActivity,
+};
 use processlama_domain::{
     AppSettings, CURRENT_SCHEMA_VERSION, HostCapabilities, HostOperatingSystem,
     MAX_INSPECTOR_WIDTH, MAX_POLLING_INTERVAL_MS, MIN_INSPECTOR_WIDTH, MIN_POLLING_INTERVAL_MS,
@@ -24,6 +26,8 @@ use std::sync::Arc;
 pub const SETTINGS_PERSIST_DEBOUNCE_MS: u64 = 400;
 /// How often the Linux network service availability is checked.
 pub const NETWORK_AVAILABILITY_INTERVAL_MS: u64 = 3000;
+/// How often it is checked while the window is unfocused or hidden.
+pub const BACKGROUND_NETWORK_AVAILABILITY_INTERVAL_MS: u64 = 30_000;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ToastTone {
@@ -160,6 +164,8 @@ pub struct AppCore {
     pub(crate) icons: IconService,
     pub(crate) network_available: bool,
     pub(crate) next_network_check: Option<u64>,
+    pub(crate) window_activity: WindowActivity,
+    pub(crate) inspector_detail_visible: bool,
     persist_at: Option<u64>,
     remote_writes_pending: usize,
     installing_update: bool,
@@ -185,6 +191,8 @@ impl AppCore {
             icons: IconService::default(),
             network_available: true,
             next_network_check: None,
+            window_activity: WindowActivity::Focused,
+            inspector_detail_visible: true,
             persist_at: None,
             remote_writes_pending: 0,
             ui_events: Vec::new(),
@@ -385,7 +393,7 @@ impl AppCore {
             self.save_settings_now();
         }
         if self.next_network_check.is_some_and(|at| at <= now) {
-            self.next_network_check = Some(now + NETWORK_AVAILABILITY_INTERVAL_MS);
+            self.next_network_check = Some(now + self.network_check_interval_ms());
             self.check_network_availability();
         }
         self.remote_on_time(now);
@@ -569,6 +577,13 @@ impl AppCore {
                     session.refresh();
                 }
             }
+            Command::SetWindowActivity(activity) => self.set_window_activity(activity, now),
+            Command::SetInspectorDetailVisible(visible) => {
+                self.inspector_detail_visible = visible;
+                for tab in &mut self.tabs {
+                    tab.session.set_detail_visible(visible, now);
+                }
+            }
             Command::ToggleFrozen => session.toggle_frozen(now),
             Command::ShowPort(port) => session.show_port(port, now),
             Command::Refresh => session.refresh(),
@@ -585,6 +600,9 @@ impl AppCore {
             }
             Command::SetRememberTreeExpansion(value) => {
                 self.change_settings(true, |settings| settings.remember_tree_expansion = value);
+            }
+            Command::SetReduceBackgroundRefresh(value) => {
+                self.change_settings(true, |settings| settings.reduce_background_refresh = value);
             }
             Command::SaveCurrentFilter => {
                 let session = &self.tabs[self.active].session;
@@ -1148,6 +1166,45 @@ impl AppCore {
             self.toast("updateInstallFailed", vec![error], ToastTone::Error);
         }
         self.emit(UiEvent::UpdateInstalled { ok });
+    }
+
+    /// Slows sampling and polling down while the window is unfocused or
+    /// hidden, and catches up when it regains the focus.
+    fn set_window_activity(&mut self, activity: WindowActivity, now: u64) {
+        if self.window_activity == activity {
+            return;
+        }
+        let was_focused = self.window_activity == WindowActivity::Focused;
+        self.window_activity = activity;
+        for tab in &mut self.tabs {
+            tab.session.set_window_activity(activity, now);
+        }
+        if self.next_network_check.is_some() {
+            if activity == WindowActivity::Focused && !was_focused {
+                self.check_network_availability();
+            }
+            self.next_network_check = Some(now + self.network_check_interval_ms());
+        }
+    }
+
+    pub fn window_activity(&self) -> WindowActivity {
+        self.window_activity
+    }
+
+    fn network_check_interval_ms(&self) -> u64 {
+        if self.window_activity == WindowActivity::Focused
+            || !self.settings.reduce_background_refresh
+        {
+            NETWORK_AVAILABILITY_INTERVAL_MS
+        } else {
+            BACKGROUND_NETWORK_AVAILABILITY_INTERVAL_MS
+        }
+    }
+
+    /// Applies the window's state to a session created after it changed.
+    pub(crate) fn adopt_window_state(&self, session: &mut ProcessSession, now: u64) {
+        session.set_window_activity(self.window_activity, now);
+        session.set_detail_visible(self.inspector_detail_visible, now);
     }
 
     fn check_network_availability(&self) {
