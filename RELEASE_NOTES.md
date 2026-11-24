@@ -4,6 +4,7 @@
 
 ### Changed
 
+- ProcessLama uses much less battery while you work in another window: it refreshes every 5 seconds while unfocused and every 10 seconds while minimized, and catches up as soon as you return. Turn this off in Preferences › Process tree if you watch processes on a second screen.
 - ProcessLama now runs on Rust and Qt instead of Flutter. It looks and works the same but uses noticeably less CPU while it watches your processes. Your settings, snapshots and remote hosts carry over.
 - Arch Linux and Omarchy users can install ProcessLama from a native package.
 - Resizing the window on Linux no longer shows black flashes or black edges.
@@ -147,6 +148,10 @@
   process tree.
 
 ## [Unreleased Beta]
+
+### Changed
+
+- ProcessLama uses much less battery while you work in another window: it refreshes every 5 seconds while unfocused and every 10 seconds while minimized, and catches up as soon as you return. Turn this off in Preferences › Process tree if you watch processes on a second screen.
 
 ## [2.0.0-beta.1] - 2026-11-22
 

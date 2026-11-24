@@ -27,6 +27,33 @@ impl Cadence {
 /// Background tabs refresh this often unless a profile overrides it.
 pub const DEFAULT_BACKGROUND_REFRESH_MS: u32 = 5000;
 
+/// While another window has the focus, sessions refresh at most this often.
+pub const UNFOCUSED_REFRESH_MS: u32 = 5000;
+/// While the window is minimized or hidden, sessions refresh at most this often.
+pub const HIDDEN_REFRESH_MS: u32 = 10_000;
+
+/// Whether the user can see, and works in, the window.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
+pub enum WindowActivity {
+    #[default]
+    Focused,
+    /// Visible while another window has the focus.
+    Unfocused,
+    /// Minimized or hidden.
+    Hidden,
+}
+
+impl WindowActivity {
+    /// The slowest refresh the window allows, or None for no limit.
+    pub const fn refresh_floor_ms(self) -> Option<u32> {
+        match self {
+            Self::Focused => None,
+            Self::Unfocused => Some(UNFOCUSED_REFRESH_MS),
+            Self::Hidden => Some(HIDDEN_REFRESH_MS),
+        }
+    }
+}
+
 /// Whether a source delivers current data.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub enum SourcePhase {

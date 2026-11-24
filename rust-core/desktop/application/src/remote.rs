@@ -491,6 +491,7 @@ impl AppCore {
         );
         let now = self.now();
         session.set_active(false, now);
+        self.adopt_window_state(&mut session, now);
         let settings = self.settings.clone();
         session.initialize(&settings, now);
         self.tabs.push(crate::core::Tab {

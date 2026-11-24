@@ -55,6 +55,8 @@ Window {
         Store.app = app
         Store.tree = treeModel
         Store.actions = actions
+        app.setWindowActivity(windowActivity)
+        app.setInspectorDetailVisible(inspectorDetailVisible)
         Theme.reducedMotion = hooks.reduceMotion()
         Theme.textScale = hooks.textScale()
         Qt.callLater(() => appWindow.hooks.configureWindow())
@@ -114,6 +116,15 @@ Window {
     }
 
     onClosing: app.flushSettings()
+
+    // Sampling slows down while another window has the focus or this one is
+    // minimized, and detail is fetched only for inspector pages that show it.
+    readonly property string windowActivity:
+        !visible || visibility === Window.Minimized || visibility === Window.Hidden ? "hidden"
+        : active ? "focused" : "unfocused"
+    readonly property bool inspectorDetailVisible: Store.inspectorShowsDetail
+    onWindowActivityChanged: if (Store.app) app.setWindowActivity(windowActivity)
+    onInspectorDetailVisibleChanged: if (Store.app) app.setInspectorDetailVisible(inspectorDetailVisible)
 
     // Resizing pauses sampling; the last resize event resumes it.
     onWidthChanged: _resized()

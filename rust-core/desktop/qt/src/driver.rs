@@ -296,6 +296,7 @@ fn settings_json(core: &AppCore) -> Value {
     json!({
         "pollingIntervalMs": settings.polling_interval_ms,
         "rememberTreeExpansion": settings.remember_tree_expansion,
+        "reduceBackgroundRefresh": settings.reduce_background_refresh,
         "savedFilters": settings.saved_filters,
         "visibleColumns": processlama_domain::normalized_visible_columns(&settings.visible_columns),
         "columnWidths": settings.column_widths,

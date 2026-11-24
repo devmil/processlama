@@ -354,3 +354,97 @@ fn hidden_and_resizing_sessions_change_cadence() {
     session.set_window_resizing(true);
     assert_eq!(calls.borrow().cadences.last(), Some(&Cadence::Paused));
 }
+
+#[test]
+fn an_unfocused_or_hidden_window_slows_sampling_down() {
+    let (mut session, calls) = session(HostOperatingSystem::Linux);
+    session.set_window_activity(WindowActivity::Unfocused, 0);
+    assert_eq!(
+        calls.borrow().cadences.last(),
+        Some(&Cadence::Background(UNFOCUSED_REFRESH_MS))
+    );
+    session.set_window_activity(WindowActivity::Hidden, 0);
+    assert_eq!(
+        calls.borrow().cadences.last(),
+        Some(&Cadence::Background(HIDDEN_REFRESH_MS))
+    );
+    let samples = calls.borrow().samples;
+    session.set_window_activity(WindowActivity::Focused, 0);
+    assert_eq!(calls.borrow().cadences.last(), Some(&Cadence::Live(1000)));
+    // Regaining the focus samples at once instead of after the slow interval.
+    assert_eq!(calls.borrow().samples, samples + 1);
+}
+
+#[test]
+fn a_slower_polling_interval_is_kept_while_unfocused() {
+    let (mut session, calls) = session(HostOperatingSystem::Linux);
+    let settings = AppSettings {
+        polling_interval_ms: 8000,
+        ..AppSettings::default()
+    };
+    session.on_settings_changed(&settings, 0);
+    session.set_window_activity(WindowActivity::Unfocused, 0);
+    assert_eq!(
+        calls.borrow().cadences.last(),
+        Some(&Cadence::Background(8000))
+    );
+}
+
+#[test]
+fn background_tabs_and_paused_tabs_respect_the_window_floor() {
+    let (mut session, calls) = session(HostOperatingSystem::Linux);
+    session.set_active(false, 0);
+    session.set_window_activity(WindowActivity::Hidden, 0);
+    assert_eq!(
+        calls.borrow().cadences.last(),
+        Some(&Cadence::Background(HIDDEN_REFRESH_MS))
+    );
+    session.set_background_cadence(Cadence::Paused);
+    assert_eq!(calls.borrow().cadences.last(), Some(&Cadence::Paused));
+}
+
+#[test]
+fn turning_the_setting_off_keeps_live_sampling_while_unfocused() {
+    let (mut session, calls) = session(HostOperatingSystem::Linux);
+    let settings = AppSettings {
+        reduce_background_refresh: false,
+        ..AppSettings::default()
+    };
+    session.on_settings_changed(&settings, 0);
+    session.set_window_activity(WindowActivity::Hidden, 0);
+    assert_eq!(calls.borrow().cadences.last(), Some(&Cadence::Live(1000)));
+    assert_eq!(session.next_deadline(), Some(INSPECTOR_DETAIL_INTERVAL_MS));
+}
+
+#[test]
+fn detail_is_fetched_only_while_an_inspector_page_shows_it() {
+    let (mut session, calls) = session(HostOperatingSystem::Linux);
+    session.on_sample(snapshot(basic()), 0);
+    session.set_detail_visible(false, 0);
+    assert_eq!(session.next_deadline(), None);
+    calls.borrow_mut().details.clear();
+    let daemon = id(&session, "daemon");
+    session.select_process(daemon, 1);
+    assert!(calls.borrow().details.is_empty());
+    session.on_time(10_000);
+    assert!(calls.borrow().details.is_empty());
+    session.set_detail_visible(true, 20);
+    assert_eq!(
+        calls.borrow().details.last().map(|(id, _)| *id),
+        Some(daemon)
+    );
+    assert_eq!(
+        session.next_deadline(),
+        Some(20 + INSPECTOR_DETAIL_INTERVAL_MS)
+    );
+}
+
+#[test]
+fn an_unfocused_window_refreshes_detail_at_the_slow_interval() {
+    let (mut session, _calls) = session(HostOperatingSystem::Linux);
+    session.set_window_activity(WindowActivity::Unfocused, 100);
+    assert_eq!(
+        session.next_deadline(),
+        Some(100 + u64::from(UNFOCUSED_REFRESH_MS))
+    );
+}
