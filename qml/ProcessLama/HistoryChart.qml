@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Window
 import Meridian
 
 // A history chart on a pane-alt inset: the metric's name and current value
@@ -121,7 +122,17 @@ Rectangle {
                 anchors.leftMargin: Theme.space.s3
                 anchors.right: parent.right
                 height: parent.height
-                readonly property real slotWidth: width / root.slots
+                // Bars sit on a pitch of whole device pixels, so every bar and
+                // every separator has the same width at any scale factor and
+                // any sub-pixel offset of the chart. The separator is one
+                // logical pixel; the remainder of the width stays empty on the
+                // left, and the newest bar ends flush with the right edge.
+                readonly property real dpr: Screen.devicePixelRatio > 0 ? Screen.devicePixelRatio : 1
+                readonly property int gapPx: Math.max(1, Math.round(dpr))
+                readonly property int pitchPx: Math.max(gapPx + 1, Math.floor(width * dpr / root.slots))
+                readonly property real pitch: pitchPx / dpr
+                readonly property real barWidth: (pitchPx - gapPx) / dpr
+                readonly property real origin: (Math.floor(width * dpr) - root.slots * pitchPx + gapPx) / dpr
                 readonly property real zeroY: root.diverging ? height / 2 : height
                 readonly property real span: root.diverging ? height / 2 : height
                 readonly property real effectiveMax: Math.max(0.1, root.scaleMax)
@@ -145,10 +156,7 @@ Rectangle {
                         readonly property int sample: index - root.leading
                         readonly property bool present: sample >= 0 && sample < root.sampleCount
                         readonly property bool latest: present && sample === root.highlighted
-                        // Bars fill their slots edge to edge on whole pixels, so
-                        // no uneven gaps appear between them.
-                        readonly property real x0: Math.round(index * chart.slotWidth)
-                        readonly property real x1: Math.round((index + 1) * chart.slotWidth)
+                        readonly property real x0: chart.origin + index * chart.pitch
                         readonly property real upper: present ? root.sampleAt(root.samples, sample) : NaN
                         readonly property real lower: present && root.diverging ? root.sampleAt(root.lowerSamples, sample) : NaN
                         readonly property real upperHeight: isFinite(upper) ? chart.span * Math.max(0, Math.min(1, upper / chart.effectiveMax)) : 0
@@ -157,7 +165,7 @@ Rectangle {
                             visible: bar.upperHeight > 0
                             x: bar.x0
                             y: chart.zeroY - bar.upperHeight
-                            width: Math.max(1, bar.x1 - bar.x0)
+                            width: chart.barWidth
                             height: bar.upperHeight
                             color: root.diverging
                                 ? (bar.latest ? AppTheme.chartUpper : Qt.alpha(AppTheme.chartUpper, AppTheme.chartHistoryOpacity))
@@ -167,7 +175,7 @@ Rectangle {
                             visible: root.diverging && bar.lowerHeight > 0
                             x: bar.x0
                             y: chart.zeroY
-                            width: Math.max(1, bar.x1 - bar.x0)
+                            width: chart.barWidth
                             height: bar.lowerHeight
                             color: bar.latest ? AppTheme.chartLower : Qt.alpha(AppTheme.chartLower, AppTheme.chartHistoryOpacity)
                         }
@@ -179,7 +187,7 @@ Rectangle {
                     onPointChanged: {
                         if (!hovered)
                             return
-                        const slot = Math.floor(point.position.x / chart.slotWidth)
+                        const slot = Math.floor((point.position.x - chart.origin) / chart.pitch)
                         const index = slot - root.leading
                         root.hovered = index >= 0 && index < root.sampleCount ? index : -1
                     }
@@ -189,7 +197,7 @@ Rectangle {
                 // The hovered value, kept inside the chart at both ends.
                 Rectangle {
                     visible: root.hovered >= 0 && root.hovered < root.sampleCount
-                    readonly property real center: (root.leading + root.hovered + 0.5) * chart.slotWidth
+                    readonly property real center: chart.origin + (root.leading + root.hovered) * chart.pitch + chart.barWidth / 2
                     x: Math.max(0, Math.min(chart.width - width, center - width / 2))
                     y: 0
                     width: hoverText.implicitWidth + 2 * Theme.space.s2

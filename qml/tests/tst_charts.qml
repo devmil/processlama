@@ -36,17 +36,23 @@ Item {
             compare(chart.highlighted, 2)
         }
 
-        function test_bars_touch_on_whole_pixels() {
+        function test_bars_and_separators_are_uniform_on_device_pixels() {
             chart.samples = [1, 5, 2, 8, 3, 7, 4, 6, 9, 2]
             const bars = findChild(chart, "bars")
             verify(bars)
-            for (let i = 0; i < bars.count; ++i) {
-                const bar = bars.itemAt(i)
-                compare(bar.x0, Math.round(bar.x0))
-                if (i + 1 < bars.count)
-                    compare(bars.itemAt(i + 1).x0, bar.x1, "gap after bar " + i)
-                verify(bar.x1 - bar.x0 >= 1)
-            }
+            const plot = bars.parent
+            const dpr = plot.dpr
+            verify(plot.barWidth > 0)
+            verify(plot.pitch > plot.barWidth)
+            // Whole device pixels: equal bars and equal separators everywhere.
+            compare(plot.pitch * dpr, Math.round(plot.pitch * dpr))
+            compare(plot.barWidth * dpr, Math.round(plot.barWidth * dpr))
+            for (let i = 0; i + 1 < bars.count; ++i)
+                fuzzyCompare(bars.itemAt(i + 1).x0 - bars.itemAt(i).x0, plot.pitch, 1e-9)
+            // The newest slot ends flush with the right edge.
+            const last = bars.itemAt(bars.count - 1)
+            fuzzyCompare((last.x0 + plot.barWidth) * dpr, Math.floor(plot.width * dpr), 1e-6)
+            verify(bars.itemAt(0).x0 >= 0)
         }
 
         function test_diverging_labels_rates() {
